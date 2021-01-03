@@ -2,6 +2,8 @@ import "@nomiclabs/hardhat-ethers";
 import {ethers} from 'hardhat';
 import * as fs from "fs";
 import * as path from "path";
+const Hash = require('ipfs-only-hash')
+
 
 export async function initTokens() {
   // find all svgs within "svg-in".
@@ -12,10 +14,14 @@ export async function initTokens() {
   // ./02-1.svg (default)
 
 
-  const tokenIds: Map<number, Map<number, string>> = new Map();
+  type FileMeta = {
+    imageData: string,
+    metadataHash: string
+  }
+  const tokenIds: Map<number, Map<number, FileMeta>> = new Map();
 
   const basePath = "./svg-in";
-  fs.readdirSync(basePath).forEach(file => {
+  for (const file of fs.readdirSync(basePath)) {
     const [filename] = file.split('.');
     const [tokenIdStr, stateNumStr] = filename.split('-');
     const tokenId = parseInt(tokenIdStr);
@@ -28,8 +34,30 @@ export async function initTokens() {
     if (tokenIds.get(tokenId)!.has(stateNum)) {
       throw new Error(`${file} results in a duplicate token/state record.`)
     }
-    tokenIds.get(tokenId)!.set(stateNum, fs.readFileSync(path.join(basePath, file)).toString());
-  });
+
+    const imageData = fs.readFileSync(path.join(basePath, file)).toString();
+    const imageDataHash = await ipfsHash(imageData);
+    const metadata = {
+      "name": `Mahin ${tokenId}`,
+      "description": "Part of the Mahin project, this is one of 24 NFTs raising breast cancer awareness.",
+      "image": `https://cloudflare-ipfs.com/ipfs/${imageDataHash}`,
+      "image_data": imageData,
+      "attributes": [
+        {
+          "kind": stateNum
+        }
+      ]
+    }
+    const metadataStr = JSON.stringify(metadata, null, 4);
+    const data: FileMeta = {
+      imageData,
+      metadataHash: await ipfsHash(metadataStr),
+    }
+    tokenIds.get(tokenId)!.set(stateNum, data);
+
+    // Write this file to the target directory
+    fs.writeFileSync(path.join(basePath, file) + ".json", metadataStr);
+  }
 
   // Validate all tokens have three states
   for (const values of tokenIds.values()) {
@@ -46,10 +74,13 @@ export async function initTokens() {
   for (const [tokenId, states] of tokenIds.entries()) {
     await nft.initToken(
         tokenId,
-        [states.get(0), states.get(1), states.get(2)],
-        []
+        [states.get(0)!.imageData, states.get(1)!.imageData, states.get(2)!.imageData],
+        [states.get(0)!.metadataHash, states.get(1)!.metadataHash, states.get(2)!.metadataHash]
     );
   }
+
+  await nft.mintToken(1, nft.address);
+  console.log(await nft.tokenURI(1));
 
   console.log("NFT deployed to:", nft.address);
 }
@@ -60,3 +91,9 @@ initTokens()
     console.error(error);
     process.exit(1);
   });
+
+
+async function ipfsHash(content: string): Promise<string> {
+  const data = Buffer.from(content)
+  return await Hash.of(data) as string;
+}
