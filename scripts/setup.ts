@@ -2,27 +2,36 @@ import "@nomiclabs/hardhat-ethers";
 import {ethers} from 'hardhat';
 import * as fs from "fs";
 import * as path from "path";
-const Hash = require('ipfs-only-hash')
+import {adjustStackTrace} from "hardhat/internal/hardhat-network/stack-traces/mapped-inlined-internal-functions-heuristics";
+const Hash = require('ipfs-only-hash');
 
+type FileMeta = {
+  imageData: string,
+  metadataHash: string
+}
+type TokenMap = Map<number, Map<number, FileMeta>>;
 
-export async function initTokens() {
-  // find all svgs within "svg-in".
-  // structure is:
-  // ./01-0.svg (default)
-  // ./01-1.svg (diagnosed)
-  // ./01-2.svg (post-op)
-  // ./02-1.svg (default)
+const PREPARED_DATA_DIR = path.join(__dirname, 'svgdata');
 
-
-  type FileMeta = {
-    imageData: string,
-    metadataHash: string
-  }
-  const tokenIds: Map<number, Map<number, FileMeta>> = new Map();
-
-  const basePath = "./svg-in";
+/**
+ * Takes an input directory of SVGs with this structure:
+ *
+ *   ./01-0.svg (default)
+ *   ./01-1.svg (diagnosed)
+ *   ./01-2.svg (post-op)
+ *   ./02-1.svg (default)
+ *   ...
+ *
+ * Will generate an output directory with every SVG compressed, and metadata
+ * JSON files generated.
+ */
+export async function processSVGs(indir: string) {
+  const basePath = indir;
   for (const file of fs.readdirSync(basePath)) {
-    const [filename] = file.split('.');
+    const [filename, ext] = getExt(file);
+    if (ext != 'svg') {
+      continue;
+    }
     const [tokenIdStr, stateNumStr] = filename.split('-');
     const tokenId = parseInt(tokenIdStr);
     const stateNum = parseInt(stateNumStr);
@@ -30,12 +39,10 @@ export async function initTokens() {
       throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
     }
 
-    if (!tokenIds.has(tokenId)) { tokenIds.set(tokenId, new Map()); }
-    if (tokenIds.get(tokenId)!.has(stateNum)) {
-      throw new Error(`${file} results in a duplicate token/state record.`)
-    }
-
+    // Read the SVG
     const imageData = fs.readFileSync(path.join(basePath, file)).toString();
+
+    // Create a metadata .json file
     const imageDataHash = await ipfsHash(imageData);
     const metadata = {
       "name": `Mahin ${tokenId}`,
@@ -48,15 +55,45 @@ export async function initTokens() {
         }
       ]
     }
+
     const metadataStr = JSON.stringify(metadata, null, 4);
+    fs.writeFileSync(path.join(PREPARED_DATA_DIR, file) + ".json", metadataStr);
+  }
+}
+
+async function loadTokens() {
+  const tokenIds: TokenMap = new Map();
+
+  const basePath = PREPARED_DATA_DIR;
+  for (const file of fs.readdirSync(basePath)) {
+    const [filename, ext] = getExt(file);
+    if (ext != 'svg') {
+      continue;
+    }
+    const [tokenIdStr, stateNumStr] = filename.split('-');
+    const tokenId = parseInt(tokenIdStr);
+    const stateNum = parseInt(stateNumStr);
+    if (Number.isNaN(tokenId) || Number.isNaN(stateNum)) {
+      throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
+    }
+
+    if (!tokenIds.has(tokenId)) {
+      tokenIds.set(tokenId, new Map());
+    }
+    if (tokenIds.get(tokenId)!.has(stateNum)) {
+      throw new Error(`${file} results in a duplicate token/state record.`)
+    }
+
+    // Read the SVG
+    const imageData = fs.readFileSync(path.join(basePath, file)).toString();
+    const metadataStr = fs.readFileSync(path.join(basePath, file) + ".json").toString();
+    const imageDataHash = await ipfsHash(imageData);
+
     const data: FileMeta = {
       imageData,
       metadataHash: await ipfsHash(metadataStr),
     }
     tokenIds.get(tokenId)!.set(stateNum, data);
-
-    // Write this file to the target directory
-    fs.writeFileSync(path.join(basePath, file) + ".json", metadataStr);
   }
 
   // Validate all tokens have three states
@@ -67,33 +104,55 @@ export async function initTokens() {
     }
   }
 
-  const MahinNFT = await ethers.getContractFactory("MahinNFT");
-  const nft = await MahinNFT.deploy();
-  await nft.deployed();
+  return tokenIds;
+}
+
+/**
+ * Will sync all SVGs to IPFS and Arweave.
+ */
+export async function syncSVGs() {
+  // TODO
+}
+
+/**
+ * Will initialize all the tokens - meaning save their IPFS hashes and contents on chain.
+ */
+export async function initTokens(contractAddress: string) {
+  const nft = await getContract(contractAddress);
+
+  const tokenIds = await loadTokens();
 
   for (const [tokenId, states] of tokenIds.entries()) {
     await nft.initToken(
         tokenId,
         [states.get(0)!.imageData, states.get(1)!.imageData, states.get(2)!.imageData],
-        [states.get(0)!.metadataHash, states.get(1)!.metadataHash, states.get(2)!.metadataHash]
+        [states.get(0)!.metadataHash, states.get(1)!.metadataHash, states.get(2)!.metadataHash],
+        {
+          gasLimit: 9500000
+        }
     );
   }
-
-  await nft.mintToken(1, nft.address);
-  console.log(await nft.tokenURI(1));
-
-  console.log("NFT deployed to:", nft.address);
 }
 
-initTokens()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error);
-    process.exit(1);
-  });
+function getExt(s: string) {
+  const re = /(?:\.([^.]+))?$/;
+  const result = re.exec(s);
+  if (!result) {
+    return [s, ""];
+  }
+  return [s.slice(1, s.length-result[1].length), result[1]];
+}
 
 
 async function ipfsHash(content: string): Promise<string> {
   const data = Buffer.from(content)
   return await Hash.of(data) as string;
+}
+
+export async function getContract(address: string) {
+  const {ethers} = await import('hardhat');
+  const Abi = (await import("../artifacts/contracts/MahinNFT.sol/MahinNFT.json")).abi;
+  const [signer] = await ethers.getSigners();
+
+  return new ethers.Contract(address, Abi, signer);
 }
