@@ -23,8 +23,8 @@ contract CurveSeller {
 
     MahinNFT public nftContract;
 
-    constructor () {
-        nftContract = new MahinNFT();
+    constructor (address mahinAddress) {
+        nftContract = MahinNFT(mahinAddress);
     }
 
     function purchase() public virtual payable returns (uint256 _tokenId) {
