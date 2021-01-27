@@ -6,6 +6,7 @@ pragma experimental ABIEncoderV2;
 import "hardhat/console.sol";
 import "./ERC721.sol";
 import "openzeppelin-solidity/contracts/access/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "./ABDKMath64x64.sol";
 import "./Roles.sol";
 
@@ -32,8 +33,6 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Roles {
     uint8 currentState;
   }
 
-  // TODO: withdraw functions
-
   uint public constant MAX_TOKENS = 24;
 
   uint public constant projectRuntimeSeconds = 365 days * 5;   // Runs for 5 years
@@ -49,6 +48,16 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Roles {
 
   constructor() {
     lastRollTime = uint32(block.timestamp);
+  }
+
+  function withdraw() public onlyOwner {
+    address payable owner = payable(owner());
+    owner.transfer(address(this).balance);
+  }
+
+  function withdrawToken(address tokenAddress) public onlyOwner {
+    IERC20 token = IERC20(tokenAddress);
+    token.transfer(owner(), token.balanceOf(address(this)));
   }
 
   // Returns the current SVG of the piece.
@@ -74,7 +83,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Roles {
   function mintToken(uint256 tokenId, address firstOwner) public onlyMinterOrOwner {
     require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
     require(pieces[tokenId].states.length > 0, "invalid id");
-    
+
     if (!_exists(tokenId)) {
       _mint(firstOwner, tokenId);
     }
