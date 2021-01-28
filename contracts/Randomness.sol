@@ -8,6 +8,14 @@ import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
 
 abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
 
+    // Configuration Chainlink VRF
+    struct VRFConfig {
+        address coordinator;
+        address token;
+        bytes32 keyHash;
+        uint256 price;
+    }
+
     event RollInProgress(
         int128 probability
     );
@@ -26,8 +34,13 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
 
     bytes32 chainlinkRequestId = 0;
     uint256 chainlinkRandomNumber = 0;
-    bytes32 internal chainlinkKeyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-    uint256 internal chainlinkFee = 0.1 * 10 ** 18; // 0.1 LINK;
+    bytes32 internal chainlinkKeyHash;
+    uint256 internal chainlinkFee;
+
+    constructor(VRFConfig memory config) ChainlinkVRF(config.coordinator, config.token) {
+        chainlinkFee = config.price;
+        chainlinkKeyHash = config.keyHash;
+    }
 
     // Will return the probability of a (non-)diagnosis for an individual NFT, assuming the roll will happen at
     // `timestamp`. This will be based on the last time a roll happened, targeting a certain total probability
@@ -200,7 +213,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
         emit RollComplete();
     }
 
-    function isRolling() public returns (bool) {
+    function isRolling() public view returns (bool) {
         return (randomSeedBlock > 0) || (chainlinkRequestId > 0);
     }
 

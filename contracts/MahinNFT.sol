@@ -26,20 +26,11 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles {
     uint8 currentState;
   }
 
-  struct LinkVrfConfig {
-    address coordinator;
-    address token;
-    address keyHash;
-    uint256 price;
-  }
-
   uint public constant MAX_TOKENS = 24;
 
   mapping(uint256 => Piece) pieces;
 
-  LinkVrfConfig vrfConfig;
-
-  constructor(address vrfCoordinator, address linkToken) ChainlinkVRF(vrfCoordinator, linkToken) {
+  constructor(VRFConfig memory vrfConfig) Randomness(vrfConfig) {
     lastRollTime = uint32(block.timestamp);
   }
 
