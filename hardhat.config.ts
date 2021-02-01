@@ -2,8 +2,9 @@ import {task} from "hardhat/config";
 require("@nomiclabs/hardhat-waffle");
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
-import {getContract} from "./scripts/setup";
-
+import {getNFTContract} from "./scripts/setup";
+import {compilerOutput as LinkToken} from "@chainlink/contracts/abi/v0.7/LinkTokenInterface.json";
+import { Contract } from "ethers";
 
 task("accounts", "Prints the list of accounts", async () => {
   const {ethers} = await import('hardhat');
@@ -14,13 +15,59 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 
+
+const Configs = {
+  rinkeby: {
+    chainlink: {
+      'coordinator': '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B',
+      'token': '0x01be23585060835e02b77ef475b0cc51aa1e0709',
+      'keyHash': '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311',
+      'price': '100000000000000000',
+    }
+  }
+}
+
 task("deploy", "Deploy the contract", async () => {
-  const {ethers} = await import('hardhat');
-  const MahinNFT = await ethers.getContractFactory("MahinNFT");
-  const nft = await MahinNFT.deploy();
-  await nft.deployed();
-  console.log("NFT deployed to:", nft.address);
-  console.log(`Verify with: npx hardhat verify --network ... ${nft.address}`);
+  const {ethers, run} = await import('hardhat');
+
+  let sourceCodeSubmitters: any[] = [];
+  async function deployContract(name, args) {
+    console.log(`Deploying ${name}...`);
+    const Class = await ethers.getContractFactory(name);
+    const contract = await Class.deploy(...args);
+    console.log('  ...[waiting to mine]')
+    await contract.deployed();
+
+    sourceCodeSubmitters.push(async () => {
+      console.log(`  ...[${name}]`)
+      await run("verify:verify", {
+        address: contract.address,
+        constructorArguments: args
+      });
+    })
+
+    return contract;
+  }
+
+  const nft = await deployContract('MahinNFT', [Configs.rinkeby.chainlink]);
+  const curve = await deployContract("CurveSeller", [nft.address]);
+  console.log("ERC721 deployed to:", nft.address);
+  console.log("Curve deployed to:", curve.address);
+
+  console.log("Making Cure the minter");
+  await (await nft.setMinter(curve.address)).wait();
+
+  console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
+  await new Promise(resolve => {
+    setTimeout(resolve, 60*1000);
+  });
+  for (const submitter of sourceCodeSubmitters) {
+    try {
+      await submitter();
+    } catch (e) {
+      console.log("Error submitting validation", e)
+    }
+  }
 });
 
 task("prepare", "Optimize SVGs and prepare metadata JSON files")
@@ -53,7 +100,7 @@ task("mint-token", "Mint a token for test purposes")
     const {ethers} = await import('hardhat');
     const [signer] = await ethers.getSigners();
 
-    const nft = await getContract(taskArgs.contract);
+    const nft = await getNFTContract(taskArgs.contract);
     await nft.mintToken(1, signer.address);
     console.log(`Minted token ${1} with url=${await nft.tokenURI(1)}`);
   });
