@@ -133,7 +133,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
   }, [updateBusterRef]);
 
   const activate = useCallback(
-      async (connector: AbstractConnector): Promise<boolean> => {
+      async (connector: AbstractConnector): Promise<void> => {
         const updateBusterInitial = updateBusterRef.current
 
         let activated = false
@@ -148,7 +148,6 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
             throw new StaleConnectorError()
           }
           dispatch({ type: ActionType.CONNECTOR_ACTIVATION_SUCCESS, payload: { connector, ...augmentedUpdate } })
-          return true;
         } catch (error) {
           if (error instanceof StaleConnectorError) {
             activated && connector.deactivate()
