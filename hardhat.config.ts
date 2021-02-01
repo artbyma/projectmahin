@@ -23,7 +23,7 @@ task("deploy", "Deploy the contract", async () => {
   console.log(`Verify with: npx hardhat verify --network ... ${nft.address}`);
 });
 
-task("prepare-svgs", "Optimize SVGs and prepare metadata JSON files")
+task("prepare", "Optimize SVGs and prepare metadata JSON files")
     .addParam("directory", "Input directory of SVG files")
     .setAction(async (taskArgs) => {
       const {processSVGs} = await import('./scripts/setup');

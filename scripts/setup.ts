@@ -2,16 +2,17 @@ import "@nomiclabs/hardhat-ethers";
 import {ethers} from 'hardhat';
 import * as fs from "fs";
 import * as path from "path";
-import {adjustStackTrace} from "hardhat/internal/hardhat-network/stack-traces/mapped-inlined-internal-functions-heuristics";
+import SVGO from 'svgo';
 const Hash = require('ipfs-only-hash');
+const svg2img = require('svg2img');
 
 type FileMeta = {
-  imageData: string,
+  svgData: string,
   metadataHash: string
 }
 type TokenMap = Map<number, Map<number, FileMeta>>;
 
-const PREPARED_DATA_DIR = path.join(__dirname, 'svgdata');
+const PREPARED_DATA_DIR = path.join(__dirname, '..', 'svgdata');
 
 /**
  * Takes an input directory of SVGs with this structure:
@@ -39,11 +40,23 @@ export async function processSVGs(indir: string) {
       throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
     }
 
+    const baseName = `${tokenId.toString().padStart(2, "0")}-${stateNum}`;
+
     // Read the SVG
     const imageData = fs.readFileSync(path.join(basePath, file)).toString();
+    const compressedImage = await compressSvg(imageData);
+    fs.writeFileSync(path.join(PREPARED_DATA_DIR, file), compressedImage);
+
+    // Generate a png
+    const buffer: any = await new Promise((resolve) => {
+      svg2img(compressedImage, {'width': 1200, 'height': 1200}, function(error, buffer) {
+        resolve(buffer);
+      });
+    })
+    fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + '.png', buffer);
 
     // Create a metadata .json file
-    const imageDataHash = await ipfsHash(imageData);
+    const imageDataHash = await ipfsHash(compressedImage);
     const metadata = {
       "name": `Mahin ${tokenId}`,
       "description": "Part of the Mahin project, this is one of 24 NFTs raising breast cancer awareness.",
@@ -57,8 +70,59 @@ export async function processSVGs(indir: string) {
     }
 
     const metadataStr = JSON.stringify(metadata, null, 4);
-    fs.writeFileSync(path.join(PREPARED_DATA_DIR, file) + ".json", metadataStr);
+    fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + ".json", metadataStr);
   }
+}
+
+async function compressSvg(data: string) {
+  const svgo = new SVGO({
+    plugins: [
+        {cleanupAttrs: true},
+        {inlineStyles: true},
+        {removeDoctype: true},
+        {removeXMLProcInst: true},
+        {removeComments: true},
+        {removeMetadata: true},
+        {removeTitle: true},
+        {removeDesc: true},
+        {removeUselessDefs: true},
+        {removeXMLNS: true},
+        {removeEditorsNSData: true},
+        {removeEmptyAttrs: true},
+        {removeHiddenElems: true},
+        {removeEmptyText: true},
+        {removeEmptyContainers: true},
+        {removeViewBox: true},
+        {cleanupEnableBackground: true},
+        {minifyStyles: true},
+        {convertStyleToAttrs: true},
+        {convertColors: true},
+        {convertPathData: {floatPrecision: 0}},
+        {convertTransform: true},
+        {removeUnknownsAndDefaults: true},
+        {removeNonInheritableGroupAttrs: true},
+        {removeUselessStrokeAndFill: true},
+        {removeUnusedNS: true},
+        {cleanupIDs: true},
+        {cleanupNumericValues: {floatPrecision: 0}},
+        {cleanupListOfValues: {floatPrecision: 0}},
+        {moveElemsAttrsToGroup: true},
+        {moveGroupAttrsToElems: true},
+        {collapseGroups: true},
+        {removeRasterImages: false},
+        {mergePaths: true},
+        {convertShapeToPath: true},
+        {sortAttrs: true},
+        {sortDefsChildren: true},
+        {removeDimensions: true},
+        {reusePaths: true},
+        {
+          removeAttrs: {attrs: '(data-name)'},
+        }
+    ]
+  });
+  const result = await svgo.optimize(data);
+  return result.data;
 }
 
 async function loadTokens() {
@@ -77,6 +141,8 @@ async function loadTokens() {
       throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
     }
 
+    const baseName = `${tokenId.toString().padStart(2, "0")}-${stateNum}`;
+
     if (!tokenIds.has(tokenId)) {
       tokenIds.set(tokenId, new Map());
     }
@@ -86,11 +152,11 @@ async function loadTokens() {
 
     // Read the SVG
     const imageData = fs.readFileSync(path.join(basePath, file)).toString();
-    const metadataStr = fs.readFileSync(path.join(basePath, file) + ".json").toString();
+    const metadataStr = fs.readFileSync(path.join(basePath, baseName) + ".json").toString();
     const imageDataHash = await ipfsHash(imageData);
 
     const data: FileMeta = {
-      imageData,
+      svgData: imageData,
       metadataHash: await ipfsHash(metadataStr),
     }
     tokenIds.get(tokenId)!.set(stateNum, data);
@@ -118,15 +184,16 @@ export async function syncSVGs() {
  * Will initialize all the tokens - meaning save their IPFS hashes and contents on chain.
  */
 export async function initTokens(contractAddress: string) {
-  const nft = await getContract(contractAddress);
+  const nft = await getNFTContract(contractAddress);
 
   const tokenIds = await loadTokens();
+  console.log(`${tokenIds.size} tokens found.`);
 
   for (const [tokenId, states] of tokenIds.entries()) {
     await nft.initToken(
         tokenId,
-        [states.get(0)!.imageData, states.get(1)!.imageData, states.get(2)!.imageData],
-        [states.get(0)!.metadataHash, states.get(1)!.metadataHash, states.get(2)!.metadataHash],
+        [states.get(0)!.svgData, states.get(2)!.svgData],
+        [states.get(0)!.metadataHash, states.get(2)!.metadataHash],
         {
           gasLimit: 9500000
         }
@@ -149,9 +216,9 @@ async function ipfsHash(content: string): Promise<string> {
   return await Hash.of(data) as string;
 }
 
-export async function getContract(address: string) {
+export async function getNFTContract(address: string) {
   const {ethers} = await import('hardhat');
-  const Abi = (await import("../artifacts/contracts/MahinNFT.sol/MahinNFT.json")).abi;
+  const Abi = JSON.parse((fs.readFileSync(__dirname + "/../artifacts/contracts/MahinNFT.sol/MahinNFT.json")).toString()).abi;
   const [signer] = await ethers.getSigners();
 
   return new ethers.Contract(address, Abi, signer);
