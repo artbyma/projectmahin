@@ -106,6 +106,37 @@ task("mint-token", "Mint a token for test purposes")
   });
 
 
+task("request-roll", "Request a preroll")
+    .addParam("contract", "The NFT contract address")
+    .setAction(async (taskArgs) => {
+      const {ethers} = await import('hardhat');
+      const [signer] = await ethers.getSigners();
+
+      const useChainLink = true;
+
+      // Fund the contract with LINK
+      if (useChainLink) {
+        const link = new Contract('0x01be23585060835e02b77ef475b0cc51aa1e0709', LinkToken.abi, signer);
+        console.log('Funding contract with LINK')
+        console.log(await link.transfer(taskArgs.contract, '100000000000000000'));
+      }
+
+      const nft = await getNFTContract(taskArgs.contract);
+      await nft.requestRoll(!useChainLink);
+      console.log(`Requested a roll`);
+    });
+
+
+task("apply-roll", "Apply roll results")
+    .addParam("contract", "The NFT contract address")
+    .setAction(async (taskArgs) => {
+      const {ethers} = await import('hardhat');
+
+      const nft = await getNFTContract(taskArgs.contract);
+      await nft.applyRoll();
+      console.log(`Applied the roll`);
+    });
+
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
