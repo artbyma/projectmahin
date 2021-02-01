@@ -43,14 +43,13 @@ abstract contract Roles is Context, Ownable {
         _;
     }
 
-
     /**
      * @dev Transfers the minter role of the contract to a new account (`newOwner`).
      * Can only be called by the current minter.
      */
-    function setMinter(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "zero address");
-        emit OwnershipTransferred(_minter, newOwner);
-        _minter = newOwner;
+    function setMinter(address newMinter) public virtual onlyOwner {
+        require(newMinter != address(0), "zero address");
+        emit OwnershipTransferred(_minter, newMinter);
+        _minter = newMinter;
     }
 }
