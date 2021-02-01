@@ -55,7 +55,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles {
   // ipfsHashes - the ipfs location of each state - needed so provided an off-chain metadata url.
   function initToken(uint256 tokenId, string[] memory states, string[] memory ipfsHashes) public onlyOwner {
     require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
-    require(pieces[tokenId].states.length > 0, "invalid id");
+    require(pieces[tokenId].states.length == 0, "invalid id");
 
     pieces[tokenId].states = states;
     pieces[tokenId].ipfsHashes = ipfsHashes;
