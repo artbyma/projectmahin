@@ -14,7 +14,7 @@ abstract contract Roles is Context, Ownable {
     /**
      * @dev Initializes the contract setting the deployer as the initial minter.
      */
-    constructor () internal {
+    constructor () {
         address msgSender = _msgSender();
         _minter = msgSender;
         emit OwnershipTransferred(address(0), msgSender);

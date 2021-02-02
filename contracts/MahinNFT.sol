@@ -26,6 +26,8 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles {
     uint8 currentState;
   }
 
+  address public beneficiary;
+
   uint public constant MAX_TOKENS = 24;
 
   mapping(uint256 => Piece) pieces;
