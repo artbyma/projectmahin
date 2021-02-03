@@ -8,9 +8,10 @@ import "openzeppelin-solidity/contracts/access/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "./Roles.sol";
 import "./Randomness.sol";
+import "./Fees.sol";
 
 
-contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles {
+contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   event TokenDataStorage(
     uint256 indexed tokenId,
     string[] states
@@ -90,8 +91,20 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles {
   }
 
   function onDiagnosed(uint256 tokenId) internal override {
-    pieces[tokenId].currentState = 2;
+    pieces[tokenId].currentState = 1;
     emit Diagnosed(tokenId);
+  }
+
+  function getBeneficiary() internal override view returns (address) {
+    return beneficiary;
+  }
+
+  function getFee(uint256 tokenId) override internal view returns (uint256) {
+    if (pieces[tokenId].currentState >= 1) {
+      return 15;
+    } else {
+      return 5;
+    }
   }
 }
 
