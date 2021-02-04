@@ -7,6 +7,8 @@ import 'tippy.js/dist/tippy.css';
 import {useState, Fragment} from 'react';
 import {useWeb3React} from "../lib/web3wallet/core";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
+import {curveAbi, useMintPrice} from "../lib/useMintPrice";
+
 
 export default function Home() {
   return (
@@ -156,8 +158,19 @@ function Hero() {
 }
 
 
+function formatMintPrice(price) {
+  if (price) {
+    // div leaves 3 decimal places.
+    return parseInt(price.div("1000000000000000")) / 1000;
+  } else {
+    return undefined;
+  }
+}
+
 function SaleArea() {
   const { account } = useWeb3React();
+  const [currentPrice, nextPrice] = useMintPrice();
+
 
   return <div css={css`
     font-family: Varta,sans-serif;
@@ -209,7 +222,7 @@ function SaleArea() {
          <div style={{flex: 1}}>
            <strong>Current Price</strong>
            <div className={"number"}>
-             Ξ 0.25
+             Ξ {formatMintPrice(currentPrice)}
            </div>
            <div className={"detail"}>
              <Tippy placement={"bottom"} content={<span>
@@ -217,7 +230,7 @@ function SaleArea() {
                 for a longer period, the price starts to slowly decay.
              </span>}>
                <span>
-                Next Price: Ξ 0.35 {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
+                Next Price: Ξ {formatMintPrice(nextPrice)} {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
                </span>
              </Tippy>
            </div>
@@ -604,99 +617,6 @@ function Gallery() {
     </div>
   </div>
 }
-
-
-const curveAbi = [
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "mahinAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [],
-    "name": "FIRST_ID",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "LAST_ID",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MIN_PRICE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getCurrentPriceToMint",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "nftContract",
-    "outputs": [
-      {
-        "internalType": "contract MahinNFT",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "purchase",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-]
 
 
 function PurchaseButton() {
