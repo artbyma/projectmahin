@@ -16,10 +16,11 @@ contract CurveSeller {
     uint public constant LAST_ID = 8;
 
     uint public constant MIN_PRICE = 0.2 ether;
+    uint public constant MAX_PRICE = 1 ether;
 
     uint256 currentId = FIRST_ID;
-    uint256 lastMintPrice;
-    uint256 lastSoldAt;
+    uint256 lastMintPrice = 0;
+    uint256 lastSoldAt = 0;
 
     MahinNFT public nftContract;
 
@@ -30,7 +31,7 @@ contract CurveSeller {
     function purchase() public virtual payable returns (uint256 _tokenId) {
         require(currentId <= LAST_ID, "sold out");
 
-        uint256 mintPrice = getCurrentPriceToMint();
+        uint256 mintPrice = getPriceToMint(0);
         require(msg.value >= mintPrice, "not enough eth");
         lastMintPrice = mintPrice;
 
@@ -50,11 +51,17 @@ contract CurveSeller {
         return tokenId;
     }
 
-    function getCurrentPriceToMint() public virtual view returns (uint256) {
-        uint256 nextIncrease = 0.1 ether;
+    function getPriceToMint(uint256 idx) public virtual view returns (uint256) {
+        uint256 floor = lastMintPrice == 0 ? MIN_PRICE : lastMintPrice;
+        uint256 nextIncrease = MAX_PRICE.sub(floor).div(LAST_ID-currentId);
 
         // Start at the floor, increase for each token
-        uint256 mintPrice = lastMintPrice == 0 ? MIN_PRICE : lastMintPrice + nextIncrease;
+        uint256 mintPrice;
+        if (lastMintPrice == 0) {
+            mintPrice = MIN_PRICE.add(nextIncrease.mul(idx));
+        } else {
+            mintPrice = lastMintPrice.add(nextIncrease.mul(idx.add(1)));
+        }
 
         // Add the current decay
         if (lastSoldAt > 0) {
@@ -64,6 +71,9 @@ contract CurveSeller {
 
             mintPrice = Math.max(MIN_PRICE, mintPrice.sub(discount));
         }
+
+        // Restrict to 2 decimal places
+        mintPrice = mintPrice / 0.01 ether * 0.01 ether;
 
         return mintPrice;
     }
