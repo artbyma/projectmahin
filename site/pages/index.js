@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Cryptoboobs</title>
+        <title>Project Mahin</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -73,7 +73,7 @@ function Header() {
     }
   `}>
     <div className={"header"}>
-      <img src="https://img.icons8.com/color/48/000000/pink-ribbon.png"/> Cryptoboobs
+      <img src="https://img.icons8.com/color/48/000000/pink-ribbon.png"/> Project Mahin
     </div>
 
     <div style={{position: 'absolute', right: 0, top: 0, bottom: 0}} className={"credit"}>
