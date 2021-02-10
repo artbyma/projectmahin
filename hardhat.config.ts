@@ -28,7 +28,7 @@ const Configs = {
 }
 
 task("deploy", "Deploy the contract", async () => {
-  const {ethers, run} = await import('hardhat');
+  const {ethers, run, network} = await import('hardhat');
 
   let sourceCodeSubmitters: any[] = [];
   async function deployContract(name, args) {
@@ -54,18 +54,20 @@ task("deploy", "Deploy the contract", async () => {
   console.log("ERC721 deployed to:", nft.address);
   console.log("Curve deployed to:", curve.address);
 
-  console.log("Making Cure the minter");
+  console.log("Making Curve the minter");
   await (await nft.setMinter(curve.address)).wait();
 
-  console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
-  await new Promise(resolve => {
-    setTimeout(resolve, 60*1000);
-  });
-  for (const submitter of sourceCodeSubmitters) {
-    try {
-      await submitter();
-    } catch (e) {
-      console.log("Error submitting validation", e)
+  if (network.name == "main" || network.name == "rinkeby") {
+    console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
+    await new Promise(resolve => {
+      setTimeout(resolve, 60 * 1000);
+    });
+    for (const submitter of sourceCodeSubmitters) {
+      try {
+        await submitter();
+      } catch (e) {
+        console.log("Error submitting validation", e)
+      }
     }
   }
 });

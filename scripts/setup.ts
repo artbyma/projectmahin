@@ -138,7 +138,7 @@ async function loadTokens() {
     const tokenId = parseInt(tokenIdStr);
     const stateNum = parseInt(stateNumStr);
     if (Number.isNaN(tokenId) || Number.isNaN(stateNum)) {
-      throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
+      throw new Error(`${file} has a name not conforning to the expected schema: $token-$state.svg`)
     }
 
     const baseName = `${tokenId.toString().padStart(2, "0")}-${stateNum}`;
@@ -187,17 +187,18 @@ export async function initTokens(contractAddress: string) {
   const nft = await getNFTContract(contractAddress);
 
   const tokenIds = await loadTokens();
-  console.log(`${tokenIds.size} tokens found.`);
+  console.log(`${tokenIds.size} tokens found: ${Array.from(tokenIds.keys()).join(', ')}`);
 
   for (const [tokenId, states] of tokenIds.entries()) {
-    await nft.initToken(
-        tokenId,
+    const response = await nft.initToken(
+        2,
         [states.get(0)!.svgData, states.get(2)!.svgData],
         [states.get(0)!.metadataHash, states.get(2)!.metadataHash],
         {
           gasLimit: 9500000
         }
     );
+    await response.wait()
   }
 }
 
