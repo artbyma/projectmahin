@@ -83,7 +83,8 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 
   // Return the current IPFS link based on state
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
-    require(_exists(tokenId), "URI query for nonexistent token");
+    require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
+    require(pieces[tokenId].states.length > 0, "invalid id");
 
     Piece memory piece = pieces[tokenId];
     string memory tokenPath = piece.ipfsHashes[piece.currentState];
