@@ -96,6 +96,16 @@ task("init-tokens", "Add SVGs and IPFs hashes to the deployed contract, initiali
     });
 
 
+task("print-stats", "Print stats from the curve")
+    .addParam("contract", "The Curve contract address")
+    .setAction(async (taskArgs) => {
+      const {getCurveContract} = await import('./scripts/setup');
+      const contract = await getCurveContract(taskArgs.contract);
+      console.log(await contract.getPriceToMint(0));
+      console.log(await contract.getPriceToMint(1));
+    });
+
+
 task("mint-token", "Mint a token for test purposes")
   .addParam("contract", "The NFT contract address")
   .setAction(async (taskArgs) => {
