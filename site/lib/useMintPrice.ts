@@ -9,8 +9,8 @@ export function useMintPrice() {
 
   const [data] = useAsyncValue(async () => {
     if (library) {
-      const mintPrice = await contract.getCurrentPriceToMint();
-      const nextPrice = await contract.getCurrentPriceToMint();
+      const mintPrice = await contract.getPriceToMint(0);
+      const nextPrice = await contract.getPriceToMint(1);
       return [mintPrice, nextPrice];
     } else {
       const {price, nextPrice} = await (await fetch('/api/price')).json();
@@ -65,7 +65,7 @@ export const curveAbi = [
   },
   {
     "inputs": [],
-    "name": "MIN_PRICE",
+    "name": "MAX_PRICE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -78,7 +78,26 @@ export const curveAbi = [
   },
   {
     "inputs": [],
-    "name": "getCurrentPriceToMint",
+    "name": "MIN_PRICE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "idx",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPriceToMint",
     "outputs": [
       {
         "internalType": "uint256",

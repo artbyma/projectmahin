@@ -5,8 +5,8 @@ const infuraProvider = new ethers.providers.InfuraProvider('rinkeby', '134faaf6c
 const curve = new ethers.Contract(process.env.NEXT_PUBLIC_CURVE_ADDRESS, curveAbi, infuraProvider);
 
 export default async function handler(req, res) {
-  const mintPrice = await curve.getCurrentPriceToMint();
-  const nextPrice = await curve.getCurrentPriceToMint();
+  const mintPrice = await curve.getPriceToMint(0);
+  const nextPrice = await curve.getPriceToMint(1);
 
   res.status(200).json({ price: mintPrice.toString(), nextPrice: mintPrice.toString() });
 }

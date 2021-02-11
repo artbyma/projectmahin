@@ -224,3 +224,11 @@ export async function getNFTContract(address: string) {
 
   return new ethers.Contract(address, Abi, signer);
 }
+
+export async function getCurveContract(address: string) {
+  const {ethers} = await import('hardhat');
+  const Abi = JSON.parse((fs.readFileSync(__dirname + "/../artifacts/contracts/CurveSeller.sol/CurveSeller.json")).toString()).abi;
+  const [signer] = await ethers.getSigners();
+
+  return new ethers.Contract(address, Abi, signer);
+}
