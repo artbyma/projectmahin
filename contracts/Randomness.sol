@@ -7,6 +7,7 @@ import "./ChainlinkVRF.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
 
 abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
+    using SafeMath for uint256;
 
     // Configuration Chainlink VRF
     struct VRFConfig {
@@ -30,7 +31,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
 
     uint256 randomSeedBlock = 0;
     int128 public rollProbability = 0;
-    uint32 public lastRollTime = 0;
+    uint256 public lastRollTime = 0;
 
     bytes32 chainlinkRequestId = 0;
     uint256 chainlinkRandomNumber = 0;
@@ -47,7 +48,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
     // over the period the project is running.
     // Will return 0.80 to indicate that the probability of a diagnosis is 20%.
     function getProbability(uint256 timestamp) public view returns (int128 probability) {
-        uint32 secondsSinceLastRoll = uint32(timestamp) - lastRollTime;
+        uint256 secondsSinceLastRoll = timestamp.sub(lastRollTime);
 
         // Say we want totalProbability = 20% over the course of the project's runtime.
         // If we roll 12 times, what should be the probability of each roll so they compound to 20%?
@@ -117,7 +118,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
         rollProbability = getProbability(block.timestamp);
 
         // Set the last roll time, which "consumes" parts of the total probability for a diagnosis
-        lastRollTime = uint32(block.timestamp);
+        lastRollTime = block.timestamp;
 
         emit RollInProgress(rollProbability);
     }
