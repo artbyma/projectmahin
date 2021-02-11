@@ -34,7 +34,6 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   mapping(uint256 => Piece) pieces;
 
   constructor(VRFConfig memory vrfConfig) Randomness(vrfConfig) {
-    lastRollTime = uint32(block.timestamp);
   }
 
   function withdraw() public onlyOwner {

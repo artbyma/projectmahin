@@ -6,6 +6,7 @@ import "./ABDKMath64x64.sol";
 import "./ChainlinkVRF.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
 
+
 abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
     using SafeMath for uint256;
 
@@ -41,6 +42,8 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
     constructor(VRFConfig memory config) ChainlinkVRF(config.coordinator, config.token) {
         chainlinkFee = config.price;
         chainlinkKeyHash = config.keyHash;
+
+        lastRollTime = block.timestamp;
     }
 
     // Will return the probability of a (non-)diagnosis for an individual NFT, assuming the roll will happen at
