@@ -1,6 +1,6 @@
 const {BigNumber} = require("@ethersproject/bignumber");
 const { expect } = require("chai");
-
+const {setupMahinNFTContract} = require('./utils');
 
 async function initToken(nftContract, tokenId) {
   await nftContract.initToken(
@@ -16,17 +16,12 @@ async function initToken(nftContract, tokenId) {
   );
 }
 
+
+
 describe("MahinNFT", function() {
   let nft;
   beforeEach(async () => {
-    const MahinNFT = await ethers.getContractFactory("MahinNFT");
-    nft = await MahinNFT.deploy({
-      'coordinator': '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B',
-      'token': '0x01be23585060835e02b77ef475b0cc51aa1e0709',
-      'keyHash': '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311',
-      'price': '100000000000000000',
-    });
-    await nft.deployed();
+    nft = await setupMahinNFTContract();
   });
 
   it("should handle init, mint and query", async function() {
@@ -61,7 +56,7 @@ describe("MahinNFT", function() {
 
   it("should revert if trying to mint an invalid token", async function() {
     const [signer, account2] = await ethers.getSigners();
-    expect(await nft.mintToken(7, signer.address)).to.be.revertedWith("revert invalid id");
+    expect(nft.mintToken(7, signer.address)).to.be.revertedWith("invalid id");
   });
 
   it("do a roll", async function() {
