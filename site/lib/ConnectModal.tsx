@@ -4,20 +4,18 @@ import {Modal} from "./web3wallet/ui/emotion-model";
 import {Grid, themesList} from "./web3wallet/ui/grid";
 import {useWeb3React} from "./web3wallet/core";
 
+/**
+ * Combines the grid UI (from web3modal) with a modal component based on emotion.
+ */
 export function ConnectModal(props: {
   onRequestClose: (success?: boolean) => void,
   isVisible: boolean
 }) {
   const { activate } = useWeb3React();
 
-  const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_NETWORK);
-  const connectors = useMemo(() => {
-    return getConnectors(CHAIN_ID);
-  },[])
-
-  const handleProviderClick = async (providerId) => {
+  const handleProviderClick = async (connector, provider) => {
     try {
-      await activate(connectors[providerId]);
+      await activate(connector);
     } catch (e) {
       console.log(e);
       alert("Failed to connect to this provider.")
@@ -28,9 +26,8 @@ export function ConnectModal(props: {
 
   return <Modal show={props.isVisible} lightboxOpacity={0.4} onRequestClose={props.onRequestClose}>
     <Grid
-        themeColors={themesList.dark.colors}
-        providers={Object.keys(connectors)}
-        onClick={handleProviderClick}
+      themeColors={themesList.dark.colors}
+      onClick={handleProviderClick}
     />
   </Modal>
 }
