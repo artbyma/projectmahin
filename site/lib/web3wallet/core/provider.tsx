@@ -1,15 +1,17 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import React, {createContext, useContext, useEffect, useMemo} from 'react'
 import invariant from 'tiny-invariant'
 
 import { Web3ReactContextInterface } from './types'
 import { useWeb3ReactManager } from './manager'
+import {ConnectorSet} from "../Connector";
 
 export const PRIMARY_KEY = 'primary'
 const CONTEXTS: { [key: string]: React.Context<Web3ReactContextInterface> } = {}
 
 interface Web3ReactProviderArguments {
   getLibrary: (provider?: any, connector?: Required<Web3ReactContextInterface>['connector']) => any
-  children: any
+  children: any,
+  connectors?: ConnectorSet
 }
 
 export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArguments) => JSX.Element {
@@ -31,7 +33,7 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
 
   const Provider = CONTEXTS[key].Provider
 
-  return function Web3ReactProvider({ getLibrary, children }: Web3ReactProviderArguments): JSX.Element {
+  return function Web3ReactProvider({ getLibrary, children, connectors }: Web3ReactProviderArguments): JSX.Element {
     const {
       connector,
       provider,
@@ -44,7 +46,7 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
       activatingConnector,
 
       error
-    } = useWeb3ReactManager()
+    } = useWeb3ReactManager({connectors})
 
     const active = connector !== undefined && chainId !== undefined && account !== undefined && !!!error
     const library = useMemo(
@@ -53,7 +55,7 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
                 ? getLibrary(provider, connector)
                 : undefined,
         [active, getLibrary, provider, connector, chainId]
-    )
+    );
 
     const web3ReactContext: Web3ReactContextInterface = {
       connector,
@@ -61,6 +63,7 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
       chainId,
       account,
       activatingConnector,
+      connectors,
 
       activate,
       setError,

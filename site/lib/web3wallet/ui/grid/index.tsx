@@ -1,7 +1,10 @@
 import styled from '@emotion/styled'
 import {ThemeColors} from "./types";
 import {Connector} from "./Connector";
-import {getProviderInfo, IProviderInfo} from "../../providerMetadata";
+import {ConnectorSet, resolveConnectors} from "../../Connector";
+import {IProviderInfo} from "../../providerdb/types";
+import {useWeb3ReactManager} from "../../core/manager";
+import {useWeb3React} from "../../core";
 
 export interface IThemeConfig {
   name: string;
@@ -71,31 +74,28 @@ const SModalCard = styled.div<IModalCardStyleProps>`
 
 export function Grid(props: {
   themeColors: ThemeColors,
-  providers: (string|IProviderInfo)[],
-  onClick: (id: string) => void
+  connectors?: ConnectorSet,
+  onClick: (connector: any, provider: IProviderInfo) => void
 }) {
-  const {themeColors, providers} = props;
-
-  const resolvedProviders = providers.map(provider => {
-    return typeof provider == 'string' ? getProviderInfo(provider) : provider;
-  })
+  const {themeColors} = props;
+  const {connectors: contextConnectors} = useWeb3React();
+  const connectors = props.connectors || contextConnectors;
+  const providers = resolveConnectors(connectors);
 
   return <SModalCard
     themeColors={themeColors}
-    maxWidth={resolvedProviders.length < 3 ? 500 : 800}
+    maxWidth={providers.length < 3 ? 500 : 800}
     show={true}
   >
-    {resolvedProviders.map(providerInfo =>
-        !!providerInfo ? (
-            <Connector
-                key={providerInfo.id}
-                name={providerInfo.name}
-                logo={providerInfo.logo}
-                description={providerInfo.description}
-                themeColors={themeColors}
-                onClick={() => props.onClick(providerInfo.id)}
-            />
-        ) : null
-    )}
+    {providers.map(({connector, info}) => {
+      return <Connector
+          key={info.id}
+          name={info.name}
+          logo={info.logo}
+          description={info.description}
+          themeColors={themeColors}
+          onClick={() => props.onClick(connector, info)}
+      />
+    })}
   </SModalCard>
 }

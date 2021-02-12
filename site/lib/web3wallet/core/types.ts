@@ -1,4 +1,5 @@
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import {ConnectorSet} from "../Connector";
 
 export interface Web3ReactManagerFunctions {
   activate: (connector: AbstractConnector, onError?: (error: Error) => void, throwErrors?: boolean) => Promise<void>
@@ -17,7 +18,8 @@ export interface Web3ReactManagerReturn extends Web3ReactManagerFunctions {
 }
 
 export interface Web3ReactContextInterface<T = any> extends Web3ReactManagerFunctions {
-  connector?: AbstractConnector
+  connector?: AbstractConnector,
+  connectors?: ConnectorSet,
   activatingConnector?: AbstractConnector
   library?: T
   chainId?: number

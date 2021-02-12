@@ -5,6 +5,7 @@ import warning from 'tiny-warning'
 
 import { Web3ReactManagerReturn } from './types'
 import { normalizeChainId, normalizeAccount } from './normalizers'
+import {ConnectorSet, findConnectorById} from "../Connector";
 
 class StaleConnectorError extends Error {
   constructor() {
@@ -122,8 +123,14 @@ async function augmentConnectorUpdate(
 
 /**
  * This provides the context value for a manager.
+ *
+ * TODO: Right now returns a single account; support multiple accounts, and multiple providers.
+ * -
  */
-export function useWeb3ReactManager(): Web3ReactManagerReturn {
+export function useWeb3ReactManager(props?: {
+  // This is only used or needed for restoring a connection.
+  connectors?: ConnectorSet
+}): Web3ReactManagerReturn {
   const [state, dispatch] = useReducer(reducer, {})
   const { connector, provider, chainId, account, error } = state;
 
@@ -218,7 +225,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
   )
   const handleDeactivate = useCallback((): void => {
     dispatch({ type: ActionType.DEACTIVATE_CONNECTOR })
-  }, [])
+  }, []);
 
   // ensure that connectors which were set are deactivated
   useEffect((): (() => void) => {
@@ -227,7 +234,25 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
         connector.deactivate()
       }
     }
-  }, [connector])
+  }, [connector]);
+
+  // Try to restore a previous connection.
+  // Prior art:
+  // - Trying only metamask: https://github.com/NoahZinsmeister/web3-react/blob/3a4fbf5d6a22b24df901c6d8eda0cc23b15d8916/example/hooks.ts
+  // - Uniswap copy of that code: https://github.com/Uniswap/uniswap-interface/blob/8fd894f2d1b03921c5519c050aed164343c47fb1/src/hooks/index.ts#L52
+  // - web3modal cached provider: https://github.com/Web3Modal/web3modal/blob/c17015b8160c7d28e3443b9f048692a1df880bb2/src/controllers/providers.ts
+  // We may try to test the injected provider (like useEagerLoad() in the examples above), even if it is not in
+  // the cache.
+  useEffect(() => {
+    if (!props?.connectors) {
+      return;
+    }
+    let cachedProvider = 'injected';
+    const connector = findConnectorById(props.connectors, cachedProvider);
+    if (connector) {
+      activate(connector.connector);
+    }
+  }, []);
 
   // ensure that events emitted from the set connector are handled appropriately
   useEffect((): (() => void) => {
