@@ -1,5 +1,6 @@
 node_modules
 svgdata/
+.env.local
 
 #Hardhat files
 cache

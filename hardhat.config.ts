@@ -6,6 +6,9 @@ import {getNFTContract} from "./scripts/setup";
 import {compilerOutput as LinkToken} from "@chainlink/contracts/abi/v0.7/LinkTokenInterface.json";
 import { Contract } from "ethers";
 
+require('dotenv').config({path: '.env.local'});
+
+
 task("accounts", "Prints the list of accounts", async () => {
   const {ethers} = await import('hardhat');
   const accounts = await ethers.getSigners();
@@ -155,5 +158,17 @@ task("apply-roll", "Apply roll results")
  */
 module.exports = {
   solidity: "0.7.3",
+  //defaultNetwork: "rinkeby",
+  networks: {
+    rinkeby: {
+      url: process.env.RINKEBY_JSON_RPC_URL,
+      accounts: {
+        mnemonic: process.env.RINKEBY_MNEMONIC
+      }
+    }
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
+  }
 };
 
