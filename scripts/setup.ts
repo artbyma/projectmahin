@@ -185,13 +185,17 @@ export async function syncSVGs() {
  */
 export async function initTokens(contractAddress: string) {
   const nft = await getNFTContract(contractAddress);
+  const names = getNames();
 
   const tokenIds = await loadTokens();
   console.log(`${tokenIds.size} tokens found: ${Array.from(tokenIds.keys()).join(', ')}`);
 
+  const startingId = 1;
+
   for (const [tokenId, states] of tokenIds.entries()) {
     const response = await nft.initToken(
-        2,
+        startingId + tokenId,
+        names[startingId],
         [states.get(0)!.svgData, states.get(2)!.svgData],
         [states.get(0)!.metadataHash, states.get(2)!.metadataHash],
         {
@@ -231,4 +235,9 @@ export async function getCurveContract(address: string) {
   const [signer] = await ethers.getSigners();
 
   return new ethers.Contract(address, Abi, signer);
+}
+
+export function getNames() {
+  const data = fs.readFileSync(__dirname + "/../names.txt").toString();
+  return data.split("\n").map(s => s.trim());
 }

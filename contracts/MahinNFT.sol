@@ -22,6 +22,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   );
 
   struct Piece {
+    string name;
     string[] states;
     string[] ipfsHashes;
     uint8 currentState;
@@ -29,9 +30,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 
   address public beneficiary;
 
-  uint public constant MAX_TOKENS = 24;
-
-  mapping(uint256 => Piece) pieces;
+  mapping(uint256 => Piece) public pieces;
 
   constructor(VRFConfig memory vrfConfig) Randomness(vrfConfig) {
   }
@@ -55,10 +54,10 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   // Will be used by the owner during setup to create all pieces of the work.
   // states - the svg code for each state.
   // ipfsHashes - the ipfs location of each state - needed so provided an off-chain metadata url.
-  function initToken(uint256 tokenId, string[] memory states, string[] memory ipfsHashes) public onlyOwner {
-    require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
+  function initToken(uint256 tokenId, string memory name, string[] memory states, string[] memory ipfsHashes) public onlyOwner {
     require(pieces[tokenId].states.length == 0, "invalid id");
 
+    pieces[tokenId].name = name;
     pieces[tokenId].states = states;
     pieces[tokenId].ipfsHashes = ipfsHashes;
     pieces[tokenId].currentState = 0;
@@ -67,7 +66,6 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 
   // Allow contract owner&minter to mint a token and assigned to to anyone they please.
   function mintToken(uint256 tokenId, address firstOwner) public onlyMinterOrOwner {
-    require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
     require(pieces[tokenId].states.length > 0, "invalid id");
 
     if (!_exists(tokenId)) {
@@ -82,7 +80,6 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 
   // Return the current IPFS link based on state
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
-    require(tokenId > 0 && tokenId <= MAX_TOKENS, "invalid id");
     require(pieces[tokenId].states.length > 0, "invalid id");
 
     Piece memory piece = pieces[tokenId];

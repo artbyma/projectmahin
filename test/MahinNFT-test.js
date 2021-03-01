@@ -5,6 +5,7 @@ const {setupMahinNFTContract} = require('./utils');
 async function initToken(nftContract, tokenId) {
   await nftContract.initToken(
       tokenId,
+      "a name",
       [
         "sdf",
         "sdf",
