@@ -12,6 +12,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract CurveSeller {
     using SafeMath for uint256;
 
+    // Sells these token ids in ascending order
     uint public constant FIRST_ID = 1;
     uint public constant LAST_ID = 8;
 

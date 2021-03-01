@@ -28,6 +28,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
     uint8 currentState;
   }
 
+  // The beneficiary (the charity or someone acting in their name) - receives royalties.
   address public beneficiary;
 
   mapping(uint256 => Piece) public pieces;
