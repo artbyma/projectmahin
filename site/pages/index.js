@@ -194,6 +194,9 @@ function ArtistStatement() {
         hard on people fighting cancer. In addition to their illness, patients have to deal with all kinds of Covid-induced limitations.
         With this project we want them to know they are not alone.
       </p>
+      <p>
+        <img src={"/img/signature.png"} height={50} alt={"Artist Signature"} />
+      </p>
     </Padding>
   </div>
 }
