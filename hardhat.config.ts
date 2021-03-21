@@ -5,6 +5,9 @@ import "@nomiclabs/hardhat-etherscan";
 import {getNFTContract} from "./scripts/setup";
 import {compilerOutput as LinkToken} from "@chainlink/contracts/abi/v0.7/LinkTokenInterface.json";
 import { Contract } from "ethers";
+import fs from "fs";
+import path from "path";
+import {arrayify} from "ethers/lib/utils";
 
 require('dotenv').config({path: '.env.local'});
 
@@ -119,6 +122,24 @@ task("mint-token", "Mint a token for test purposes")
     await nft.mintToken(1, signer.address);
     console.log(`Minted token ${1} with url=${await nft.tokenURI(1)}`);
   });
+
+
+task("fetch-token-data", "Fetch token data from the contract")
+    .addParam("contract", "The NFT contract address")
+    .setAction(async (taskArgs) => {
+      const {ethers} = await import('hardhat');
+      const [signer] = await ethers.getSigners();
+
+      const nft = await getNFTContract(taskArgs.contract);
+      const logs = await nft.queryFilter(nft.filters.TokenDataStorage(2));
+      const [normal, diagnosed] = logs[0].args!.states;
+
+      fs.writeFileSync(path.join(__dirname, 'state1-out.gz'), Buffer.from(arrayify(normal)));
+      fs.writeFileSync(path.join(__dirname, 'state2-out.gz'), Buffer.from(arrayify(diagnosed)));
+
+      // fs.writeFileSync(path.join(__dirname, 'state1-out.png'), Buffer.from(arrayify(normal)));
+      // fs.writeFileSync(path.join(__dirname, 'state2-out.png'), Buffer.from(arrayify(diagnosed)));
+    });
 
 
 task("request-roll", "Request a preroll")

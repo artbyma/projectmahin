@@ -5,9 +5,12 @@ import * as path from "path";
 import SVGO from 'svgo';
 const Hash = require('ipfs-only-hash');
 const svg2img = require('svg2img');
+const { deflateSync } = require('zlib');
+
 
 type FileMeta = {
-  svgData: string,
+  imageData: Buffer,
+  type: string,
   metadataHash: string
 }
 type TokenMap = Map<number, Map<number, FileMeta>>;
@@ -19,7 +22,6 @@ const PREPARED_DATA_DIR = path.join(__dirname, '..', 'svgdata');
  *
  *   ./01-0.svg (default)
  *   ./01-1.svg (diagnosed)
- *   ./01-2.svg (post-op)
  *   ./02-1.svg (default)
  *   ...
  *
@@ -30,38 +32,51 @@ export async function processSVGs(indir: string) {
   const basePath = indir;
   for (const file of fs.readdirSync(basePath)) {
     const [filename, ext] = getExt(file);
-    if (ext != 'svg') {
+    if (ext != 'svg' && ext != 'png') {
       continue;
     }
     const [tokenIdStr, stateNumStr] = filename.split('-');
     const tokenId = parseInt(tokenIdStr);
     const stateNum = parseInt(stateNumStr);
     if (Number.isNaN(tokenId) || Number.isNaN(stateNum)) {
-      throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.svg`)
+      throw new Error(`${file} has a name not confirming to the expected schema: $token-$state.(svg|png)`)
     }
 
     const baseName = `${tokenId.toString().padStart(2, "0")}-${stateNum}`;
 
-    // Read the SVG
-    const imageData = fs.readFileSync(path.join(basePath, file)).toString();
-    const compressedImage = await compressSvg(imageData);
-    fs.writeFileSync(path.join(PREPARED_DATA_DIR, file), compressedImage);
+    // Read the image
+    let imageData = fs.readFileSync(path.join(basePath, file));
 
-    // Generate a png
-    const buffer: any = await new Promise((resolve) => {
-      svg2img(compressedImage, {'width': 1200, 'height': 1200}, function(error, buffer) {
-        resolve(buffer);
-      });
-    })
-    fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + '.png', buffer);
+    if (ext == 'svg') {
+      imageData = await compressSvg(imageData.toString());
+      fs.writeFileSync(path.join(PREPARED_DATA_DIR, file), imageData);
+
+      // Generate a png
+      const buffer: any = await new Promise((resolve) => {
+        svg2img(imageData, {'width': 1200, 'height': 1200}, function(error, buffer) {
+          resolve(buffer);
+        });
+      })
+      // Not used for now, and .png ext alone makes trouble since we'd consider it pixelart
+      fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + '.thumb.png', buffer);
+
+      // Compress it with gzip. I've tried lzma, doesn't make a difference
+      const gzipped = deflateSync(imageData, {level: 9, memLevel: 9})
+      fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + '.svg.gz', gzipped);
+    }
+
+    else {
+      // Run it through tinypng
+      fs.writeFileSync(path.join(PREPARED_DATA_DIR, baseName) + '.png', imageData);
+    }
 
     // Create a metadata .json file
-    const imageDataHash = await ipfsHash(compressedImage);
+    const imageDataHash = await ipfsHash(imageData);
     const metadata = {
       "name": `Mahin ${tokenId}`,
       "description": "Part of the Mahin project, this is one of 24 NFTs raising breast cancer awareness.",
       "image": `https://cloudflare-ipfs.com/ipfs/${imageDataHash}`,
-      "image_data": imageData,
+      "image_data": ext == 'svg' ? imageData : undefined,
       "attributes": [
         {
           "kind": stateNum
@@ -131,9 +146,17 @@ async function loadTokens() {
   const basePath = PREPARED_DATA_DIR;
   for (const file of fs.readdirSync(basePath)) {
     const [filename, ext] = getExt(file);
-    if (ext != 'svg') {
+
+    let type;
+    if (ext == 'svg.gz') {
+      type = 'svg';
+    } else if (ext == 'png') {
+      type = 'png';
+    }
+    else {
       continue;
     }
+
     const [tokenIdStr, stateNumStr] = filename.split('-');
     const tokenId = parseInt(tokenIdStr);
     const stateNum = parseInt(stateNumStr);
@@ -151,12 +174,13 @@ async function loadTokens() {
     }
 
     // Read the SVG
-    const imageData = fs.readFileSync(path.join(basePath, file)).toString();
+    const imageData = fs.readFileSync(path.join(basePath, file));
     const metadataStr = fs.readFileSync(path.join(basePath, baseName) + ".json").toString();
     const imageDataHash = await ipfsHash(imageData);
 
     const data: FileMeta = {
-      svgData: imageData,
+      imageData,
+      type,
       metadataHash: await ipfsHash(metadataStr),
     }
     tokenIds.get(tokenId)!.set(stateNum, data);
@@ -165,8 +189,8 @@ async function loadTokens() {
   // Validate all tokens have three states
   for (const values of tokenIds.values()) {
     const keys = new Set(values.keys());
-    if (!keys.has(0) || !keys.has(1) || !keys.has(2)) {
-      throw new Error(`Token does not have all 3 states.`)
+    if (!keys.has(0) || !keys.has(1)) {
+      throw new Error(`Token does not have both states.`)
     }
   }
 
@@ -192,12 +216,14 @@ export async function initTokens(contractAddress: string) {
 
   const startingId = 1;
 
+
   for (const [tokenId, states] of tokenIds.entries()) {
+    console.log(states.get(0)!.imageData.toString().length)
     const response = await nft.initToken(
         startingId + tokenId,
         names[startingId],
-        [states.get(0)!.svgData, states.get(2)!.svgData],
-        [states.get(0)!.metadataHash, states.get(2)!.metadataHash],
+        [states.get(0)!.imageData, states.get(1)!.imageData],
+        [states.get(0)!.metadataHash, states.get(1)!.metadataHash],
         {
           gasLimit: 9500000
         }
@@ -207,16 +233,16 @@ export async function initTokens(contractAddress: string) {
 }
 
 function getExt(s: string) {
-  const re = /(?:\.([^.]+))?$/;
+  const re = /([^.]+)\.(.+)?$/;
   const result = re.exec(s);
   if (!result) {
     return [s, ""];
   }
-  return [s.slice(1, s.length-result[1].length), result[1]];
+  return [result[1], result[2]]
 }
 
 
-async function ipfsHash(content: string): Promise<string> {
+async function ipfsHash(content: string|Buffer): Promise<string> {
   const data = Buffer.from(content)
   return await Hash.of(data) as string;
 }

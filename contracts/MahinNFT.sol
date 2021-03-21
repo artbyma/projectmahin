@@ -14,7 +14,7 @@ import "./Fees.sol";
 contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   event TokenDataStorage(
     uint256 indexed tokenId,
-    string[] states
+    bytes[] states
   );
 
   event Diagnosed(
@@ -23,7 +23,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 
   struct Piece {
     string name;
-    string[] states;
+    bytes[] states;
     string[] ipfsHashes;
     uint8 currentState;
   }
@@ -47,22 +47,22 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
   }
 
   // Returns the current SVG of the piece.
-  function getSvg(uint256 tokenId) public view returns (string memory) {
-    require(_exists(tokenId), "not a valid token");
-    return pieces[tokenId].states[0];
-  }
+//  function getImageData(uint256 tokenId) public view returns (bytes memory) {
+//    require(_exists(tokenId), "not a valid token");
+//    return pieces[tokenId].states[0];
+//  }
 
   // Will be used by the owner during setup to create all pieces of the work.
   // states - the svg code for each state.
   // ipfsHashes - the ipfs location of each state - needed so provided an off-chain metadata url.
-  function initToken(uint256 tokenId, string memory name, string[] memory states, string[] memory ipfsHashes) public onlyOwner {
-    require(pieces[tokenId].states.length == 0, "invalid id");
-
-    pieces[tokenId].name = name;
-    pieces[tokenId].states = states;
-    pieces[tokenId].ipfsHashes = ipfsHashes;
-    pieces[tokenId].currentState = 0;
-    emit TokenDataStorage(tokenId, states);
+  function initToken(uint256 tokenId, string memory name, bytes[] memory states, string[] memory ipfsHashes) public onlyOwner {
+//    require(pieces[tokenId].ipfsHashes.length == 0, "invalid id");
+//
+//    pieces[tokenId].name = name;
+      pieces[tokenId].states = states;
+//    pieces[tokenId].ipfsHashes = ipfsHashes;
+//    pieces[tokenId].currentState = 0;
+    //emit TokenDataStorage(tokenId, states);
   }
 
   // Allow contract owner&minter to mint a token and assigned to to anyone they please.
