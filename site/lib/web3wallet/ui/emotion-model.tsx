@@ -19,12 +19,12 @@ const SLightbox = styled.div<ILightboxStyleProps>`
   z-index: 2;
   will-change: opacity;
   background-color: ${({ opacity }) => {
-  let alpha = 0.4;
-  if (typeof opacity === "number") {
-    alpha = opacity;
-  }
-  return `rgba(0, 0, 0, ${alpha})`;
-}};
+    let alpha = 0.4;
+    if (typeof opacity === "number") {
+      alpha = opacity;
+    }
+    return `rgba(0, 0, 0, ${alpha})`;
+  }};
   opacity: ${({ show }) => (show ? 1 : 0)};
   visibility: ${({ show }) => (show ? "visible" : "hidden")};
   pointer-events: ${({ show }) => (show ? "auto" : "none")};
@@ -34,6 +34,23 @@ const SLightbox = styled.div<ILightboxStyleProps>`
   & * {
     box-sizing: border-box !important;
   }
+`;
+
+interface IModalContainerStyleProps {
+  show: boolean;
+}
+
+const SModalContainer = styled.div<IModalContainerStyleProps>`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  visibility: ${({ show }) => (show ? "visible" : "hidden")};
+  pointer-events: ${({ show }) => (show ? "auto" : "none")};
 `;
 
 const SHitbox = styled.div`
@@ -101,8 +118,10 @@ export class Modal extends React.Component<IModalProps, IModalState> {
               display: !show ? 'none' : 'block'
             }}
         >
-          <SHitbox onClick={onRequestClose} />
-          {this.props.children}
+          <SModalContainer show={show}>
+            <SHitbox onClick={onRequestClose} />
+            {this.props.children}
+          </SModalContainer>
         </SLightbox>
     );
   };

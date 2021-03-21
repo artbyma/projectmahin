@@ -3,7 +3,6 @@ import {ThemeColors} from "./types";
 import {Connector} from "./Connector";
 import {ConnectorSet, resolveConnectors} from "../../Connector";
 import {IProviderInfo} from "../../providerdb/types";
-import {useWeb3ReactManager} from "../../core/manager";
 import {useWeb3React} from "../../core";
 
 export interface IThemeConfig {

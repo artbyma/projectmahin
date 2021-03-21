@@ -10,6 +10,10 @@ import DcentWalletLogo from "../logos/dcentwallet.png";
 import BitskiLogo from "../logos/bitski.svg";
 import FrameLogo from "../logos/frame.svg";
 import Web3DefaultLogo from "../logos/web3-default.svg";
+import LatticeLogo from '../logos/lattice.png';
+import LedgerLogo from '../logos/ledger.svg';
+import TrezorLogo from '../logos/trezor.svg';
+import WalletLinkLogo from '../logos/walletlink.svg';
 import {IProviderInfo} from "./types";
 
 
@@ -61,7 +65,7 @@ export const AUTHEREUM: IProviderInfo = {
 export const WALLETLINK: IProviderInfo = {
   id: "walletlink",
   name: "WalletLink",
-  logo: Web3DefaultLogo,
+  logo: WalletLinkLogo,
   type: "web",
 };
 
@@ -95,21 +99,21 @@ export const DCENT: IProviderInfo = {
 export const TREZOR: IProviderInfo = {
   id: "trezor",
   name: "Trezor",
-  logo: Web3DefaultLogo,
+  logo: TrezorLogo,
   type: "hardware",
 };
 
 export const LEDGER: IProviderInfo = {
   id: "ledger",
   name: "Ledger",
-  logo: Web3DefaultLogo,
+  logo: LedgerLogo,
   type: "hardware",
 };
 
 export const LATTICE: IProviderInfo = {
   id: "lattice",
   name: "Lattice",
-  logo: Web3DefaultLogo,
+  logo: LatticeLogo,
   type: "hardware",
 };
 

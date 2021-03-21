@@ -12,12 +12,13 @@
 
 import {getProviderInfo} from "./providerdb";
 import {AbstractConnector} from "@web3-react/abstract-connector";
+import {detectInjectedProvider} from "./detectInjected";
 
 
 // This is used to map a `web3-react` connector implementation to an entry in the provider metadata list.
 export interface Connector {
-  provider: string,
-  connector: AbstractConnector,
+  provider: string,                  // the id of the provider in our database.
+  connector: AbstractConnector,      // the connector class to establish a connection
 }
 
 // Various ways to specify a set of connectors
@@ -26,8 +27,6 @@ export type ConnectorSet = Connector[]|{[provider: string]: AbstractConnector};
 
 /**
  * Return a list of connectors, and their provider information attached.
- *
- * TODO: Auto-detect injected here...
  */
 export function resolveConnectors(set: ConnectorSet) {
   let connectors: Connector[];
@@ -40,9 +39,16 @@ export function resolveConnectors(set: ConnectorSet) {
   }
 
   return connectors.map(connector => {
-    // the provider "injected" is special - we try to autodetect it.
+    let info;
+    if (connector.provider == 'injected') {
+      // the provider id "injected" is special - we try to autodetect it.
+      info = detectInjectedProvider();
+    } else {
+      info = getProviderInfo(connector.provider);
+    }
+
     return {
-      info: getProviderInfo(connector.provider),
+      info,
       connector: connector.connector,
       // connector and provider id are the same, expect for the "injected" connector, which can map to multiple providers.
       connectorId: connector.provider

@@ -23,7 +23,7 @@ export interface Web3ReactContextInterface<T = any> extends Web3ReactManagerFunc
   activatingConnector?: AbstractConnector
   library?: T
   chainId?: number
-  account?: null | string
+  account?: null | string,
 
   active: boolean
   error?: Error

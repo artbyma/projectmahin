@@ -7,3 +7,18 @@ Solution: Merge all three:
 - A custom use-wallet inspired context (in core/)
 - The provider packages from web3-react.
 - The logos, icons and modal from web3-modal.
+
+
+Usage:
+
+```
+function getLibrary(provider, connector) {
+    return new Web3Provider(provider);
+}
+
+return (
+    <Web3ReactProvider getLibrary={getLibrary} connectors={connectors}>
+        <Component {...pageProps} />
+    </Web3ReactProvider>
+)
+```

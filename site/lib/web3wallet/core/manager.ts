@@ -250,7 +250,7 @@ export function useWeb3ReactManager(props?: {
     let cachedProvider = 'injected';
     const connector = findConnectorById(props.connectors, cachedProvider);
     if (connector) {
-      activate(connector.connector);
+      //activate(connector.connector);
     }
   }, []);
 

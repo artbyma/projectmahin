@@ -3,7 +3,7 @@ import * as standardProviders from "./standardProviders";
 import * as injectedProviders from "./injectedProviders";
 import {FALLBACK} from "./injectedProviders";
 
-// Index provider metadata recrds by id
+// Index provider metadata records by id
 const providerInfoById = [
   ...Object.values(standardProviders),
   ...Object.values(injectedProviders)

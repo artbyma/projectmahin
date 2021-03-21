@@ -34,21 +34,23 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
   const Provider = CONTEXTS[key].Provider
 
   return function Web3ReactProvider({ getLibrary, children, connectors }: Web3ReactProviderArguments): JSX.Element {
+    // The hook contains the real logic.
     const {
       connector,
       provider,
       chainId,
       account,
-
       activate,
       setError,
       deactivate,
       activatingConnector,
-
       error
     } = useWeb3ReactManager({connectors})
 
+    // Combine multiple properties into a new "active" field.
     const active = connector !== undefined && chainId !== undefined && account !== undefined && !!!error
+
+    // Once we are active and have a chain id, ask the caller to give us a Provider instance with their  preferred lib.
     const library = useMemo(
         () =>
             active && chainId !== undefined && Number.isInteger(chainId) && !!connector
