@@ -1,5 +1,4 @@
 const {setupMahinNFTContract} = require("./utils");
-const {BigNumber} = require("@ethersproject/bignumber");
 const { expect } = require("chai");
 
 
@@ -10,16 +9,16 @@ describe("CurveSeller", function() {
     await nftContract.initToken(1, "name", ["sdf", "sdf",],  ["hash1", "hash1"]);
 
     const CurveSeller = await ethers.getContractFactory("CurveSeller");
-    curveSeller = await CurveSeller.deploy(nftContract.address);
+    curveSeller = await CurveSeller.deploy(nftContract.address, [1]);
     await curveSeller.deployed();
     await nftContract.setMinter(curveSeller.address);
   });
 
   it("can get price", async function() {
     const [signer, account2] = await ethers.getSigners();
-    expect(await curveSeller.getPriceToMint(0)).to.equal('200000000000000000'); // 0.2
-    expect(await curveSeller.getPriceToMint(1)).to.equal('310000000000000000'); // 0.3
-    expect(await curveSeller.getPriceToMint(2)).to.equal('420000000000000000'); // 0.4
+    expect(await curveSeller.getPriceToMint(0)).to.equal('150000000000000000'); // 0.15
+    expect(await curveSeller.getPriceToMint(2)).to.equal('150000000000000000'); // 0.15
+    expect(await curveSeller.getPriceToMint(5)).to.equal('300000000000000000'); // 0.15
   });
 
   it("fails to purchase w/o enough eth", async function() {
