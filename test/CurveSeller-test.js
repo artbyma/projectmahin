@@ -6,7 +6,7 @@ describe("CurveSeller", function() {
   let curveSeller, nftContract;
   beforeEach(async () => {
     nftContract = await setupMahinNFTContract();
-    await nftContract.initToken(1, "name", ["sdf", "sdf",],  ["hash1", "hash1"]);
+    await nftContract.initToken(1, "name", [Buffer.from("sdf"), Buffer.from("sdf")],  ["hash1", "hash1"]);
 
     const CurveSeller = await ethers.getContractFactory("CurveSeller");
     curveSeller = await CurveSeller.deploy(nftContract.address, [1]);

@@ -60,7 +60,7 @@ contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
 //
 //    pieces[tokenId].name = name;
       pieces[tokenId].states = states;
-//    pieces[tokenId].ipfsHashes = ipfsHashes;
+      pieces[tokenId].ipfsHashes = ipfsHashes;
 //    pieces[tokenId].currentState = 0;
     //emit TokenDataStorage(tokenId, states);
   }

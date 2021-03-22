@@ -7,8 +7,8 @@ async function initToken(nftContract, tokenId) {
       tokenId,
       "a name",
       [
-        "sdf",
-        "sdf",
+        Buffer.from("sdf"),
+        Buffer.from("sdf"),
       ],
       [
         "hash1",
