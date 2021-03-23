@@ -14,6 +14,7 @@ export function Layout(props: {
     <Head>
       <title>Project Mahin</title>
       <link rel="icon" href="/favicon.ico" />
+      {process.browser && <script defer async data-domain="mahin.by-ma.art" src="https://plausible.io/js/plausible.js" />}
     </Head>
 
     {!props.hideHeader ? <Header /> : null}
