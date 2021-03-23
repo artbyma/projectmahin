@@ -41,6 +41,10 @@ contract CurveSeller is Ownable {
         enabled = _enable;
     }
 
+    function numRemaining() public view returns (uint256) {
+        return idsToSell.length;
+    }
+
     function purchase() public virtual payable returns (uint256 _tokenId) {
         require(idsToSell.length > 0, "sold out");
         require(enabled, "disabled");

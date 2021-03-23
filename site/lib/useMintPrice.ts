@@ -7,7 +7,7 @@ export function useMintPrice() {
   const [data] = useAsyncValue(async () => getMintPrice(contract), [contract]);
 
   if (!data) {
-    return [undefined, undefined];
+    return [undefined, undefined, undefined];
   }
   return data;
 }
@@ -17,9 +17,15 @@ export async function getMintPrice(contract?: Contract) {
   if (contract) {
     const mintPrice = await contract.getPriceToMint(0);
     const nextPrice = await contract.getPriceToMint(1);
-    return [mintPrice, nextPrice];
+    const numRemaining = await contract.numRemaining();
+    return [mintPrice, nextPrice, numRemaining];
   } else {
-    const {price, nextPrice} = await (await fetch('/api/price')).json();
-    return [BigNumber.from(price), BigNumber.from(nextPrice)];
+    try {
+      const {price, nextPrice, numRemaining} = await (await fetch('/api/price')).json();
+      return [BigNumber.from(price), BigNumber.from(nextPrice), BigNumber.from(numRemaining)];
+    } catch(e) {
+      console.log("Failed to fetch price from server, probably misconfigured.")
+      return [BigNumber.from("0"), BigNumber.from("0"), 0];
+    }
   }
 }

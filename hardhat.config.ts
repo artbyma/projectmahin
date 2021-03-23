@@ -2,14 +2,16 @@ import {task} from "hardhat/config";
 require("@nomiclabs/hardhat-waffle");
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
-import {getNFTContract} from "./scripts/setup";
+require('hardhat-contract-sizer');
+import {getNFTContract, syncFiles} from "./scripts/setup";
 import {compilerOutput as LinkToken} from "@chainlink/contracts/abi/v0.7/LinkTokenInterface.json";
 import { Contract } from "ethers";
 import fs from "fs";
 import path from "path";
 import {arrayify} from "ethers/lib/utils";
 
-require('dotenv').config({path: '.env.local'});
+
+require('dotenv').config({path: path.join(__dirname, '.env.local')});
 
 
 task("accounts", "Prints the list of accounts", async () => {
@@ -56,12 +58,15 @@ task("deploy", "Deploy the contract", async () => {
   }
 
   const nft = await deployContract('MahinNFT', [Configs.rinkeby.chainlink]);
-  const curve = await deployContract("CurveSeller", [nft.address]);
+  const curve = await deployContract("CurveSeller", [nft.address, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,28,29,30]]);
   console.log("ERC721 deployed to:", nft.address);
   console.log("Curve deployed to:", curve.address);
 
   console.log("Making Curve the minter");
   await (await nft.setMinter(curve.address)).wait();
+
+  console.log("Set IPFS Host");
+  await (await nft.setIPFSHost("https://cloudflare-ipfs.com/ipfs/")).wait();
 
   if (network.name == "main" || network.name == "rinkeby") {
     console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
@@ -89,8 +94,8 @@ task("prepare", "Optimize SVGs and prepare metadata JSON files")
 task("publish-svgs", "Upload SVGs to IPFS and Arweave")
     .addParam("directory", "Input directory of SVG files")
     .setAction(async (taskArgs) => {
-      const {syncSVGs} = await import('./scripts/setup');
-      await syncSVGs();
+      const {syncFiles} = await import('./scripts/setup');
+      await syncFiles();
     });
 
 
@@ -99,6 +104,13 @@ task("init-tokens", "Add SVGs and IPFs hashes to the deployed contract, initiali
     .setAction(async (taskArgs) => {
       const {initTokens} = await import('./scripts/setup');
       await initTokens(taskArgs.contract);
+    });
+
+
+task("upload-assets", "Upload assets to IPFS and Arweave")
+    .setAction(async (taskArgs) => {
+      const {syncFiles} = await import('./scripts/setup');
+      await syncFiles();
     });
 
 
@@ -114,13 +126,15 @@ task("print-stats", "Print stats from the curve")
 
 task("mint-token", "Mint a token for test purposes")
   .addParam("contract", "The NFT contract address")
+  .addParam("token", "The Token ID")
   .setAction(async (taskArgs) => {
     const {ethers} = await import('hardhat');
     const [signer] = await ethers.getSigners();
+    const tokenId = parseInt(taskArgs.token);
 
     const nft = await getNFTContract(taskArgs.contract);
-    await nft.mintToken(1, signer.address);
-    console.log(`Minted token ${1} with url=${await nft.tokenURI(1)}`);
+    await nft.mintToken(tokenId, signer.address);
+    console.log(`Minted token ${tokenId} with url=${await nft.tokenURI(tokenId)}`);
   });
 
 
@@ -178,7 +192,20 @@ task("apply-roll", "Apply roll results")
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.7.3",
+  solidity: {
+    version: "0.7.3",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
+  },
   //defaultNetwork: "rinkeby",
   networks: {
     rinkeby: {

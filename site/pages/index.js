@@ -106,7 +106,7 @@ function formatMintPrice(price) {
 
 function SaleArea() {
   const { account } = useWeb3React();
-  const [currentPrice, nextPrice] = useMintPrice();
+  const [currentPrice, nextPrice, numItems] = useMintPrice();
 
 
   return <div css={css`
@@ -154,7 +154,7 @@ function SaleArea() {
            <div style={{flex: 1}}>
              <strong>Pieces Available</strong>
              <div className={"number"}>
-               55/60
+               {numItems?.toString() ?? "-"}/60
              </div>
            </div>
            <div style={{flex: 1}}>
@@ -164,8 +164,7 @@ function SaleArea() {
              </div>
              <div className={"detail"}>
                <Tippy placement={"bottom"} content={<span>
-                  Each sale increases the price of the next piece. If a piece remains unsold
-                  for a longer period, the price starts to slowly decay.
+                  The price increases using a step-function. See the table below.
                </span>}>
                  <span>
                   Next Price: Ξ {formatMintPrice(nextPrice)} {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
