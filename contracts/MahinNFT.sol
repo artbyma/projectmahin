@@ -47,10 +47,15 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
     token.transfer(owner(), token.balanceOf(address(this)));
   }
 
-  // Returns the current SVG of the piece.
+  // Returns the current SVG/PNG of the piece.
   function getImageData(uint256 tokenId) public view returns (bytes memory) {
     require(_exists(tokenId), "not a valid token");
     return pieces[tokenId].imageData[0];
+  }
+
+  function setImageData(uint256 tokenId, bytes calldata state1, bytes calldata state2) public onlyOwner {
+    pieces[tokenId].imageData[0] = state1;
+    pieces[tokenId].imageData[1] = state2;
   }
 
   // Will be used by the owner during setup to create all pieces of the work.
@@ -62,7 +67,6 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
     pieces[tokenId].ipfsHashes = ipfsHashes;
     pieces[tokenId].arweaveHashes = arweaveHashes;
     pieces[tokenId].currentState = 0;
-    //emit TokenDataStorage(tokenId, states);
   }
 
   // Init multiple tokens at once
