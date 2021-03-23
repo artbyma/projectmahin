@@ -7,9 +7,15 @@ import "openzeppelin-solidity/contracts/GSN/Context.sol";
 
 /**
  * @dev Uses the Ownable class and adds a second role called the minter.
+ *
+ * Owner: Can upload tokens, withdraw lost tokens, config ipfs hashes etc. Can also mint tokens.
+     Can set the other roles.
+ * Minter: Can only mint tokens.
+ * Doctor: If set, can diagnose pieces. Replaces the builtin rand gen.
  */
 abstract contract Roles is Context, Ownable {
     address private _minter;
+    address private _doctor;
 
     /**
      * @dev Initializes the contract setting the deployer as the initial minter.
@@ -25,6 +31,13 @@ abstract contract Roles is Context, Ownable {
      */
     function minter() public view returns (address) {
         return _minter;
+    }
+
+    /**
+     * @dev Returns the address of the doctor.
+     */
+    function doctor() public view returns (address) {
+        return _doctor;
     }
 
     /**
@@ -49,7 +62,14 @@ abstract contract Roles is Context, Ownable {
      */
     function setMinter(address newMinter) public virtual onlyOwner {
         require(newMinter != address(0), "zero address");
-        emit OwnershipTransferred(_minter, newMinter);
         _minter = newMinter;
+    }
+
+    /**
+     * @dev Assigns the doctor role, replacing the builtin rng.
+     */
+    function setDoctor(address newDoctor) public virtual onlyOwner {
+        require(newDoctor != address(0), "zero address");
+        _doctor = newDoctor;
     }
 }

@@ -11,7 +11,7 @@ import "./Randomness.sol";
 import "./Fees.sol";
 
 
-contract MahinNFT is ERC721("Mahin", "MAHIN"), Randomness, Roles, HasFees  {
+contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
   event TokenDataStorage(
     uint256 indexed tokenId,
     bytes[] states

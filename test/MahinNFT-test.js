@@ -90,7 +90,14 @@ describe("MahinNFT", function() {
     expect((await nft.rollProbability())).to.be.equal(0);
     expect((await nft.isRolling())).to.be.equal(false);
   });
+
+  it ('fails to roll if doctor set', async function() {
+    const [signer] = await ethers.getSigners();
+    await nft.setDoctor(signer.address);
+    expect(nft.requestRoll(true)).to.be.revertedWith("rng-disabled");
+  })
 });
 
 // TODO: test we cannot requestRoll() twice
 // TODO: test we cannot applyRoll() out-of-order
+// TODO: Test replacement doctor

@@ -5,9 +5,10 @@ import "hardhat/console.sol";
 import "./ABDKMath64x64.sol";
 import "./ChainlinkVRF.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
+import "./Roles.sol";
 
 
-abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
+abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
     using SafeMath for uint256;
 
     // Configuration Chainlink VRF
@@ -106,6 +107,8 @@ abstract contract Randomness is ChainlinkVRF, IERC721Enumerable {
     // We accept as low-impact that a miner mining this block could withhold it. A user seed/reveal system
     // to counteract miner withholding introduces too much complexity (need to penalize users etc).
     function requestRoll(bool useFallback) external {
+        require(doctor() == address(0), "rng-disabled");
+
         // If a roll is already scheduled, do nothing.
         if (isRolling()) { return; }
 
