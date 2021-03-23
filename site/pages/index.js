@@ -17,7 +17,7 @@ export default function Home() {
     <Layout hideHeader={true}>
       <Hero />
 
-      <Gallery />
+      
 
       <SaleArea />
       <Mechanics />
