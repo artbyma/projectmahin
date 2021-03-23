@@ -109,6 +109,10 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
     emit Diagnosed(tokenId);
   }
 
+  function diagnose(uint256 tokenId) public onlyDoctor {
+    onDiagnosed(tokenId);
+  }
+
   function getBeneficiary() internal override view returns (address) {
     return beneficiary;
   }

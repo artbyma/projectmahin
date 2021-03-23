@@ -8,11 +8,11 @@ async function initToken(nftContract, tokenId) {
       "a name",
       [
         "hash1",
-        "hash1",
+        "hash2",
       ],
       [
         "hash1",
-        "hash1",
+        "hash2",
       ],
   );
 }
@@ -95,7 +95,21 @@ describe("MahinNFT", function() {
     const [signer] = await ethers.getSigners();
     await nft.setDoctor(signer.address);
     expect(nft.requestRoll(true)).to.be.revertedWith("rng-disabled");
-  })
+  });
+
+  it ('doctor can diagnose', async function() {
+    const [signer] = await ethers.getSigners();
+    await initToken(nft, 5);
+    await nft.mintToken(5, signer.address);
+
+    expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
+
+    await nft.setDoctor(signer.address);
+
+    expect(await nft.tokenURI(5)).to.equal("hash1");
+    await nft.diagnose(5);
+    expect(await nft.tokenURI(5)).to.equal("hash2");
+  });
 });
 
 // TODO: test we cannot requestRoll() twice

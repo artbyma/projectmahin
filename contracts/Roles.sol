@@ -49,6 +49,14 @@ abstract contract Roles is Context, Ownable {
     }
 
     /**
+     * @dev Throws if called by any account other than the doctor.
+     */
+    modifier onlyDoctor() {
+        require(_doctor == _msgSender(), "not doctor");
+        _;
+    }
+
+    /**
      * @dev Throws if called by any account other than the minter or the owner.
      */
     modifier onlyMinterOrOwner() {
