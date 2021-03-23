@@ -1,26 +1,27 @@
 /** @jsxRuntime classic /
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react'
-import Head from 'next/head'
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import {useState, Fragment} from 'react';
 import {useWeb3React} from "../lib/web3wallet/core";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
-import {curveAbi, getMintPrice, useMintPrice} from "../lib/useMintPrice";
-import {Layout, Padding} from "../lib/Layout";
+import {getMintPrice, useMintPrice} from "../lib/useMintPrice";
+import {Layout, LogoWithText, MaxWidth, Padding} from "../lib/Layout";
 import {useCurveContract} from "../lib/useCurveContract";
 import {useRouter} from "next/router";
+import {Overview} from "../lib/Overview";
 
 export default function Home() {
   return (
-    <Layout>
+    <Layout hideHeader={true}>
       <Hero />
 
       <Gallery />
 
       <SaleArea />
       <Mechanics />
+      <Overview />
       <ArtistStatement />
       <TechStack />
     </Layout>
@@ -29,9 +30,13 @@ export default function Home() {
 
 
 function Hero() {
-  return <Padding css={css`
+  return <div css={css`
+    background: #f63677;
+    color: white;
+    padding: 50px 0;
+    
     font-family: Varta, sans-serif;
-    text-align: left;
+    text-align: center;
     h1 {
       font-size: 40px;
       margin-top: 45px;
@@ -43,21 +48,50 @@ function Hero() {
       font-size: 22px;
     }
     a {
-      color: #f45e92;
+      color: #f63677;
       font-weight: bold;
+    }
+    
+    .divided {
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      align-items: center;
+      text-align: center;
+    }
+    .divided > * {
+      
+    }
+    .divided .bncLogo {
+      width: 250px;
     }
   `}
   >
-    <h1>
-      Crypto art that mirrors real world data. An exploration of emergent behavior, an
-      autonomous performance on the Ethereum blockchain.
-    </h1>
-    <p>
-      The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive
-      breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When
-      they do, the art work changes shape to represent this. <a href={"#mechanics"}>Learn more.</a>
-    </p>
-  </Padding>
+    <MaxWidth>
+      <Padding>
+        <div className={"divided"}>
+          <div>
+            <LogoWithText />
+          </div>
+          <div>
+            <img className={"bncLogo"} src={"/img/bcn-aid-reverse.png"} alt={"Breast Cancer Now Logo"}/>
+          </div>
+        </div>
+        <h1>
+          An autonomous crypto art experiment.
+
+          {/*An exploration of emergent behavior, an*/}
+          {/*autonomous performance on the Ethereum blockchain.*/}
+        </h1>
+        <p>
+          The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive
+          breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When
+          they do, the art work changes shape to represent this. <a href={"#mechanics"}>Learn more.</a>
+        </p>
+      </Padding>
+    </MaxWidth>
+  </div>
 }
 
 
@@ -85,68 +119,134 @@ function SaleArea() {
     
     background: #fafafa;
   `}>
-    <Padding>
-      <div css={css`
-        text-align: center;
-        h4 {
-          font-size: 44px;
-        }
-      `}>
-        <h4>
-          1st Set: Starting 7th February
-        </h4>
-      </div>
-      <div css={css`
-         text-align: center;
-         display: flex;
-         flex-direction: row;
-         align-items: flex-start;
-         justify-content: center;
-         > div {
-            margin: 30px;
-         }
-         
-         strong {
-          font-weight: 300;
-         }
-         .number {
+    <MaxWidth>
+      <Padding>
+        <div css={css`
+          text-align: center;
+          h4 {
             font-size: 44px;
-         }
-         .detail {
-            font-size: 0.9em;
-         }
-       `}>
-         <div style={{flex: 1}}>
-           <strong>Pieces Available</strong>
-           <div className={"number"}>
-             8/8
+          }
+        `}>
+          <h4>
+            Thursday, 25th March: Launch Sale
+          </h4>
+        </div>
+        <div css={css`
+           text-align: center;
+           display: flex;
+           flex-direction: row;
+           align-items: flex-start;
+           justify-content: center;
+           > div {
+              margin: 30px;
+           }
+           
+           strong {
+            font-weight: 300;
+           }
+           .number {
+              font-size: 44px;
+           }
+           .detail {
+              font-size: 0.9em;
+           }
+         `}>
+           <div style={{flex: 1}}>
+             <strong>Pieces Available</strong>
+             <div className={"number"}>
+               55/60
+             </div>
            </div>
-         </div>
-         <div style={{flex: 1}}>
-           <strong>Current Price</strong>
-           <div className={"number"}>
-             Ξ {formatMintPrice(currentPrice)}
+           <div style={{flex: 1}}>
+             <strong>Current Price</strong>
+             <div className={"number"}>
+               Ξ {formatMintPrice(currentPrice)}
+             </div>
+             <div className={"detail"}>
+               <Tippy placement={"bottom"} content={<span>
+                  Each sale increases the price of the next piece. If a piece remains unsold
+                  for a longer period, the price starts to slowly decay.
+               </span>}>
+                 <span>
+                  Next Price: Ξ {formatMintPrice(nextPrice)} {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
+                 </span>
+               </Tippy>
+             </div>
            </div>
-           <div className={"detail"}>
-             <Tippy placement={"bottom"} content={<span>
-                Each sale increases the price of the next piece. If a piece remains unsold
-                for a longer period, the price starts to slowly decay.
-             </span>}>
-               <span>
-                Next Price: Ξ {formatMintPrice(nextPrice)} {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
-               </span>
-             </Tippy>
+           <div style={{flex: 1, textAlign: 'right'}}>
+             <PurchaseButton />
+             <div className={"detail"} style={{paddingTop: '15px', color: '#3a3a3a'}}>
+               {account ? <span>Connected as {account.slice(0, 6)}.{" "}</span> : null}
+               A random piece in the series will be minted for you.
+             </div>
            </div>
-         </div>
-         <div style={{flex: 1, textAlign: 'right'}}>
-           <PurchaseButton />
-           <div className={"detail"} style={{paddingTop: '15px', color: '#3a3a3a'}}>
-             {account ? <span>Connected as {account.slice(0, 6)}.{" "}</span> : null}
-             The next piece in the series will be minted for you.
-           </div>
-         </div>
-      </div>
-    </Padding>
+        </div>
+
+        <div css={css`
+           border-top: 1px dotted silver;
+           
+           display: flex;
+           flex-direction: row;
+           align-items: flex-start;
+           justify-content: center; 
+           text-align: left;
+           
+           > div {
+              flex: 1;
+              margin: 30px;
+           }
+           
+           strong {
+            font-weight: bold;
+           }
+           
+           table {
+             border-collapse: collapse;
+           }
+           table tr td:first-child {
+            padding-right: 20px;
+           }
+           table tr td {
+              border-bottom: 1px solid silver;
+           }
+        `}>
+          <div style={{
+            display: 'flex',
+            flexDirection: "row",
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div>
+              <strong>Pricing Schedule</strong>
+              <table>
+                <tr><td>1 - 10</td> <td>0.2 ETH</td></tr>
+                <tr><td>11 - 20</td> <td>0.3 ETH</td></tr>
+                <tr><td>21 - 30</td> <td>0.4 ETH</td></tr>
+                <tr><td>31 - 40</td> <td>0.5 ETH</td></tr>
+                <tr><td>41 - 50</td> <td>0.6 ETH</td></tr>
+                <tr><td>51 - 60</td> <td>Reserved</td></tr>
+              </table>
+            </div>
+          </div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}>
+            <div><img src={"/img/bcn-aid.png"} alt={"Breast Cancer Now Logo"} style={{width: '200px', marginRight: '10px'}} /></div>
+            <div>
+              <strong>Royalty Statement</strong>
+              <p>
+                For each item sold, 75% of the purchase price, plus 100% of any secondary royalties, will be donated to
+                Breast Cancer Now, a charity registered in England and Wales (No. 1160558), Scotland (SC045584) and Isle of Man (No. 1200).
+              </p>
+              <p>
+                You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc"}>this address</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Padding>
+    </MaxWidth>
   </div>
 }
 
@@ -272,37 +372,41 @@ function Mechanics() {
 
         <div className={"fact"}>
           <div className={"number"}>
-            24
-          </div>
-          <div className={"text"}>
-            unique illustrations, minted as NFTs.
-          </div>
-          <div className={"detail"}>
-            Only 24 pieces will exist. They will be released in multiple sets, over a period of approximately 1 month.
-          </div>
-        </div>
-
-        <div className={"fact"}>
-          <div className={"number"}>
             1 in 12
           </div>
           <div className={"text"}>
-            women are diagnosed with breast cancer.
+            probability a woman will experience breast cancer.
           </div>
           <div className={"detail"}>
-            There is a 1/12 chance a token will be diagnosed and change state.
+            Accordingly, there is a 1/12 chance for each NFT to be diagnosed. This is random and
+            unpredictable, and the creators do not control the process or know the outcome.
           </div>
         </div>
 
         <div className={"fact"}>
           <div className={"number"}>
-            5% <small style={{fontSize: '0.7em', verticalAlign: 'middle', color: "gray"}}>/</small> 15%
+            60
+          </div>
+          <div className={"text"}>
+            hand-designed, unique illustrations.
+          </div>
+          <div className={"detail"}>
+            Each illustration is a lovingly created, one-of-a kind piece, and if diagnosed, will transform to
+            represent a woman post-surgery. Because we cannot predict the outcome, two versions of each
+            illustration have been created.
+          </div>
+        </div>
+
+        <div className={"fact"}>
+          <div className={"number"}>
+            5<small>%</small> <small style={{fontSize: '0.7em', verticalAlign: 'middle', color: "gray"}}>/</small> 15<small>%</small>
           </div>
           <div className={"text"}>
             secondary market royalties, going to charity.
           </div>
           <div className={"detail"}>
-            Royalties increase to 15% for tokens which are diagnosed.
+            If a token is diagnosed, secondary sale royalties increase to 15%. All secondary sale royalties go to
+            our charity partner, <a href={"https://breastcancernow.org/"}>Breast Cancer Now UK</a>.
           </div>
         </div>
 
@@ -311,10 +415,12 @@ function Mechanics() {
             5 years
           </div>
           <div className={"text"}>
-            runtime of the project.
+            minimum runtime of the project.
           </div>
           <div className={"detail"}>
-            The tokens will exist forever, but the randomness generator will gradually wind down, making new diagnosis unlikely.
+            While the artwork will exist on the blockchain forever, the randomness generator will gradually wind
+            down after 5 years, making new diagnosis increasingly unlikely, while never excluding the possibility
+            entirely.
           </div>
         </div>
       </div>
@@ -352,8 +458,7 @@ function TechStack() {
       font-weight: 700;
     }
     a {
-      text-decoration: underline;
-      text-underline: deeppink;
+      color: #fc79a5;
     }
     
     .section {
@@ -372,131 +477,122 @@ function TechStack() {
       padding: 0.2em;
     }
   `}>
-    <Padding>
-      <h3>Technical Details</h3>
-      <p className={"detail"}>
-        <span>
-          0x663378bfc54ad95005358392d1e35bd1265e9d12
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://etherscan.com">Etherscan</a>
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://etherscan.com">OpenSea</a>
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://etherscan.com">Source Code</a>
-        </span>
-      </p>
-
-      <div className={"section"}>
-        <div className={"sectionHeader"}>Randomness</div>
-        <p>
-          Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
-          at any time, as follows:
+    <MaxWidth>
+      <Padding>
+        <h3>Technical Details</h3>
+        <p className={"detail"}>
+          <span>
+            0x663378bfc54ad95005358392d1e35bd1265e9d12
+          </span>
+          {" "}&bull;{" "}
+          <span>
+            <a href="https://etherscan.com">Etherscan</a>
+          </span>
+          {" "}&bull;{" "}
+          <span>
+            <a href="https://etherscan.com">OpenSea</a>
+          </span>
+          {" "}&bull;{" "}
+          <span>
+            <a href="https://etherscan.com">Source Code</a>
+          </span>
         </p>
-        <ol css={css`
-           list-style: none;
-           counter-reset: item;
-           li {
-             counter-increment: item;
-             margin-top: 25px;
-             margin-bottom: 25px;
-             display: flex;
-             flex-direction: row;
+
+        <div className={"section"}>
+          <div className={"sectionHeader"}>Randomness</div>
+          <p>
+            Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
+            at any time, as follows:
+          </p>
+          <ol css={css`
+             list-style: none;
+             counter-reset: item;
+             li {
+               counter-increment: item;
+               margin-top: 25px;
+               margin-bottom: 25px;
+               display: flex;
+               flex-direction: row;
+               
+             }
+             li:before {
+              margin-right: 10px;
+              margin-top: -10px;
+              content: counter(item);
+              width: 1em;
+              height: 1em;
+              padding: 0.2em;
+              font-size: 2em;
+              line-height: 1em;
+              vertical-align: middle;
+              text-align: center;
+              display: inline-block;
+             }
              
-           }
-           li:before {
-            margin-right: 10px;
-            margin-top: -10px;
-            content: counter(item);
-            width: 1em;
-            height: 1em;
-            padding: 0.2em;
-            font-size: 2em;
-            line-height: 1em;
-            vertical-align: middle;
-            text-align: center;
-            display: inline-block;
-           }
-           
-           .hint {
-             font-size: .9em;
-             margin-top: 0.5em;
-             color: silver;
-           }
-        `}>
-          <li>
-            <div>
-              <div>Fund the contract with 2 LINK.</div>
-              <div className={"hint"}>
-                Hint: Only fund the contract when you want to request randomness. Since anyone can call the contract
-                as often as they want, it is easy to drain its balance.
-              </div>
-            </div>
-
-          </li>
-          <li>
-            <div>
+             .hint {
+               font-size: .9em;
+               margin-top: 0.5em;
+               color: silver;
+             }
+          `}>
+            <li>
               <div>
-                Call the <code>requestRoll()</code> function.
+                <div>Fund the contract with 2 LINK.</div>
+                <div className={"hint"}>
+                  Hint: Only fund the contract when you want to request randomness. Since anyone can call the contract
+                  as often as they want, it is easy to drain its balance.
+                </div>
               </div>
-              <div className={"hint"}>
-                Wait roughly two minutes, then verify on-chain that Chainlink has provided a random number.
+
+            </li>
+            <li>
+              <div>
+                <div>
+                  Call the <code>requestRoll()</code> function.
+                </div>
+                <div className={"hint"}>
+                  Wait roughly two minutes, then verify on-chain that Chainlink has provided a random number.
+                </div>
               </div>
-            </div>
-          </li>
-          <li>
-            <div>
-              After a minute or two, call the <code>applyRoll()</code> function.
-            </div>
-          </li>
-        </ol>
-      </div>
+            </li>
+            <li>
+              <div>
+                After a minute or two, call the <code>applyRoll()</code> function.
+              </div>
+            </li>
+          </ol>
+        </div>
 
-      <div className={"section"}>
-        <div className={"sectionHeader"}>Zora Protocol</div>
-        <p>
-          The contract implements the <a href={"https://zora.engineering/protocol/smart-contracts"}>Zora Protocol</a>,
-          embedding within each token its own marketplace. Owners have the ability to sell their tokens on the
-          built-in market, using any interface available in the future, but retain the ability to list their
-          tokens on OpenSea and others.
-        </p>
-      </div>
+        <div className={"section"}>
+          <div className={"sectionHeader"}>On-Chain Content</div>
+          <p>
+            It is imperative that the media files represented by NFTs remain accessible. For this reason, all artwork
+            will be stored on the Ethereum blockchain. Further, to improve their accessibility through the web,
+            we also store them on <a href={"https://www.arweave.org/"}>Arweave</a>.
+          </p>
+        </div>
 
-      <div className={"section"}>
-        <div className={"sectionHeader"}>On-Chain Content</div>
-        <p>
-          It is imperative that the media files represented by NFTs remain accessible. For this reason, all artwork
-          is stored on the Ethereum blockchain as SVG code. Further, to improve their accessibility through the web,
-          we also store them on <a href={"https://www.arweave.org/"}>Arweave</a>. Finally, the Zora protocol allows
-          an owner to update their
-        </p>
-      </div>
-
-      <div className={"section"}>
-        <div className={"sectionHeader"}>Royalties</div>
-        <p>
-          There is currently no accepted standard for NFT royalties. Since since is a long-term project,
-          we wanted to future-proof it as much as possible by implementing multiple of the royalty standards
-          currently in use. Specifically, the contract exposes functions to implement these interfaces:
-        </p>
-        <ul>
-          <li>EIP-2981</li>
-          <li>Rarible</li>
-          <li>Known Origin</li>
-          <li>InfinityNFT</li>
-        </ul>
-        <p>
-          We did not implement <a href={"https://github.com/ethereum/EIPs/issues/2571"}>ERC-2571</a>
-          {" "} or <a href={"https://github.com/ethereum/EIPs/issues/2665"}>ERC-2665</a>. The former has the
-          undesirable effect of disabling simple transfers, and the latter seems to lack traction.
-        </p>
-      </div>
-    </Padding>
+        <div className={"section"}>
+          <div className={"sectionHeader"}>Royalties</div>
+          <p>
+            There is currently no accepted standard for NFT royalties. Since since is a long-term project,
+            we wanted to future-proof it as much as possible by implementing multiple of the royalty standards
+            currently in use. Specifically, the contract exposes functions to implement these interfaces:
+          </p>
+          <ul>
+            <li>EIP-2981</li>
+            <li>Rarible</li>
+            <li>Known Origin</li>
+            <li>InfinityNFT</li>
+          </ul>
+          <p>
+            We did not implement <a href={"https://github.com/ethereum/EIPs/issues/2571"}>ERC-2571</a>
+            {" "} or <a href={"https://github.com/ethereum/EIPs/issues/2665"}>ERC-2665</a>. The former has the
+            undesirable effect of disabling simple transfers, and the latter seems to lack traction.
+          </p>
+        </div>
+      </Padding>
+    </MaxWidth>
   </div>
 }
 

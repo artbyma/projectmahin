@@ -2,7 +2,7 @@
  /** @jsx jsx */
 import React, {useEffect, useState} from "react";
 import {css, jsx} from "@emotion/react";
-import {Layout, Padding} from "../lib/Layout";
+import {Layout, MaxWidth, Padding} from "../lib/Layout";
 import {useWeb3React} from "../lib/web3wallet/core";
 import {useNFTContract} from "../lib/useNFTContract";
 
@@ -18,7 +18,7 @@ export default function Thanks() {
 
 export function Content(props: {
 }) {
-  return <Padding css={css`
+  return <MaxWidth><Padding css={css`
     font-size: 18px;
   `}>
     <h1>Thank you!</h1>
@@ -33,6 +33,7 @@ export function Content(props: {
       royalties will increase from 5% to 15% - all are donated to charity.
     </p>
   </Padding>
+  </MaxWidth>
 }
 
 export function MyGallery() {
