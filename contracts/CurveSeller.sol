@@ -3,6 +3,7 @@
 
 pragma solidity ^0.7.0;
 
+//import "hardhat/console.sol";
 import "./MahinNFT.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -39,7 +40,14 @@ contract CurveSeller {
         uint256 mintPrice = getPriceToMint(0);
         require(msg.value >= mintPrice, "not enough eth");
 
-        uint256 tokenId = idsToSell[block.timestamp % idsToSell.length];
+        uint idx = block.timestamp % idsToSell.length;
+
+        uint256 tokenId = idsToSell[idx];
+
+        // delete the element - move the last element to the deleted slot
+        idsToSell[idx] = idsToSell[idsToSell.length-1];
+        idsToSell.pop();
+
         numSold = numSold+1;
 
         // Send the token to the buyer

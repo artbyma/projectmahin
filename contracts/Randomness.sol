@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.0;
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 import "./ABDKMath64x64.sol";
 import "./ChainlinkVRF.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
@@ -204,7 +204,7 @@ abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
             // giving us a 64-bit number. Stored as an int128, this represents a fractional value between 0 and 1
             // in the format used by the 64.64 - fixed point library.
             int128 randomNumber = int128(uint256(hash) >> 192);
-            console.log("RANDOMNUMBER", uint256(randomNumber));
+            //console.log("RANDOMNUMBER", uint256(randomNumber));
 
             if (randomNumber > rollProbability) {
                 onDiagnosed(tokenId);

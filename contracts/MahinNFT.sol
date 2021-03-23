@@ -23,8 +23,9 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
 
   struct Piece {
     string name;
-    bytes[] states;
+    bytes[] imageData;
     string[] ipfsHashes;
+    string[] arweaveHashes;
     uint8 currentState;
   }
 
@@ -47,31 +48,42 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
   }
 
   // Returns the current SVG of the piece.
-//  function getImageData(uint256 tokenId) public view returns (bytes memory) {
-//    require(_exists(tokenId), "not a valid token");
-//    return pieces[tokenId].states[0];
-//  }
+  function getImageData(uint256 tokenId) public view returns (bytes memory) {
+    require(_exists(tokenId), "not a valid token");
+    return pieces[tokenId].imageData[0];
+  }
 
   // Will be used by the owner during setup to create all pieces of the work.
-  // states - the svg code for each state.
   // ipfsHashes - the ipfs location of each state - needed so provided an off-chain metadata url.
-  function initToken(uint256 tokenId, string memory name, bytes[] memory states, string[] memory ipfsHashes) public onlyOwner {
-//    require(pieces[tokenId].ipfsHashes.length == 0, "invalid id");
-//
-//    pieces[tokenId].name = name;
-      pieces[tokenId].states = states;
-      pieces[tokenId].ipfsHashes = ipfsHashes;
-//    pieces[tokenId].currentState = 0;
+  function initToken(uint256 tokenId, string memory name, string[] memory arweaveHashes, string[] memory ipfsHashes) public onlyOwner {
+    require(pieces[tokenId].ipfsHashes.length == 0, "invalid id");
+
+    pieces[tokenId].name = name;
+    pieces[tokenId].ipfsHashes = ipfsHashes;
+    pieces[tokenId].arweaveHashes = arweaveHashes;
+    pieces[tokenId].currentState = 0;
     //emit TokenDataStorage(tokenId, states);
+  }
+
+  // Init multiple tokens at once
+  function initTokens(uint256[] memory tokenIds, string[] memory names, string[][] memory arweaveHashSets, string[][] memory ipfsHashSets) public onlyOwner {
+    for (uint256 i=0; i<tokenIds.length; i++) {
+      uint256 tokenId = tokenIds[i];
+      require(pieces[tokenId].ipfsHashes.length == 0, "invalid id");
+
+      pieces[tokenId].name = names[i];
+      pieces[tokenId].ipfsHashes = ipfsHashSets[i];
+      pieces[tokenId].arweaveHashes = arweaveHashSets[i];
+      pieces[tokenId].currentState = 0;
+    }
   }
 
   // Allow contract owner&minter to mint a token and assigned to to anyone they please.
   function mintToken(uint256 tokenId, address firstOwner) public onlyMinterOrOwner {
-    require(pieces[tokenId].states.length > 0, "invalid id");
+    require(pieces[tokenId].ipfsHashes.length > 0, "invalid id");
+    require(!_exists(tokenId), "exists");
 
-    if (!_exists(tokenId)) {
-      _mint(firstOwner, tokenId);
-    }
+    _mint(firstOwner, tokenId);
   }
 
   // Allow contract owner to set the IPFS host
@@ -81,7 +93,7 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
 
   // Return the current IPFS link based on state
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
-    require(pieces[tokenId].states.length > 0, "invalid id");
+    require(pieces[tokenId].ipfsHashes.length > 0, "invalid id");
 
     Piece memory piece = pieces[tokenId];
     string memory tokenPath = piece.ipfsHashes[piece.currentState];

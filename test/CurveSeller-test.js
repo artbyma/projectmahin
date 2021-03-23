@@ -6,10 +6,11 @@ describe("CurveSeller", function() {
   let curveSeller, nftContract;
   beforeEach(async () => {
     nftContract = await setupMahinNFTContract();
-    await nftContract.initToken(1, "name", [Buffer.from("sdf"), Buffer.from("sdf")],  ["hash1", "hash1"]);
+    await nftContract.initToken(1, "name", ["hash1", "hash1"],  ["hash1", "hash1"]);
+    await nftContract.initToken(2, "name", ["hash1", "hash1"],  ["hash1", "hash1"]);
 
     const CurveSeller = await ethers.getContractFactory("CurveSeller");
-    curveSeller = await CurveSeller.deploy(nftContract.address, [1]);
+    curveSeller = await CurveSeller.deploy(nftContract.address, [1, 2]);
     await curveSeller.deployed();
     await nftContract.setMinter(curveSeller.address);
   });
@@ -18,18 +19,38 @@ describe("CurveSeller", function() {
     const [signer, account2] = await ethers.getSigners();
     expect(await curveSeller.getPriceToMint(0)).to.equal('150000000000000000'); // 0.15
     expect(await curveSeller.getPriceToMint(2)).to.equal('150000000000000000'); // 0.15
-    expect(await curveSeller.getPriceToMint(5)).to.equal('300000000000000000'); // 0.15
+    expect(await curveSeller.getPriceToMint(5)).to.equal('300000000000000000');
+
+    // How about after a purchase?
+    let tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
+    await tx.wait();
+    tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
+    await tx.wait();
+
+    // +3 is now enough to reach the second level
+    expect(await curveSeller.getPriceToMint(3)).to.equal('300000000000000000');
   });
 
   it("fails to purchase w/o enough eth", async function() {
     expect(curveSeller.purchase()).to.be.revertedWith("not enough eth");
   });
 
-  it("purchases", async function() {
+  it("can purchase", async function() {
     const [signer, account2] = await ethers.getSigners();
-    const tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
-    await tx.wait();
 
-    expect(await nftContract.ownerOf(1)).to.equal(signer.address);
+    // Buy one
+    let tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
+    await tx.wait();
+    expect(await nftContract.tokenOfOwnerByIndex(signer.address, 0)).to.not.equal(0);  // to.not.revert really
+    expect(await nftContract.totalSupply()).to.equal(1);
+
+    // Buy another one
+    tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
+    await tx.wait();
+    expect(await nftContract.tokenOfOwnerByIndex(signer.address, 1)).to.not.equal(0);  // to.not.revert really
+    expect(await nftContract.totalSupply()).to.equal(2);
+
+    // Only two are in the curve, so this will fail
+    expect(curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})).to.be.revertedWith("sold out");
   });
 });
