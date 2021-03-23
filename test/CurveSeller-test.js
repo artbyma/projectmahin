@@ -12,6 +12,7 @@ describe("CurveSeller", function() {
     const CurveSeller = await ethers.getContractFactory("CurveSeller");
     curveSeller = await CurveSeller.deploy(nftContract.address, [1, 2]);
     await curveSeller.deployed();
+    await curveSeller.enable(true);
     await nftContract.setMinter(curveSeller.address);
   });
 

@@ -5,12 +5,13 @@ pragma solidity ^0.7.0;
 
 //import "hardhat/console.sol";
 import "./MahinNFT.sol";
+import "openzeppelin-solidity/contracts/access/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 // Sell NFTs using a step function.
-contract CurveSeller {
+contract CurveSeller is Ownable {
     using SafeMath for uint256;
 
     // Sells these token ids in ascending order
@@ -25,6 +26,8 @@ contract CurveSeller {
         [3, 1 ether]
     ];
 
+    bool public enabled = false;
+
     uint256 numSold = 0;
 
     MahinNFT public nftContract;
@@ -34,8 +37,13 @@ contract CurveSeller {
         idsToSell = _idsToSell;
     }
 
+    function enable(bool _enable) public onlyOwner {
+        enabled = _enable;
+    }
+
     function purchase() public virtual payable returns (uint256 _tokenId) {
         require(idsToSell.length > 0, "sold out");
+        require(enabled, "disabled");
 
         uint256 mintPrice = getPriceToMint(0);
         require(msg.value >= mintPrice, "not enough eth");
