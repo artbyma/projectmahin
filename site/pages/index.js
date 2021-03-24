@@ -17,7 +17,7 @@ export default function Home() {
     <Layout hideHeader={true}>
       <Hero />
 
-      
+      <Gallery />
 
       <SaleArea />
       <Mechanics />
@@ -37,6 +37,7 @@ function Hero() {
     
     font-family: Varta, sans-serif;
     text-align: center;
+    
     h1 {
       font-size: 40px;
       margin-top: 45px;
@@ -60,9 +61,16 @@ function Hero() {
       align-items: center;
       text-align: center;
     }
-    .divided > * {
-      
+    
+    @media (max-width: 700px) {
+      .divided {
+        flex-direction: column;
+      }
+      .bncLogo {
+        margin-top: 40px;
+      }
     }
+    
     .divided .bncLogo {
       width: 250px;
     }
@@ -78,17 +86,14 @@ function Hero() {
             <img className={"bncLogo"} src={"/img/bcn-aid-reverse.png"} alt={"Breast Cancer Now Logo"}/>
           </div>
         </div>
-        <h1>
-          An autonomous crypto art experiment.
-
-          {/*An exploration of emergent behavior, an*/}
-          {/*autonomous performance on the Ethereum blockchain.*/}
-        </h1>
-        <p>
-          The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive
-          breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When
-          they do, the art work changes shape to represent this. <a href={"#mechanics"}>Learn more.</a>
-        </p>
+        {/*<h1>*/}
+        {/*  An autonomous crypto art experiment.*/}
+        {/*</h1>*/}
+        {/*<p>*/}
+        {/*  The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive*/}
+        {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
+        {/*  they do, the art work changes shape to represent this.*/}
+        {/*</p>*/}
       </Padding>
     </MaxWidth>
   </div>
@@ -107,7 +112,6 @@ function formatMintPrice(price) {
 function SaleArea() {
   const { account } = useWeb3React();
   const [currentPrice, nextPrice, numItems] = useMintPrice();
-
 
   return <div css={css`
     font-family: Varta,sans-serif;
@@ -140,6 +144,11 @@ function SaleArea() {
            > div {
               margin: 30px;
            }
+           
+           @media (max-width: 700px) {
+            flex-direction: column;
+            align-items: center;
+          }
            
            strong {
             font-weight: 300;
@@ -189,6 +198,11 @@ function SaleArea() {
            align-items: flex-start;
            justify-content: center; 
            text-align: left;
+          
+          @media (max-width: 700px) {
+            flex-direction: column;
+            align-items: center;
+          }
            
            > div {
               flex: 1;
@@ -227,10 +241,14 @@ function SaleArea() {
               </table>
             </div>
           </div>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-          }}>
+          <div css={css`
+            display: flex;
+            flex-direction: row;
+            @media (max-width: 700px) {
+              flex-direction: column;
+              align-items: center;
+            }
+          `}>
             <div><img src={"/img/bcn-aid.png"} alt={"Breast Cancer Now Logo"} style={{width: '200px', marginRight: '10px'}} /></div>
             <div>
               <strong>Royalty Statement</strong>
@@ -259,7 +277,7 @@ function ArtistStatement() {
     font-size: 18px;
     line-height: 1.6;
     font-weight: 300;
-    padding: 100px;
+    padding: 100px 0px;
     margin: 0 0 0;
     background: #fcf6f6;
   `}>
@@ -595,34 +613,86 @@ function TechStack() {
   </div>
 }
 
-function Gallery() {
-  return  <div>
-    <div>
-      <style jsx>{`
-        .image {
-          width: 200px;
-          height: 200px;
-          background-color: burlywood;
-          margin: 10px;
-          margin-top: 50px;
-        }
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `}</style>
 
-      <div className={"image"}/>
-      <div className={"image"}/>
-      <div className={"image"}/>
-    </div>
+function Gallery() {
+  return <div style={{
+    margin: '30px 0 10'
+  }}>
+    <MaxWidth>
+      <Padding>
+        <div css={css`
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          
+          h1 {
+            font-weight: 900;
+            font-size: 32px;
+          }
+          
+          p {
+            font-size: 20px;
+          }
+          
+          .previews { 
+            flex-shrink: 0;
+            margin-left: 50px;
+          }
+          
+          @media (max-width: 700px) {
+            flex-direction: column;
+            
+            .previews { 
+              flex-shrink: 0;
+              margin-left: 0px;
+            }
+          }
+        `}>
+          <div style={{flex: 1, marginRight: '30px'}}>
+            <h1>
+              An exploration of emergent behavior.<br />
+              An autonomous performance on the blockchain.<br />
+              A unique, 5-year experiment.
+            </h1>
+            <p>
+              1 in 8 woman will develop invasive breast cancer over the course of their lives.
+              60 unique illustrations represent women of every age and background, and face the same,
+              unpredictable odds. When diagnosed, the illustration will update.
+            </p>
+          </div>
+          <div classsName={"previews"}>
+            <style jsx>{`
+              .image {
+                width: 170px;
+                margin: 10px;
+              }
+              
+              .videos {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: row;
+              }
+            `}</style>
+
+            <div style={{fontStyle: 'italic', fontWeight: 400, textAlign: 'center'}}>
+              1/8 real-life odds of a breast-cancer diagnosis.
+            </div>
+            <div className={"videos"}>
+              <video src={"/img/example-set1.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} />
+              <video src={"/img/example-set2.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} />
+            </div>
+          </div>
+        </div>
+      </Padding>
+    </MaxWidth>
   </div>
 }
 
 
 function PurchaseButton() {
   const [busy, setBusy] = useState(false);
-  const { library, active } = useWeb3React();
+  const {library, active} = useWeb3React();
   const router = useRouter();
   const contract = useCurveContract();
 
