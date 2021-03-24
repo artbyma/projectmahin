@@ -15,7 +15,7 @@ export function Overview() {
   return <div css={css`
     display: grid;
     grid-template-columns: repeat(11, 1fr);
-  `} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
+  `} onMouseOver={() => setHover(false)} onMouseOut={() => setHover(false)}>
     {all.map((img) => {
       return  <img src={`/assets/${img.set}/${img.set}-${img.id}.${isHover ? '2' : '1'}.${img.type}`} style={{
         width: '100%',
