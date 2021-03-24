@@ -16,6 +16,7 @@ contract CurveSeller is Ownable {
 
     // Sells these token ids in ascending order
     uint[] public idsToSell;
+    uint256 public beneficiarySplit = 75;
 
     uint[2][6] public steps = [
         [5, 0.15 ether],
@@ -37,6 +38,11 @@ contract CurveSeller is Ownable {
         idsToSell = _idsToSell;
     }
 
+    function withdraw() public onlyOwner {
+        address payable owner = payable(owner());
+        owner.transfer(address(this).balance);
+    }
+
     function enable(bool _enable) public onlyOwner {
         enabled = _enable;
     }
@@ -52,8 +58,14 @@ contract CurveSeller is Ownable {
         uint256 mintPrice = getPriceToMint(0);
         require(msg.value >= mintPrice, "not enough eth");
 
-        uint idx = block.timestamp % idsToSell.length;
+        // Cut for the beneficiary
+        address beneficiary = nftContract.beneficiary();
+        if (beneficiary != address(0)) {
+            uint256 toCharity = mintPrice.mul(beneficiarySplit).div(100);
+            payable(beneficiary).transfer(toCharity);
+        }
 
+        uint idx = block.timestamp % idsToSell.length;
         uint256 tokenId = idsToSell[idx];
 
         // delete the element - move the last element to the deleted slot

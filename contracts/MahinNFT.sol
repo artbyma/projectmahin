@@ -95,6 +95,10 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
     _setBaseURI(baseURI_);
   }
 
+  function setBeneficiary(address _beneficiary) public onlyOwner {
+    beneficiary = _beneficiary;
+  }
+
   // Return the current IPFS link based on state
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
     require(pieces[tokenId].ipfsHashes.length > 0, "invalid id");

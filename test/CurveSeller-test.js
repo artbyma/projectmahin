@@ -1,6 +1,7 @@
 const {setupMahinNFTContract} = require("./utils");
 const { expect } = require("chai");
-
+const { waffle, network } = require("hardhat");
+const provider = waffle.provider;
 
 describe("CurveSeller", function() {
   let curveSeller, nftContract;
@@ -45,6 +46,9 @@ describe("CurveSeller", function() {
     expect(await nftContract.tokenOfOwnerByIndex(signer.address, 0)).to.not.equal(0);  // to.not.revert really
     expect(await nftContract.totalSupply()).to.equal(1);
 
+    // Check balance of the contract
+    expect(await provider.getBalance(curveSeller.address)).to.equal("150000000000000000");
+
     // Buy another one
     tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
     await tx.wait();
@@ -53,5 +57,20 @@ describe("CurveSeller", function() {
 
     // Only two are in the curve, so this will fail
     expect(curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})).to.be.revertedWith("sold out");
+  });
+
+  it('distributes to beneficiary', async () => {
+    const [signer, account2] = await ethers.getSigners();
+
+    await nftContract.setBeneficiary(account2.address);
+
+    // Buy one
+    let tx = await curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})
+    await tx.wait();
+    expect(await nftContract.tokenOfOwnerByIndex(signer.address, 0)).to.not.equal(0);  // to.not.revert really
+    expect(await nftContract.totalSupply()).to.equal(1);
+
+    expect(await provider.getBalance(curveSeller.address)).to.equal("37500000000000000");
+    expect(await provider.getBalance(account2.address)).to.equal("10000112500000000000000");
   });
 });
