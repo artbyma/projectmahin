@@ -11,6 +11,7 @@ import {Layout, LogoWithText, MaxWidth, Padding} from "../lib/Layout";
 import {useCurveContract} from "../lib/useCurveContract";
 import {useRouter} from "next/router";
 import {Overview} from "../lib/Overview";
+import {BigNumber} from "ethers";
 
 export default function Home() {
   return (
@@ -111,7 +112,10 @@ function formatMintPrice(price) {
 
 function SaleArea() {
   const { account } = useWeb3React();
-  const [currentPrice, nextPrice, numItems] = useMintPrice();
+  let [currentPrice, nextPrice, numItems] = useMintPrice();
+  numItems = 50;
+  currentPrice = BigNumber.from("150000000000000000")
+  nextPrice = BigNumber.from("150000000000000000")
 
   return <div css={css`
     font-family: Varta,sans-serif;
