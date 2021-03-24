@@ -96,8 +96,12 @@ function Header() {
     }
   `}>
     <div className={"header"}>
-      <SvgLogo style={{width: '1em', height: '1em', marginRight: '10px'}} color={"#f63677"} />
-      Project Mahin
+      <Link href={"/"}>
+        <a href={""}>
+          <SvgLogo style={{width: '1em', height: '1em', marginRight: '10px'}} color={"#f63677"} />
+          Project Mahin
+        </a>
+      </Link>
     </div>
 
     <div style={{position: 'absolute', right: 0, top: 0, bottom: 0}} className={"credit"}>
