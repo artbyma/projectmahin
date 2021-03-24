@@ -8,13 +8,21 @@ export function Overview() {
 
   const set1 = new Array(25).fill(true).map((_, idx) => ({set: 'set1', type: 'svg', id: String(idx+1).padStart(2, '0')}));
   const set2 = new Array(25).fill(true).map((_, idx) => ({set: 'set2', type: 'svg', id: String(idx+1).padStart(2, '0')}));
-  const set3 = new Array(5).fill(true).map((_, idx) => ({set: 'set3', type: 'png', id: String(idx+1).padStart(2, '0')}));
+  const set3 = new Array(6).fill(true).map((_, idx) => ({set: 'set3', type: 'png', id: String(idx+1).padStart(2, '0')}));
 
   const all = [...set1, ...set2, ...set3];
 
   return <div css={css`
     display: grid;
-    grid-template-columns: repeat(11, 1fr);
+    
+    grid-template-columns: repeat(8, 1fr);
+    
+    @media screen and (min-width: 1768px) {
+      grid-template-columns: repeat(14, 1fr);
+    }
+    @media screen and (max-width: 700px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
   `} onMouseOver={() => setHover(false)} onMouseOut={() => setHover(false)}>
     {all.map((img) => {
       return  <img src={`/assets/${img.set}-${img.id}.${isHover ? '2' : '1'}.${img.type}`} style={{

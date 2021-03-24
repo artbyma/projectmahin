@@ -28,7 +28,7 @@ export function Content(props: {
     <MyGallery />
     <h3>What happens now?</h3>
     <p>
-      Over the next 5 years, there is a 12% chance (1 in 8) that Lisa will be diagnosed with, fight
+      Over the next 5 years, there is a 12% chance (1 in 8) that your pieces will be diagnosed with, fight
       and successfully beat breast cancer. This will be reflected in your NFT. If so, secondary sale
       royalties will increase from 5% to 15% - all are donated to charity.
     </p>
