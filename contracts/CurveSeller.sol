@@ -29,7 +29,7 @@ contract CurveSeller is Ownable {
 
     bool public enabled = false;
 
-    uint256 numSold = 0;
+    uint256 public numSold = 0;
 
     MahinNFT public nftContract;
 
@@ -88,7 +88,7 @@ contract CurveSeller is Ownable {
     function getPriceToMint(uint256 idx) public virtual view returns (uint256) {
         uint256 target = numSold + idx;
         uint256 count = 0;
-        for (uint s=0; s<steps.length-1; s++) {
+        for (uint s=0; s<steps.length; s++) {
             count = count + steps[s][0];
             if (count > target) {
                 return steps[s][1];

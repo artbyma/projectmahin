@@ -58,7 +58,16 @@ task("deploy", "Deploy the contract", async () => {
   }
 
   const nft = await deployContract('MahinNFT', [Configs.rinkeby.chainlink]);
-  const curve = await deployContract("CurveSeller", [nft.address, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,28,29,30]]);
+  const curve = await deployContract("CurveSeller", [
+      nft.address,
+      [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+       17,18,
+       20,21,22,23,24,25,26,27,
+       30, 31, 32, 33, 34, 35, 36, 37, 38,
+       40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+       53, 54, 55, 56
+      ]
+  ]);
   console.log("ERC721 deployed to:", nft.address);
   console.log("Curve deployed to:", curve.address);
 
@@ -107,6 +116,28 @@ task("init-tokens", "Add SVGs and IPFs hashes to the deployed contract, initiali
     });
 
 
+task("test-run", "Purchase all tokens")
+    .addParam("curve", "The Curve contract address")
+    .setAction(async (taskArgs) => {
+      const {ethers} = await import('hardhat');
+      const {getCurveContract, getNFTContract} = await import('./scripts/setup');
+      const curve = await getCurveContract(taskArgs.curve);
+      await curve.enable(true);
+      const nft = await getNFTContract(await curve.nftContract());
+      await nft.setBeneficiary("0x83cB05402E875B5ca953e6eAa639F723d92BC4fc")
+
+      for (let i=0; i<50; i++) {
+        console.log("Purchasing", i);
+        const tx = await curve.purchase({value: await curve.getPriceToMint(0)});
+        await tx.wait();
+        console.log();
+      }
+
+      console.log((await ethers.provider.getBalance(curve.address)).toString());
+      console.log((await ethers.provider.getBalance("0x83cB05402E875B5ca953e6eAa639F723d92BC4fc")).toString());
+    });
+
+
 task("upload-assets", "Upload assets to IPFS and Arweave")
     .setAction(async (taskArgs) => {
       const {syncFiles} = await import('./scripts/setup');
@@ -115,12 +146,17 @@ task("upload-assets", "Upload assets to IPFS and Arweave")
 
 
 task("print-stats", "Print stats from the curve")
-    .addParam("contract", "The Curve contract address")
+    .addParam("curve", "The Curve contract address")
     .setAction(async (taskArgs) => {
       const {getCurveContract} = await import('./scripts/setup');
-      const contract = await getCurveContract(taskArgs.contract);
-      console.log(await contract.getPriceToMint(0));
-      console.log(await contract.getPriceToMint(1));
+      const contract = await getCurveContract(taskArgs.curve);
+      console.log('This price', await contract.getPriceToMint(0));
+      console.log('Next price', await contract.getPriceToMint(1));
+      const numRemaining = (await contract.numRemaining()).toNumber();
+      console.log('Ids left to Sell', numRemaining);
+      for (let i=0; i<numRemaining; i++) {
+        console.log('   ', (await contract.idsToSell(i)).toString());
+      }
     });
 
 
@@ -181,6 +217,9 @@ task("apply-roll", "Apply roll results")
     .addParam("contract", "The NFT contract address")
     .setAction(async (taskArgs) => {
       const {ethers} = await import('hardhat');
+
+      await ethers.provider.send("evm_mine", []);
+      await ethers.provider.send("evm_mine", []);
 
       const nft = await getNFTContract(taskArgs.contract);
       await nft.applyRoll();
