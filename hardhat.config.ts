@@ -227,6 +227,24 @@ task("apply-roll", "Apply roll results")
     });
 
 
+task("diagnose", "Diagnose")
+    .addParam("contract", "The NFT contract address")
+    .addParam("token", "The token id")
+    .setAction(async (taskArgs) => {
+      const {ethers} = await import('hardhat');
+      const [signer] = await ethers.getSigners();
+
+      const {getNFTContract} = await import('./scripts/setup');
+      const contract = await getNFTContract(taskArgs.contract);
+      await (await contract.setDoctor(signer.address)).wait();
+
+      const before = await contract.tokenURI(parseInt(taskArgs.token));
+      await contract.diagnose(parseInt(taskArgs.token));
+      const after = await contract.tokenURI(parseInt(taskArgs.token));
+      console.log(`Done, url changed from ${before} to ${after}`);
+    });
+
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
