@@ -236,11 +236,12 @@ function SaleArea() {
             <div>
               <strong>Pricing Schedule</strong>
               <table>
-                <tr><td>1 - 10</td> <td>0.2 ETH</td></tr>
-                <tr><td>11 - 20</td> <td>0.3 ETH</td></tr>
-                <tr><td>21 - 30</td> <td>0.4 ETH</td></tr>
-                <tr><td>31 - 40</td> <td>0.5 ETH</td></tr>
-                <tr><td>41 - 50</td> <td>0.6 ETH</td></tr>
+                <tr><td>1 - 5</td> <td>0.15 ETH</td></tr>
+                <tr><td>6 - 15</td> <td>0.3 ETH</td></tr>
+                <tr><td>16 - 30</td> <td>0.5 ETH</td></tr>
+                <tr><td>31 - 40</td> <td>0.65 ETH</td></tr>
+                <tr><td>41 - 47</td> <td>0.8 ETH</td></tr>
+                <tr><td>48 - 50</td> <td>1 ETH</td></tr>
                 <tr><td>51 - 60</td> <td>Reserved</td></tr>
               </table>
             </div>
@@ -667,7 +668,7 @@ function Gallery() {
           <div classsName={"previews"}>
             <style jsx>{`
               .image {
-                width: 170px;
+                height: 170px;
                 margin: 10px;
               }
               
