@@ -132,7 +132,7 @@ function SaleArea() {
           }
         `}>
           <h4>
-            Thursday, 25th March: Launch Sale
+            Thursday, 25th March, 13:00 GMT: Launch Sale
           </h4>
         </div>
         <div css={css`
@@ -744,7 +744,7 @@ function PurchaseButton() {
   return <Fragment>
     <ConnectModal {...modalProps} />
     <button
-      disabled={busy}
+      disabled={true}
       onClick={handleClick}
       css={css`
        width: 80%;
