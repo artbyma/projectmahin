@@ -9,6 +9,8 @@ const { deflateSync } = require('zlib');
 const pinataSDK = require('@pinata/sdk');
 const tmp = require('tmp');
 import {chunk} from 'lodash';
+const { spawnSync } = require('child_process');
+
 
 type FileMeta = {
   imageData: Buffer,
@@ -89,10 +91,23 @@ export async function processSVGs(indir: string) {
     }
 
     else {
-      // Run it through tinypng
+      // TODO: Run it through tinypng
       outPath = path.join(PREPARED_DATA_DIR, baseName + '.png');
-      fs.writeFileSync(outPath, imageData);
+
+      spawnSync(
+          'convert',
+          [
+              path.join(basePath, file),
+              '-filter', 'point',
+              '-interpolate', 'nearest',
+              '-resize', '800%',
+              outPath
+          ]
+      );
     }
+
+    // Also copy it to the next.js public dir
+    fs.copyFileSync(outPath, path.join(__dirname, '../site/public/assets', file))
 
     // Create a metadata .json file
     let newImageData = fs.readFileSync(outPath);
