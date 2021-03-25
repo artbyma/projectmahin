@@ -113,9 +113,6 @@ function formatMintPrice(price) {
 function SaleArea() {
   const { account } = useWeb3React();
   let [currentPrice, nextPrice, numItems] = useMintPrice();
-  numItems = 50;
-  currentPrice = BigNumber.from("150000000000000000")
-  nextPrice = BigNumber.from("150000000000000000")
 
   return <div css={css`
     font-family: Varta,sans-serif;

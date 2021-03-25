@@ -1,7 +1,7 @@
 import {ethers} from "ethers";
 import { curveAbi } from "../../lib/useCurveContract";
 
-const infuraProvider = new ethers.providers.InfuraProvider('rinkeby', '134faaf6c8b64741b67fce6ae1683183'); // TODO
+const infuraProvider = new ethers.providers.InfuraProvider('mainnet', '134faaf6c8b64741b67fce6ae1683183'); // TODO
 const curve = new ethers.Contract(process.env.NEXT_PUBLIC_CURVE_ADDRESS, curveAbi, infuraProvider);
 
 export default async function handler(req, res) {
