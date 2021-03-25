@@ -205,8 +205,7 @@ function SaleArea() {
             align-items: center;
           }
            
-           > div {
-              flex: 1;
+           > div {              
               margin: 30px;
            }
            
@@ -225,6 +224,7 @@ function SaleArea() {
            }
         `}>
           <div style={{
+            flex: 3,
             display: 'flex',
             flexDirection: "row",
             alignItems: 'center',
@@ -244,6 +244,7 @@ function SaleArea() {
             </div>
           </div>
           <div css={css`
+            flex: 5;
             display: flex;
             flex-direction: row;
             @media (max-width: 700px) {
@@ -260,6 +261,9 @@ function SaleArea() {
               </p>
               <p>
                 You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc"}>this address</a>.
+              </p>
+              <p>
+                The remaining funds are used to cover gas fees for contract deployment and maintaining the random generator.
               </p>
             </div>
           </div>
