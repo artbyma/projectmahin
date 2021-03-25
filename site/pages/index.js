@@ -750,7 +750,7 @@ function PurchaseButton() {
   return <Fragment>
     <ConnectModal {...modalProps} />
     <button
-      disabled={true}
+      disabled={busy}
       onClick={handleClick}
       css={css`
        width: 80%;
@@ -762,8 +762,7 @@ function PurchaseButton() {
        font-size: 18px;
       `}
     >
-      {active ? "Purchase" : "Connect"}
-      {busy ? "..." : null}
+      {busy ? "Waiting..." : active ? "Purchase" : "Connect"}
     </button>
   </Fragment>
 }
