@@ -728,7 +728,8 @@ function PurchaseButton() {
 
     try {
       tx = await withSigner.purchase({
-        value: price
+        value: price,
+        gasLimit: 220000
       })
     } catch(e) {
       console.log(e);
