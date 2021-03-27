@@ -182,7 +182,7 @@ function SaleArea() {
            <div style={{flex: 1}}>
              <strong>Pieces Available</strong>
              <div className={"number"}>
-               {numItems?.toString() ?? "-"}/60
+               {numItems?.toString() ?? "-"}/50
              </div>
            </div>
            <div style={{flex: 1}}>
