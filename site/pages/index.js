@@ -151,7 +151,7 @@ function SaleArea() {
           }
         `}>
           <h4>
-            Thursday, 25th March, 13:00 GMT: Launch Sale
+            Total raised so far: 6.93 ETH / $11,400
           </h4>
         </div>
         <div css={css`
@@ -278,7 +278,7 @@ function SaleArea() {
                 Breast Cancer Now, a charity registered in England and Wales (No. 1160558), Scotland (SC045584) and Isle of Man (No. 1200).
               </p>
               <p>
-                You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc"}>this address</a>.
+                You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc#internaltx"}>this address</a>.
               </p>
               <p>
                 The remaining funds are used to cover gas fees for contract deployment and maintaining the random generator.
