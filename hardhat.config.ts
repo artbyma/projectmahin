@@ -131,10 +131,19 @@ task("test-run", "Purchase all tokens")
     .setAction(async (taskArgs) => {
       const {ethers} = await import('hardhat');
       const {getCurveContract, getNFTContract} = await import('./scripts/setup');
+
+
+      // await ethers.provider.send("hardhat_impersonateAccount", ["owner"]);
+      // const signer = ethers.provider.getSigner("owner")
+      // const whaleWallet = await SignerWithAddress.create(signer);
+
+      // const curve2 = await getCurveContract(taskArgs.curve, whaleWallet);
+      // await curve2.enable(true);
+
       const curve = await getCurveContract(taskArgs.curve);
-      await curve.enable(true);
-      const nft = await getNFTContract(await curve.nftContract());
-      await nft.setBeneficiary("0x83cB05402E875B5ca953e6eAa639F723d92BC4fc")
+
+      // const nft = await getNFTContract(await curve.nftContract());
+      // await nft.setBeneficiary("0x83cB05402E875B5ca953e6eAa639F723d92BC4fc")
 
       for (let i=0; i<50; i++) {
         console.log("Purchasing", i);
