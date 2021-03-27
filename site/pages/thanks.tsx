@@ -122,6 +122,7 @@ function ConnectButton() {
   const handleClick = async () => {
     setBusy(true)
     try {
+      // @ts-ignore
       await askToConnect();
     }
     finally {
@@ -130,7 +131,7 @@ function ConnectButton() {
   }
 
   return <Fragment>
-    <ConnectModal {...modalProps} />
+    <ConnectModal {...modalProps as any} />
     <button
         disabled={busy}
         onClick={handleClick}
