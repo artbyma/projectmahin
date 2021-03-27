@@ -95,6 +95,24 @@ function Hero() {
         {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
         {/*  they do, the art work changes shape to represent this.*/}
         {/*</p>*/}
+
+        <div>
+          <a
+              href={"https://opensea.io/collection/mahin"}
+              css={css`
+                margin-top: 40px;
+                display: inline-block;
+               background-color: #363634;
+               color: white;
+               border: 0;
+               padding: 0.7em;
+               border-radius: 2px;
+               font-size: 18px;
+              `}
+          >
+            Browse on OpenSea
+          </a>
+        </div>
       </Padding>
     </MaxWidth>
   </div>
