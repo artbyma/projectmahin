@@ -114,7 +114,7 @@ export async function processSVGs(indir: string) {
     const imageDataHash = await ipfsHash(newImageData);
     const metadata = {
       "name": `Project Mahin: ${characterName}`,
-      "description": "Part of Project Mahin, an experiment with autonomous, dynamic NFTs on the Ethereum blockchain, and raising awareness for Breast Cancer. Each piece has a 1/8 chance of being diagnosed, mirroring the real-world odds.",
+      "description": `This is ${characterName}. ${characterName} has a 1/8 chance of being diagnosed with breast cancer, mirroring the real-world odds. \n\nPart of Project Mahin, an experiment with autonomous, dynamic NFTs on the Ethereum blockchain, and raising awareness for Breast Cancer.`,
       "image": `https://cloudflare-ipfs.com/ipfs/${imageDataHash}`,
       "image_data": ext == 'svg' ? newImageData.toString() : undefined,
       "attributes": [
