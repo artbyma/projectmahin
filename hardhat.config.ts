@@ -31,12 +31,22 @@ const Configs = {
       'token': '0x01be23585060835e02b77ef475b0cc51aa1e0709',
       'keyHash': '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311',
       'price': '100000000000000000',
+    },
+  },
+  mainnet: {
+    chainlink: {
+      'coordinator': '0xf0d54349aDdcf704F77AE15b96510dEA15cb7952',
+      'token': '0x514910771af9ca656af840dff83e8264ecf986ca',
+      'keyHash': '0xAA77729D3466CA35AE8D28B3BBAC7CC36A5031EFDC430821C02BC31A238AF445',
+      'price': '2000000000000000000',
     }
   }
 }
 
 task("deploy", "Deploy the contract", async () => {
   const {ethers, run, network} = await import('hardhat');
+  const [signer] = await ethers.getSigners();
+  console.log("Working as", signer.address);
 
   let sourceCodeSubmitters: any[] = [];
   async function deployContract(name, args) {
@@ -57,7 +67,7 @@ task("deploy", "Deploy the contract", async () => {
     return contract;
   }
 
-  const nft = await deployContract('MahinNFT', [Configs.rinkeby.chainlink]);
+  const nft = await deployContract("MahinNFT", [Configs.mainnet.chainlink]);
   const curve = await deployContract("CurveSeller", [
       nft.address,
       [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
@@ -77,7 +87,7 @@ task("deploy", "Deploy the contract", async () => {
   console.log("Set IPFS Host");
   await (await nft.setIPFSHost("https://cloudflare-ipfs.com/ipfs/")).wait();
 
-  if (network.name == "main" || network.name == "rinkeby") {
+  if (network.name == "mainnet" || network.name == "rinkeby") {
     console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
     await new Promise(resolve => {
       setTimeout(resolve, 60 * 1000);
@@ -269,6 +279,12 @@ module.exports = {
       url: process.env.RINKEBY_JSON_RPC_URL,
       accounts: {
         mnemonic: process.env.RINKEBY_MNEMONIC
+      }
+    },
+    mainnet: {
+      url: process.env.MAIN_JSON_RPC_URL,
+      accounts: {
+        mnemonic: process.env.MAIN_MNEMONIC
       }
     }
   },
