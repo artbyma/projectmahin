@@ -703,8 +703,8 @@ function Gallery() {
               1/8 real-life odds of a breast-cancer diagnosis.
             </div>
             <div className={"videos"}>
-              <video src={"/img/example-set1.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} />
-              <video src={"/img/example-set2.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} />
+              <video src={"/img/example-set1.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} playsInline={true} />
+              <video src={"/img/example-set2.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} playsInline={true}  />
             </div>
           </div>
         </div>
