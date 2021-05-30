@@ -413,13 +413,13 @@ function Mechanics() {
 
         <div className={"fact"}>
           <div className={"number"}>
-            1 in 12
+            1 in 8
           </div>
           <div className={"text"}>
             probability a woman will experience breast cancer.
           </div>
           <div className={"detail"}>
-            Accordingly, there is a 1/12 chance for each NFT to be diagnosed. This is random and
+            Accordingly, there is a 1/8 chance for each NFT to be diagnosed. This is random and
             unpredictable, and the creators do not control the process or know the outcome.
           </div>
         </div>
