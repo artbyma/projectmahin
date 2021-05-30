@@ -34,7 +34,12 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
 
   mapping(uint256 => Piece) public pieces;
 
-  constructor(VRFConfig memory vrfConfig) Randomness(vrfConfig) {
+  uint public constant projectRuntimeSeconds = 365 days * 5;      // Runs for 5 years
+  uint public constant targetProbability     = 1250000000000000;  // 0.125% - over the course of the project; see denominator
+
+  constructor(VRFConfig memory vrfConfig)
+    // 0.0000000014151671% - This has been pre-calculated to be 20% over the project period
+    Randomness(vrfConfig, 14151671, block.timestamp) {
   }
 
   function withdraw() public onlyOwner {
@@ -111,6 +116,18 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
   function onDiagnosed(uint256 tokenId) internal override {
     pieces[tokenId].currentState = 1;
     emit Diagnosed(tokenId);
+  }
+
+  function _totalSupply() public view override returns (uint256) {
+    return totalSupply();
+  }
+
+  function _tokenByIndex(uint256 index) public view override returns (uint256) {
+    return tokenByIndex(index);
+  }
+
+  function _isDisabled() public view override returns (bool) {
+    return doctor() != address(0);
   }
 
   function diagnose(uint256 tokenId) public onlyDoctor {

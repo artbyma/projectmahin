@@ -8,7 +8,13 @@ import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
 import "./Roles.sol";
 
 
-abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
+interface IERC721Adapter {
+    function _totalSupply() external view returns (uint256);
+    function _tokenByIndex(uint256 index) external view  returns (uint256);
+    function _isDisabled() external view returns (bool);
+}
+
+abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     using SafeMath for uint256;
 
     // Configuration Chainlink VRF
@@ -25,11 +31,8 @@ abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
 
     event RollComplete();
 
-    uint public constant projectRuntimeSeconds = 365 days * 5;   // Runs for 5 years
-    uint public constant targetProbability     = 2000000000000000;  // 0.2% - over the course of the project
+    uint probabilityPerSecond;
     uint public constant denominator           = 10000000000000000; // 100%
-    // This has been pre-calculated based on the values above
-    uint public constant probabilityPerSecond  = 14151671;        // 0.0000000014151671%
 
     uint256 randomSeedBlock = 0;
     int128 public rollProbability = 0;
@@ -40,11 +43,12 @@ abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
     bytes32 internal chainlinkKeyHash;
     uint256 internal chainlinkFee;
 
-    constructor(VRFConfig memory config) ChainlinkVRF(config.coordinator, config.token) {
+    constructor(VRFConfig memory config, uint _probabilityPerSecond, uint initRollTime) ChainlinkVRF(config.coordinator, config.token) {
         chainlinkFee = config.price;
         chainlinkKeyHash = config.keyHash;
 
-        lastRollTime = block.timestamp;
+        lastRollTime = initRollTime;
+        probabilityPerSecond = _probabilityPerSecond;
     }
 
     // Will return the probability of a (non-)diagnosis for an individual NFT, assuming the roll will happen at
@@ -107,7 +111,7 @@ abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
     // We accept as low-impact that a miner mining this block could withhold it. A user seed/reveal system
     // to counteract miner withholding introduces too much complexity (need to penalize users etc).
     function requestRoll(bool useFallback) external {
-        require(doctor() == address(0), "rng-disabled");
+        require(!this._isDisabled(), "rng-disabled");
 
         // If a roll is already scheduled, do nothing.
         if (isRolling()) { return; }
@@ -187,8 +191,8 @@ abstract contract Randomness is Roles, ChainlinkVRF, IERC721Enumerable {
     }
 
     function _applyRandomness(bytes32 randomness) internal {
-        for (uint i=0; i<this.totalSupply(); i++) {
-            uint256 tokenId = this.tokenByIndex(i);
+        for (uint i=0; i<this._totalSupply(); i++) {
+            uint256 tokenId = this._tokenByIndex(i);
 
             // For each token, mix in the token id to get a new random number
             bytes32 hash = keccak256(abi.encodePacked(randomness, tokenId));

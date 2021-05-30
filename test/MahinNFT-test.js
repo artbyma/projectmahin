@@ -2,6 +2,7 @@ const {BigNumber} = require("@ethersproject/bignumber");
 const { expect } = require("chai");
 const {setupMahinNFTContract} = require('./utils');
 
+
 async function initToken(nftContract, tokenId) {
   await nftContract.initToken(
       tokenId,
@@ -98,7 +99,7 @@ describe("MahinNFT", function() {
   });
 
   it ('doctor can diagnose', async function() {
-    const [signer] = await ethers.getSigners();
+    const [signer, signer2] = await ethers.getSigners();
     await initToken(nft, 5);
     await nft.mintToken(5, signer.address);
 
@@ -109,9 +110,12 @@ describe("MahinNFT", function() {
     expect(await nft.tokenURI(5)).to.equal("hash1");
     await nft.diagnose(5);
     expect(await nft.tokenURI(5)).to.equal("hash2");
+
+    // We can change the doctor a second time
+    await nft.setDoctor(signer2.address);
+    expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
   });
 });
 
 // TODO: test we cannot requestRoll() twice
 // TODO: test we cannot applyRoll() out-of-order
-// TODO: Test replacement doctor
