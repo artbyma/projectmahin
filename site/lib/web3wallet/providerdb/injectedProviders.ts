@@ -1,6 +1,6 @@
 import {IProviderInfo} from "./types";
 import Web3DefaultLogo from "../logos/web3-default.svg";
-import MetaMaskLogo from "../logos/metamask.svg";
+import MetaMaskLogo from "../logos/metamask.png";
 import SafeLogo from "../logos/safe.svg";
 import NiftyWalletLogo from "../logos/niftyWallet.png";
 import DapperLogo from "../logos/dapper.png";
@@ -17,7 +17,7 @@ import LiqualityLogo from "../logos/liquality.png";
 export const FALLBACK: IProviderInfo = {
   id: "fallback",
   name: "Web3",
-  logo: Web3DefaultLogo,
+  logo: MetaMaskLogo,
   type: "injected",
   check: "isWeb3"
 };

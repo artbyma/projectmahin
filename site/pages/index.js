@@ -151,7 +151,7 @@ function SaleArea() {
           }
         `}>
           <h4>
-            Total raised so far: 6.93 ETH / $11,400
+            Total raised so far: 8.91 ETH / $16,000
           </h4>
         </div>
         <div css={css`
