@@ -8,7 +8,7 @@ import {compilerOutput as LinkToken} from "@chainlink/contracts/abi/v0.7/LinkTok
 import { Contract } from "ethers";
 import fs from "fs";
 import path from "path";
-import {arrayify} from "ethers/lib/utils";
+import {arrayify, parseUnits} from "ethers/lib/utils";
 
 
 require('dotenv').config({path: path.join(__dirname, '.env.local')});
@@ -42,6 +42,51 @@ const Configs = {
     }
   }
 }
+
+task("deploy-doctor", "Deploy the doctor contract", async () => {
+  const {ethers, run, network} = await import('hardhat');
+
+  let sourceCodeSubmitters: any[] = [];
+  async function deployContract(name, args) {
+    console.log(`Deploying ${name}...`);
+    const Class = await ethers.getContractFactory(name);
+    const contract = await Class.deploy(...args, {gasPrice: parseUnits('11', 'gwei')});
+    console.log('  ...[waiting to mine]')
+    await contract.deployed();
+
+    sourceCodeSubmitters.push(async () => {
+      console.log(`  ...[${name}]`)
+      await run("verify:verify", {
+        address: contract.address,
+        constructorArguments: args
+      });
+    })
+
+    return contract;
+  }
+
+  let nft = await getNFTContract("0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f");
+  const doctor = await deployContract("DoctorV2",
+      [Configs.mainnet.chainlink, nft.address]);
+  console.log('setting the doctor to ', doctor.address)
+  //await (await nft.applyRoll()).wait();
+  await (await nft.setDoctor(doctor.address, {gasPrice: parseUnits('12', 'gwei')})).wait();
+  //console.log(await nft.projectRuntimeSeconds())
+
+  if (network.name == "mainnet" || network.name == "rinkeby") {
+    console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
+    await new Promise(resolve => {
+      setTimeout(resolve, 60 * 1000);
+    });
+    for (const submitter of sourceCodeSubmitters) {
+      try {
+        await submitter();
+      } catch (e) {
+        console.log("Error submitting validation", e)
+      }
+    }
+  }
+});
 
 task("deploy", "Deploy the contract", async () => {
   const {ethers, run, network} = await import('hardhat');
