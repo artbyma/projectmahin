@@ -11,7 +11,8 @@ import {Layout, LogoWithText, MaxWidth, Padding} from "../lib/Layout";
 import {useCurveContract} from "../lib/useCurveContract";
 import {useRouter} from "next/router";
 import {Overview} from "../lib/Overview";
-import {BigNumber} from "ethers";
+import {useRandomState} from "../lib/useRandomState";
+import BigNumber from "bignumber.js";
 
 export default function Home() {
   return (
@@ -129,8 +130,9 @@ function formatMintPrice(price) {
 }
 
 function SaleArea() {
-  const { account } = useWeb3React();
-  let [currentPrice, nextPrice, numItems] = useMintPrice();
+  const [isRolling, lastRollTime, probability] = useRandomState();
+
+  const collectiveProbability = new BigNumber(1).minus(new BigNumber(1).minus(probability).pow(42));
 
   return <div css={css`
     font-family: Varta,sans-serif;
@@ -141,34 +143,52 @@ function SaleArea() {
     padding: 20px 0 80px;
     
     background: #fafafa;
+    
+    h4 {
+      text-align: left;
+      font-size: 44px;
+      margin-bottom: 0em;
+    }
   `}>
     <MaxWidth>
       <Padding>
         <div css={css`
-          text-align: center;
-          h4 {
-            font-size: 44px;
-          }
         `}>
           <h4>
-            Total raised so far: 8.91 ETH / $16,000
+            What happened so far.
           </h4>
+          <p>
+            In March, we raised about $16.000, which will be donated to Breast Cancer Now. In addition to this,
+            3 ETH (25% of the project's income) has been allocated to {" "}
+            <a href={"0x47746e3563dc8c3ec09878907f8ce3a3f20082f0"}>its treasury</a> to support the project over
+            the next couple of years in terms of gas and random generator fees.
+          </p>
+          <p>
+            In total, 42 pieces have been minted and are in circulation.
+          </p>
         </div>
+
+        <h4 style={{textAlign: 'right'}}>
+          What is happening now.
+        </h4>
+        <p  style={{textAlign: 'right'}}>
+          Over the next 5 years, each piece faces a potential breast cancer diagnosis.
+        </p>
         <div css={css`
            text-align: center;
            display: flex;
            flex-direction: row;
-           align-items: flex-start;
-           justify-content: center;
+           align-items: center;
+           justify-content: flex-end;
            > div {
               margin: 30px;
            }
-           
+
            @media (max-width: 700px) {
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end;
           }
-           
+
            strong {
             font-weight: 300;
            }
@@ -179,112 +199,26 @@ function SaleArea() {
               font-size: 0.9em;
            }
          `}>
-           <div style={{flex: 1}}>
-             <strong>Pieces Available</strong>
-             <div className={"number"}>
-               {numItems?.toString() ?? "-"}/50
-             </div>
-           </div>
-           <div style={{flex: 1}}>
-             <strong>Current Price</strong>
-             <div className={"number"}>
-               Ξ {formatMintPrice(currentPrice)}
-             </div>
-             <div className={"detail"}>
-               <Tippy placement={"bottom"} content={<span>
-                  The price increases using a step-function. See the table below.
-               </span>}>
-                 <span>
-                  Next Price: Ξ {formatMintPrice(nextPrice)} {" "} <img style={{width: 16}} src="https://img.icons8.com/metro/26/000000/info.png"/>
-                 </span>
-               </Tippy>
-             </div>
-           </div>
-           <div style={{flex: 1, textAlign: 'right'}}>
-             <PurchaseButton />
-             <div className={"detail"} style={{paddingTop: '15px', color: '#3a3a3a'}}>
-               {account ? <span>Connected as {account.slice(0, 6)}.{" "}</span> : null}
-               A random piece in the series will be minted for you.
-             </div>
-           </div>
-        </div>
-
-        <div css={css`
-           border-top: 1px dotted silver;
-           
-           display: flex;
-           flex-direction: row;
-           align-items: flex-start;
-           justify-content: center; 
-           text-align: left;
-          
-          @media (max-width: 700px) {
-            flex-direction: column;
-            align-items: center;
-          }
-           
-           > div {              
-              margin: 30px;
-           }
-           
-           strong {
-            font-weight: bold;
-           }
-           
-           table {
-             border-collapse: collapse;
-           }
-           table tr td:first-child {
-            padding-right: 20px;
-           }
-           table tr td {
-              border-bottom: 1px solid silver;
-           }
-        `}>
-          <div style={{
-            flex: 3,
-            display: 'flex',
-            flexDirection: "row",
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div>
-              <strong>Pricing Schedule</strong>
-              <table>
-                <tr><td>1 - 5</td> <td>0.15 ETH</td></tr>
-                <tr><td>6 - 15</td> <td>0.3 ETH</td></tr>
-                <tr><td>16 - 30</td> <td>0.5 ETH</td></tr>
-                <tr><td>31 - 40</td> <td>0.65 ETH</td></tr>
-                <tr><td>41 - 47</td> <td>0.8 ETH</td></tr>
-                <tr><td>48 - 50</td> <td>1 ETH</td></tr>
-                <tr><td>51 - 60</td> <td>Reserved</td></tr>
-              </table>
+          <div>
+            <strong>Current risk of diagnosis<br/>(individually)</strong>
+            <div className={"number"}>
+              {probability ? <div>
+                {new Intl.NumberFormat("en-US", {
+                  style: 'percent', minimumFractionDigits: 2}).format(probability.toNumber()) }
+              </div> : null}
             </div>
           </div>
-          <div css={css`
-            flex: 5;
-            display: flex;
-            flex-direction: row;
-            @media (max-width: 700px) {
-              flex-direction: column;
-              align-items: center;
-            }
-          `}>
-            <div><img src={"/img/bcn-aid.png"} alt={"Breast Cancer Now Logo"} style={{width: '200px', marginRight: '10px'}} /></div>
-            <div>
-              <strong>Royalty Statement</strong>
-              <p>
-                For each item sold, 75% of the purchase price, plus 100% of any secondary royalties, will be donated to
-                Breast Cancer Now, a charity registered in England and Wales (No. 1160558), Scotland (SC045584) and Isle of Man (No. 1200).
-              </p>
-              <p>
-                You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc#internaltx"}>this address</a>.
-              </p>
-              <p>
-                The remaining funds are used to cover gas fees for contract deployment and maintaining the random generator.
-              </p>
+          <div>
+            <strong>Current risk of diagnosis <br/>(collectively)</strong>
+            <div className={"number"}>
+              {probability ? <div>
+                {new Intl.NumberFormat("en-US", {
+                  style: 'percent', minimumFractionDigits: 2}).format(collectiveProbability.toNumber()) }
+              </div> : null}
             </div>
           </div>
+          {/*<div style={{flex: 1, textAlign: 'right'}}>*/}
+          {/*</div>*/}
         </div>
       </Padding>
     </MaxWidth>

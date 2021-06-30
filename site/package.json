@@ -15,6 +15,7 @@
     "@web3-react/lattice-connector": "^6.1.8",
     "@web3-react/ledger-connector": "^6.1.1",
     "@web3-react/trezor-connector": "^6.1.6",
+    "bignumber.js": "^9.0.1",
     "ethers": "^5.0.26",
     "next": "10.0.5",
     "react": "17.0.1",
