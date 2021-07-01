@@ -130,6 +130,7 @@ function formatMintPrice(price) {
 }
 
 function SaleArea() {
+  const [mintPrice] = useMintPrice();
   const [isRolling, lastRollTime, probability] = useRandomState();
 
   const collectiveProbability = new BigNumber(1).minus(new BigNumber(1).minus(probability).pow(42));
@@ -164,8 +165,43 @@ function SaleArea() {
             the next couple of years in terms of gas and random generator fees.
           </p>
           <p>
-            In total, 42 pieces have been minted and are in circulation.
+            In total, 42 pieces have been minted and are in circulation. 8 are still available. If you'd like
+            one of your own, they are currently available for purchase at Ξ {formatMintPrice(mintPrice)} each.
           </p>
+          <div  css={css`
+            display: flex;
+            flex-direction: row;
+          `}>
+            <p>
+              <PurchaseButton />
+            </p>
+
+            <div css={css`
+              font-size: 0.6em;
+              display: flex;
+              margin-left: 30px;
+              flex-direction: row;
+              @media (max-width: 700px) {
+                flex-direction: column;
+                align-items: center;
+              }
+            `}>
+              <div><img src={"/img/bcn-aid.png"} alt={"Breast Cancer Now Logo"} style={{width: '60px', marginRight: '10px'}} /></div>
+              <div>
+                <strong>Royalty Statement</strong>
+                <p>
+                  For each item sold, 75% of the purchase price, plus 100% of any secondary royalties, will be donated to
+                  Breast Cancer Now, a charity registered in England and Wales (No. 1160558), Scotland (SC045584) and Isle of Man (No. 1200).
+                </p>
+                <p>
+                  You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc#internaltx"}>this address</a>.
+                </p>
+                <p>
+                  The remaining funds are used to cover gas fees for contract deployment and maintaining the random generator.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <h4 style={{textAlign: 'right'}}>
@@ -706,7 +742,7 @@ function PurchaseButton() {
       disabled={busy}
       onClick={handleClick}
       css={css`
-       width: 80%;
+       display: inline-block;
        background-color: #363634;
        color: white;
        border: 0;
@@ -715,7 +751,7 @@ function PurchaseButton() {
        font-size: 18px;
       `}
     >
-      {busy ? "Waiting..." : active ? "Purchase" : "Connect"}
+      {busy ? "Waiting..." : active ? "Purchase" : "Connect to Purchase"}
     </button>
   </Fragment>
 }
