@@ -23,6 +23,7 @@ export default function Home() {
 
       <SaleArea />
       <Mechanics />
+      <Treasury />
       <Overview />
       <ArtistStatement />
       <TechStack />
@@ -159,7 +160,7 @@ function SaleArea() {
             What happened so far.
           </h4>
           <p>
-            In March, we raised about $16.000, which will be donated to Breast Cancer Now. In addition to this,
+            In March, we raised about $17,000, which has been donated to Breast Cancer Now. In addition to this,
             3 ETH (25% of the project's income) has been allocated to {" "}
             <a href={"0x47746e3563dc8c3ec09878907f8ce3a3f20082f0"}>its treasury</a> to support the project over
             the next couple of years in terms of gas and random generator fees.
@@ -438,6 +439,106 @@ function Mechanics() {
     </Padding>
   </div>
 }
+
+
+function Treasury() {
+  return <div id={"mechanics"} css={css`
+    font-family: Varta,sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 300;
+    padding: 50px 0;
+    
+    h3 {
+        margin-top: 0;
+        margin-bottom: 50px;
+        font-size: 35px;
+        font-weight: 900;
+        text-align: center;
+        display: flex;
+        justify-content: center;       
+        align-items: center;       
+    }
+      h3:before, h3:after { 
+        content: ""; 
+        width: 200px;
+        margin: 0 0.2em;
+        border-bottom: 1px solid #000;
+      } 
+    
+    .point {
+      margin-bottom: 20px;
+    }
+    strong {
+      font-weight: 700;
+    }
+  `}>
+    <Padding>
+      <div css={css`
+        max-width: 800px;
+        margin: 0 auto;
+            
+      `}>
+        <h3>Treasury</h3>
+        
+        <p>
+          <strong>
+            <a href="https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc">Charity Wallet</a>
+          </strong>: 
+            75% of the proceeds of every sale go to this wallet. They are then converted to fiat if necessary, and sent to the charity.
+
+            {/* See also the tx log */}
+        </p>
+
+        <p>
+        <a href="https://etherscan.io/address/0x336d967ffd8984fb1b00a9e4d17823ae4e068f8a">Treasury Wallet</a>: 25% of the proceeds of every sale are retained by the smart contract and are withdrawn
+          to the treasury.
+        </p>        
+        <table cellPadding={10}>
+          <tbody>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Note</th>
+            </tr>
+            <tr>
+              <td>2022-02-08</td>              
+              <td>
+                3.1375 ETH
+              </td>
+              <td>Opening of Treasury Wallet, Initial Balance</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Sum</strong>
+              </td>
+              <td>
+                3.1375 ETH
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Not withdrawn:</strong>
+              </td>
+              <td>
+                0.1625 ETH
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Total sum:</strong>
+              </td>
+              <td>
+                3.3 ETH
+              </td>
+            </tr>
+          </tbody>          
+        </table>        
+      </div>
+    </Padding>
+  </div>
+}
+
 
 
 function TechStack() {
