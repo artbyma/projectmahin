@@ -488,122 +488,127 @@ function TechStack() {
       padding: 0.2em;
     }
   `}>
-    <MaxWidth>
-      <Padding>
-        <h3>Technical Details</h3>
-        <p className={"detail"}>
-          <span>
-            0x663378bfc54ad95005358392d1e35bd1265e9d12
-          </span>
-          {" "}&bull;{" "}
-          <span>
-            <a href="https://etherscan.com">Etherscan</a>
-          </span>
-          {" "}&bull;{" "}
-          <span>
-            <a href="https://etherscan.com">OpenSea</a>
-          </span>
-          {" "}&bull;{" "}
-          <span>
-            <a href="https://etherscan.com">Source Code</a>
-          </span>
+    <Padding>
+      <h3>Technical Details</h3>
+      <p className={"detail"}>
+        <span>
+          0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f
+        </span>
+        {" "}&bull;{" "}
+        <span>
+          <a href="https://etherscan.io/address/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f">Etherscan</a>
+        </span>
+        {" "}&bull;{" "}
+        <span>
+          <a href="https://opensea.io/collection/mahin">OpenSea</a>
+        </span>   
+      </p>
+
+      <div className={"section"}>
+        <div className={"sectionHeader"}>Randomness</div>
+        <p>
+          Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
+          at any time, as follows:
         </p>
-
-        <div className={"section"}>
-          <div className={"sectionHeader"}>Randomness</div>
-          <p>
-            Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
-            at any time, as follows:
-          </p>
-          <ol css={css`
-             list-style: none;
-             counter-reset: item;
-             li {
-               counter-increment: item;
-               margin-top: 25px;
-               margin-bottom: 25px;
-               display: flex;
-               flex-direction: row;
-               
-             }
-             li:before {
-              margin-right: 10px;
-              margin-top: -10px;
-              content: counter(item);
-              width: 1em;
-              height: 1em;
-              padding: 0.2em;
-              font-size: 2em;
-              line-height: 1em;
-              vertical-align: middle;
-              text-align: center;
-              display: inline-block;
-             }
+        <ol css={css`
+           list-style: none;
+           counter-reset: item;
+           li {
+             counter-increment: item;
+             margin-top: 25px;
+             margin-bottom: 25px;
+             display: flex;
+             flex-direction: row;
              
-             .hint {
-               font-size: .9em;
-               margin-top: 0.5em;
-               color: silver;
-             }
-          `}>
-            <li>
-              <div>
-                <div>Fund the contract with 2 LINK.</div>
-                <div className={"hint"}>
-                  Hint: Only fund the contract when you want to request randomness. Since anyone can call the contract
-                  as often as they want, it is easy to drain its balance.
-                </div>
+           }
+           li:before {
+            margin-right: 10px;
+            margin-top: -10px;
+            content: counter(item);
+            width: 1em;
+            height: 1em;
+            padding: 0.2em;
+            font-size: 2em;
+            line-height: 1em;
+            vertical-align: middle;
+            text-align: center;
+            display: inline-block;
+           }
+           
+           .hint {
+             font-size: .9em;
+             margin-top: 0.5em;
+             color: silver;
+           }
+        `}>
+          <li>
+            <div>
+              <div>Fund the contract with 2 LINK.</div>
+              <div className={"hint"}>
+                Hint: Only fund the contract when you want to request randomness. Since anyone can call the contract
+                as often as they want, it is easy to drain its balance.
               </div>
+            </div>
 
-            </li>
-            <li>
+          </li>
+          <li>
+            <div>
               <div>
-                <div>
-                  Call the <code>requestRoll()</code> function.
-                </div>
-                <div className={"hint"}>
-                  Wait roughly two minutes, then verify on-chain that Chainlink has provided a random number.
-                </div>
+                Call the <code>requestRoll()</code> function.
               </div>
-            </li>
-            <li>
-              <div>
-                After a minute or two, call the <code>applyRoll()</code> function.
+              <div className={"hint"}>
+                Wait roughly two minutes, then verify on-chain that Chainlink has provided a random number.
               </div>
-            </li>
-          </ol>
-        </div>
+            </div>
+          </li>
+          <li>
+            <div>
+              After a minute or two, call the <code>applyRoll()</code> function.
+            </div>
+          </li>
+        </ol>
+      </div>
 
-        <div className={"section"}>
-          <div className={"sectionHeader"}>On-Chain Content</div>
-          <p>
-            It is imperative that the media files represented by NFTs remain accessible. For this reason, all artwork
-            will be stored on the Ethereum blockchain. Further, to improve their accessibility through the web,
-            we also store them on <a href={"https://www.arweave.org/"}>Arweave</a>.
-          </p>
-        </div>
+      <div className={"section"}>
+        <div className={"sectionHeader"}>Zora Protocol</div>
+        <p>
+          The contract implements the <a href={"https://zora.engineering/protocol/smart-contracts"}>Zora Protocol</a>,
+          embedding within each token its own marketplace. Owners have the ability to sell their tokens on the
+          built-in market, using any interface available in the future, but retain the ability to list their
+          tokens on OpenSea and others.
+        </p>
+      </div>
 
-        <div className={"section"}>
-          <div className={"sectionHeader"}>Royalties</div>
-          <p>
-            There is currently no accepted standard for NFT royalties. Since since is a long-term project,
-            we wanted to future-proof it as much as possible by implementing multiple of the royalty standards
-            currently in use. Specifically, the contract exposes functions to implement these interfaces:
-          </p>
-          <ul>
-            <li>EIP-2981</li>
-            <li>Rarible</li>
-            <li>Known Origin</li>
-            <li>InfinityNFT</li>
-          </ul>
-          <p>
-            We did not implement <a href={"https://github.com/ethereum/EIPs/issues/2571"}>ERC-2571</a>
-            {" "} or <a href={"https://github.com/ethereum/EIPs/issues/2665"}>ERC-2665</a>. The former has the
-            undesirable effect of disabling simple transfers, and the latter seems to lack traction.
-          </p>
-        </div>
-      </Padding>
-    </MaxWidth>
+      <div className={"section"}>
+        <div className={"sectionHeader"}>On-Chain Content</div>
+        <p>
+          It is imperative that the media files represented by NFTs remain accessible. For this reason, all artwork
+          is stored on the Ethereum blockchain as SVG code. Further, to improve their accessibility through the web,
+          we also store them on <a href={"https://www.arweave.org/"}>Arweave</a>. Finally, the Zora protocol allows
+          an owner to update their
+        </p>
+      </div>
+
+      <div className={"section"}>
+        <div className={"sectionHeader"}>Royalties</div>
+        <p>
+          There is currently no accepted standard for NFT royalties. Since since is a long-term project,
+          we wanted to future-proof it as much as possible by implementing multiple of the royalty standards
+          currently in use. Specifically, the contract exposes functions to implement these interfaces:
+        </p>
+        <ul>
+          <li>EIP-2981</li>
+          <li>Rarible</li>
+          <li>Known Origin</li>
+          <li>InfinityNFT</li>
+        </ul>
+        <p>
+          We did not implement <a href={"https://github.com/ethereum/EIPs/issues/2571"}>ERC-2571</a>
+          {" "} or <a href={"https://github.com/ethereum/EIPs/issues/2665"}>ERC-2665</a>. The former has the
+          undesirable effect of disabling simple transfers, and the latter seems to lack traction.
+        </p>
+      </div>
+    </Padding>
   </div>
 }
 
