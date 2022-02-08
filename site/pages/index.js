@@ -377,16 +377,12 @@ function TechStack() {
         </span>
         {" "}&bull;{" "}
         <span>
-          <a href="https://etherscan.com">Etherscan</a>
+          <a href="https://etherscan.io/address/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f">Etherscan</a>
         </span>
         {" "}&bull;{" "}
         <span>
-          <a href="https://etherscan.com">OpenSea</a>
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://etherscan.com">Source Code</a>
-        </span>
+          <a href="https://opensea.io/collection/mahin">OpenSea</a>
+        </span>   
       </p>
 
       <div className={"section"}>
