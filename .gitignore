@@ -5,3 +5,5 @@ svgdata/
 #Hardhat files
 cache
 artifacts
+
+.vercel
