@@ -89,11 +89,11 @@ function Hero() {
         <h1>
           An autonomous crypto art experiment.
         </h1>
-        <p>
-          The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive
-          breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When
-          they do, the art work changes shape to represent this.
-        </p>
+        {/*<p>*/}
+        {/*  The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive*/}
+        {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
+        {/*  they do, the art work changes shape to represent this.*/}
+        {/*</p>*/}
 
         <div>
           <a
@@ -163,7 +163,7 @@ function SaleArea() {
             the next couple of years in terms of gas and random generator fees.
           </p>
           <p>
-            In total, 42 pieces have been minted and are in circulation. 8 are still available. If you'd like
+            In total, 43 pieces have been minted and are in circulation. 17 are still available. If you'd like
             one of your own, they are currently available for purchase at Ξ {formatMintPrice(mintPrice)} each.
           </p>
           <div  css={css`
