@@ -1,16 +1,19 @@
-Deploy:
-
-$ npx hardhat prepare --directory ./nft-assets/
-$ npx hardhat upload-assets
-$ npx hardhat deploy --network rinkeby
-$ npx hardhat init-tokens --network rinkeby --contract ADDRESS
+## Commands
 
 For a local testnet, start `npx hardhat node` and use `--network localhost`.
 
 
-------
+### Publish contracts / init tokens 
 
-# Oracle services
+    $ npx hardhat prepare --directory ./nft-assets/
+    $ npx hardhat upload-assets
+    $ npx hardhat deploy --network rinkeby
+    $ npx hardhat init-tokens --network rinkeby --contract ADDRESS
+
+
+## Historical Notes on Randomness Design
+
+### Oracle services
 
 - http://rinkeby.chain.link/
 
@@ -20,7 +23,7 @@ For a local testnet, start `npx hardhat node` and use `--network localhost`.
 
 Should we allow new sources to be added? Ask all sources for randomness?
 
-# Good links
+### Good links
 
 - https://fravoll.github.io/solidity-patterns/randomness.html
 - https://blog.positive.com/predicting-random-numbers-in-ethereum-smart-contracts-e5358c6b8620
@@ -29,7 +32,7 @@ Should we allow new sources to be added? Ask all sources for randomness?
 - https://ethereum.stackexchange.com/questions/419/when-can-blockhash-be-safely-used-for-a-random-number-when-would-it-be-unsafe
 - https://medium.com/dedaub/bad-randomness-is-even-dicier-than-you-think-7fa2c6e0c2cd
 
-# Things I learned
+### Things I learned
 
 - Anyone knows the past block hashes including up to the current one (by mining in the same block).
   Therefore, solutions such as `blockhash(block.number-1)` are at best acceptable if the bet happened
@@ -46,19 +49,3 @@ Should we allow new sources to be added? Ask all sources for randomness?
 - Consider that people can run code in smart contracts to get the same "current block" info that you do,
   and even if they don't, will be able to call your smart contract, then abort if they do not get the 
   desired result.
-  
-
-
-roll()
-  -> fixes the block number that will decide
-
-apply()
-  -> apply tne result of a roll. if you are trying to be clever and not apply it because you did 
-     not get the result you wanted, first, we count it as a roll anyway. so worst case scenario,
-     it will take *longer* for the 3 nfts to be diagnosed, but we cannot increase the frequency.
- 
-  -> we combat grieving by letting anyone call apply() and having events. 
-
-
-  pick two blocks: +2  +500
-
