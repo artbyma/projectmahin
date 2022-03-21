@@ -266,7 +266,7 @@ task("request-roll", "Request a preroll")
 
       // Fund the contract with LINK
       if (useChainLink) {
-        const link = new Contract('0x01be23585060835e02b77ef475b0cc51aa1e0709', LinkToken.abi, signer);
+        const link = new Contract('0x01be23585060835e02b77ef475b0cc51aa1e0709', LinkToken.abi, signer as any);
         console.log('Funding contract with LINK')
         console.log(await link.transfer(taskArgs.contract, '100000000000000000'));
       }

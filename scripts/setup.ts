@@ -364,7 +364,7 @@ export async function getNFTContract(address: string) {
   const Abi = JSON.parse((fs.readFileSync(__dirname + "/../artifacts/contracts/MahinNFT.sol/MahinNFT.json")).toString()).abi;
   const [signer] = await ethers.getSigners();
 
-  return new ethers.Contract(address, Abi, signer);
+  return new ethers.Contract(address, Abi, signer as any);
 }
 
 export async function getCurveContract(address: string, signer?: any) {
