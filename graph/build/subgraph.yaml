@@ -1,0 +1,45 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: ProjectMahinNFT
+    network: mainnet
+    source:
+      address: "0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f"
+      startBlock: 12104381
+      abi: ProjectMahinNFT
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - Diagnosed
+        - OwnershipTransferred
+        - RollComplete
+        - RollInProgress
+        - TokenDataStorage
+        - Transfer
+      abis:
+        - name: ProjectMahinNFT
+          file: ProjectMahinNFT/abis/ProjectMahinNFT.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: Diagnosed(indexed uint256)
+          handler: handleDiagnosed
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: RollComplete()
+          handler: handleRollComplete
+        - event: RollInProgress(int128)
+          handler: handleRollInProgress
+        - event: TokenDataStorage(indexed uint256,bytes[])
+          handler: handleTokenDataStorage
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ProjectMahinNFT/ProjectMahinNFT.wasm
