@@ -14,32 +14,17 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
         - Diagnosed
-        - OwnershipTransferred
         - RollComplete
         - RollInProgress
-        - TokenDataStorage
-        - Transfer
       abis:
         - name: ProjectMahinNFT
           file: ProjectMahinNFT/abis/ProjectMahinNFT.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
         - event: Diagnosed(indexed uint256)
           handler: handleDiagnosed
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: RollComplete()
           handler: handleRollComplete
         - event: RollInProgress(int128)
           handler: handleRollInProgress
-        - event: TokenDataStorage(indexed uint256,bytes[])
-          handler: handleTokenDataStorage
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
       file: ProjectMahinNFT/ProjectMahinNFT.wasm
