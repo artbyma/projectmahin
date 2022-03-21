@@ -1,5 +1,6 @@
 import {task} from "hardhat/config";
 require("@nomiclabs/hardhat-waffle");
+import "@tenderly/hardhat-tenderly"
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 require('hardhat-contract-sizer');
