@@ -2,6 +2,9 @@
 
 For a local testnet, start `npx hardhat node` and use `--network localhost`.
 
+    $ npx hardhat compile
+    $ npx hardhat test
+
 
 ### Publish contracts / init tokens 
 
