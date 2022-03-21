@@ -5,6 +5,8 @@ const provider = waffle.provider;
 
 describe("FixedPriceSeller", function() {
   let fixedSeller, nftContract;
+
+  // setup a new NFT + seller contract for each tests (but account balances are shared!)
   beforeEach(async () => {
     nftContract = await setupMahinNFTContract();
     await nftContract.initToken(1, "name", ["hash1", "hash1"],  ["hash1", "hash1"]);
@@ -32,9 +34,9 @@ describe("FixedPriceSeller", function() {
   });
 
   it("can purchase", async function() {
-    const [signer, account2, account3] = await ethers.getSigners();
+    const [signer, _, treasury] = await ethers.getSigners();
 
-    await fixedSeller.transferOwnership(account3.address);
+    await fixedSeller.setTreasury(treasury.address);
 
     // Buy one
     let tx = await fixedSeller.purchase({value: await fixedSeller.mintPrice()})
@@ -42,24 +44,26 @@ describe("FixedPriceSeller", function() {
     expect(await nftContract.tokenOfOwnerByIndex(signer.address, 0)).to.not.equal(0);  // to.not.revert really
     expect(await nftContract.totalSupply()).to.equal(1);
 
-    // Check balance of the owner
-    expect(await provider.getBalance(account3.address)).to.equal("10000400000000000000000");
+    // Check balance of the treasury; there is no beneficiary, so it receives the full amount!
+    expect(await provider.getBalance(treasury.address)).to.equal("10000400000000000000000");
 
     // Buy another one
     tx = await fixedSeller.purchase({value: await fixedSeller.mintPrice()})
     await tx.wait();
     expect(await nftContract.tokenOfOwnerByIndex(signer.address, 1)).to.not.equal(0);  // to.not.revert really
     expect(await nftContract.totalSupply()).to.equal(2);
+    expect(await provider.getBalance(treasury.address)).to.equal("10000800000000000000000");
 
     // Only two are in the curve, so this will fail
     expect(fixedSeller.purchase({value: await fixedSeller.mintPrice()})).to.be.revertedWith("sold out");
   });
 
   it('distributes to beneficiary', async () => {
-    const [signer, account2, account3] = await ethers.getSigners();
+    const [signer, _, treasury, beneficiary] = await ethers.getSigners();
 
-    await nftContract.setBeneficiary(account2.address);
-    await fixedSeller.transferOwnership(account3.address);
+    // setup a beneficiary for the first time
+    await nftContract.setBeneficiary(beneficiary.address);
+    await fixedSeller.setTreasury(treasury.address);
 
     // Buy one
     let tx = await fixedSeller.purchase({value: await fixedSeller.mintPrice()})
@@ -67,7 +71,9 @@ describe("FixedPriceSeller", function() {
     expect(await nftContract.tokenOfOwnerByIndex(signer.address, 0)).to.not.equal(0);  // to.not.revert really
     expect(await nftContract.totalSupply()).to.equal(1);
 
-    expect(await provider.getBalance(account3.address)).to.equal("10000900000000000000000");
-    expect(await provider.getBalance(account2.address)).to.equal("10000412500000000000000");
+    // treasury gets 25% (of 0.4 ETH + existing 0.8 ETH)
+    expect(await provider.getBalance(treasury.address)).to.equal(   "10000900000000000000000");
+    // beneficiary gets 75% of 0.4
+    expect(await provider.getBalance(beneficiary.address)).to.equal("10000300000000000000000");
   });
 });

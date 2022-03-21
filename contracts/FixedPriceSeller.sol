@@ -19,10 +19,15 @@ contract FixedPriceSeller is Ownable {
     bool public enabled = false;
     uint256 public numSold = 0;
     MahinNFT public nftContract;
+    address public treasury;
 
     constructor (address mahinAddress, uint[] memory _idsToSell) {
         nftContract = MahinNFT(mahinAddress);
         idsToSell = _idsToSell;
+    }
+
+    function setTreasury(address _treasury) public onlyOwner {
+        treasury = _treasury;
     }
 
     function setIdsToSell(uint[] memory _idsToSell) public onlyOwner {
@@ -44,6 +49,7 @@ contract FixedPriceSeller is Ownable {
     function purchase() public virtual payable returns (uint256 _tokenId) {
         require(idsToSell.length > 0, "sold out");
         require(enabled, "disabled");
+        require(treasury != address(0), "treasury not set");
 
         require(msg.value >= mintPrice, "not enough eth");
 
@@ -58,7 +64,7 @@ contract FixedPriceSeller is Ownable {
         // remainder to treasury
         uint256 remainder = msg.value.sub(toCharity);
         if (remainder > 0) {
-            payable(owner()).transfer(remainder);
+            payable(treasury).transfer(remainder);
         }
 
         uint idx = block.timestamp % idsToSell.length;
