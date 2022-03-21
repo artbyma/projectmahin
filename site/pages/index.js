@@ -577,11 +577,9 @@ function Gallery() {
             }
           }
         `}>
-          <div style={{flex: 1, marginRight: '30px'}}>
+          <div style={{flex: 1, marginRight: '30px', marginTop: '80px'}}>
             <h1>
-              An exploration of emergent behavior.<br />
-              An autonomous performance on the blockchain.<br />
-              A unique, 5-year experiment.
+              A unique experiment combining art, smart contracts and charity.
             </h1>
             <p>
               1 in 8 woman will develop invasive breast cancer over the course of their lives.
