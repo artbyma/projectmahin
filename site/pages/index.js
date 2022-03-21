@@ -10,6 +10,7 @@ import {getMintPrice, useMintPrice} from "../lib/useMintPrice";
 import {Layout, LogoWithText, MaxWidth, Padding} from "../lib/Layout";
 import {useCurveContract} from "../lib/useCurveContract";
 import {useRouter} from "next/router";
+import Link from "next/link";
 import {Overview} from "../lib/Overview";
 import {useRandomState} from "../lib/useRandomState";
 import BigNumber from "bignumber.js";
@@ -23,7 +24,6 @@ export default function Home() {
 
       <SaleArea />
       <Mechanics />
-      <Treasury />
       <Overview />
       <ArtistStatement />
       <TechStack />
@@ -85,18 +85,15 @@ function Hero() {
           <div>
             <LogoWithText />
           </div>
-          <div>
-            <img className={"bncLogo"} src={"/img/bcn-aid-reverse.png"} alt={"Breast Cancer Now Logo"}/>
-          </div>
         </div>
-        {/*<h1>*/}
-        {/*  An autonomous crypto art experiment.*/}
-        {/*</h1>*/}
-        {/*<p>*/}
-        {/*  The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive*/}
-        {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
-        {/*  they do, the art work changes shape to represent this.*/}
-        {/*</p>*/}
+        <h1>
+          An autonomous crypto art experiment.
+        </h1>
+        <p>
+          The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive
+          breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When
+          they do, the art work changes shape to represent this.
+        </p>
 
         <div>
           <a
@@ -441,106 +438,6 @@ function Mechanics() {
 }
 
 
-function Treasury() {
-  return <div id={"mechanics"} css={css`
-    font-family: Varta,sans-serif;
-    font-size: 18px;
-    line-height: 1.5;
-    font-weight: 300;
-    padding: 50px 0;
-    
-    h3 {
-        margin-top: 0;
-        margin-bottom: 50px;
-        font-size: 35px;
-        font-weight: 900;
-        text-align: center;
-        display: flex;
-        justify-content: center;       
-        align-items: center;       
-    }
-      h3:before, h3:after { 
-        content: ""; 
-        width: 200px;
-        margin: 0 0.2em;
-        border-bottom: 1px solid #000;
-      } 
-    
-    .point {
-      margin-bottom: 20px;
-    }
-    strong {
-      font-weight: 700;
-    }
-  `}>
-    <Padding>
-      <div css={css`
-        max-width: 800px;
-        margin: 0 auto;
-            
-      `}>
-        <h3>Treasury</h3>
-        
-        <p>
-          <strong>
-            <a href="https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc">Charity Wallet</a>
-          </strong>: 
-            75% of the proceeds of every sale go to this wallet. They are then converted to fiat if necessary, and sent to the charity.
-
-            {/* See also the tx log */}
-        </p>
-
-        <p>
-        <a href="https://etherscan.io/address/0x336d967ffd8984fb1b00a9e4d17823ae4e068f8a">Treasury Wallet</a>: 25% of the proceeds of every sale are retained by the smart contract and are withdrawn
-          to the treasury.
-        </p>        
-        <table cellPadding={10}>
-          <tbody>
-            <tr>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Note</th>
-            </tr>
-            <tr>
-              <td>2022-02-08</td>              
-              <td>
-                3.1375 ETH
-              </td>
-              <td>Opening of Treasury Wallet, Initial Balance</td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Sum</strong>
-              </td>
-              <td>
-                3.1375 ETH
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Not withdrawn:</strong>
-              </td>
-              <td>
-                0.1625 ETH
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Total sum:</strong>
-              </td>
-              <td>
-                3.3 ETH
-              </td>
-            </tr>
-          </tbody>          
-        </table>        
-      </div>
-    </Padding>
-  </div>
-}
-
-
-
 function TechStack() {
   return <div css={css`
     font-family: Varta,sans-serif;
@@ -602,103 +499,35 @@ function TechStack() {
         {" "}&bull;{" "}
         <span>
           <a href="https://opensea.io/collection/mahin">OpenSea</a>
-        </span>   
+        </span>
       </p>
 
       <div className={"section"}>
         <div className={"sectionHeader"}>Randomness</div>
         <p>
           Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
-          at any time, as follows:
-        </p>
-        <ol css={css`
-           list-style: none;
-           counter-reset: item;
-           li {
-             counter-increment: item;
-             margin-top: 25px;
-             margin-bottom: 25px;
-             display: flex;
-             flex-direction: row;
-             
-           }
-           li:before {
-            margin-right: 10px;
-            margin-top: -10px;
-            content: counter(item);
-            width: 1em;
-            height: 1em;
-            padding: 0.2em;
-            font-size: 2em;
-            line-height: 1em;
-            vertical-align: middle;
-            text-align: center;
-            display: inline-block;
-           }
-           
-           .hint {
-             font-size: .9em;
-             margin-top: 0.5em;
-             color: silver;
-           }
-        `}>
-          <li>
-            <div>
-              <div>Fund the contract with 2 LINK.</div>
-              <div className={"hint"}>
-                Hint: Only fund the contract when you want to request randomness. Since anyone can call the contract
-                as often as they want, it is easy to drain its balance.
-              </div>
-            </div>
-
-          </li>
-          <li>
-            <div>
-              <div>
-                Call the <code>requestRoll()</code> function.
-              </div>
-              <div className={"hint"}>
-                Wait roughly two minutes, then verify on-chain that Chainlink has provided a random number.
-              </div>
-            </div>
-          </li>
-          <li>
-            <div>
-              After a minute or two, call the <code>applyRoll()</code> function.
-            </div>
-          </li>
-        </ol>
-      </div>
-
-      <div className={"section"}>
-        <div className={"sectionHeader"}>Zora Protocol</div>
-        <p>
-          The contract implements the <a href={"https://zora.engineering/protocol/smart-contracts"}>Zora Protocol</a>,
-          embedding within each token its own marketplace. Owners have the ability to sell their tokens on the
-          built-in market, using any interface available in the future, but retain the ability to list their
-          tokens on OpenSea and others.
+          at any time. In addition, there is a fallback randomness source based on block-randomness. See <Link href={"/randomness"}><a>Randomness.</a></Link>
         </p>
       </div>
 
       <div className={"section"}>
-        <div className={"sectionHeader"}>On-Chain Content</div>
+        <div className={"sectionHeader"}>IPFS-hosted Content</div>
         <p>
-          It is imperative that the media files represented by NFTs remain accessible. For this reason, all artwork
-          is stored on the Ethereum blockchain as SVG code. Further, to improve their accessibility through the web,
-          we also store them on <a href={"https://www.arweave.org/"}>Arweave</a>. Finally, the Zora protocol allows
-          an owner to update their
+          The artwork is stored in IPFS. In addition, there are placeholders in the contract that allow
+          on-chain storage & <a href={"https://www.arweave.org/"}>Arweave</a> identifiers to be associated
+          with each piece.
         </p>
       </div>
 
       <div className={"section"}>
         <div className={"sectionHeader"}>Royalties</div>
         <p>
-          There is currently no accepted standard for NFT royalties. Since since is a long-term project,
-          we wanted to future-proof it as much as possible by implementing multiple of the royalty standards
-          currently in use. Specifically, the contract exposes functions to implement these interfaces:
+          When Project Mahin was deployed, there was no accepted standard for NFT royalties. As a long-term project,
+          we still wanted to future-proof it as much as possible by implementing multiple of the royalty systems
+          in use at the time. Specifically, the contract exposes functions to implement these interfaces:
         </p>
         <ul>
-          <li>EIP-2981</li>
+          <li>EIP-2981 (pre-final version)</li>
           <li>Rarible</li>
           <li>Known Origin</li>
           <li>InfinityNFT</li>
