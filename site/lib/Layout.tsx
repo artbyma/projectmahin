@@ -141,8 +141,8 @@ function Navigation() {
     }
   `}>
     <Link href={"/"}><a>Home</a></Link>
-    <Link href={"/purchase"}><a>Purchase</a></Link>
-    <Link href={"/randomness"}><a>Randomness</a></Link>
+    {/*<Link href={"/purchase"}><a>Purchase</a></Link>*/}
+    {/*<Link href={"/randomness"}><a>Randomness</a></Link>*/}
     <Link href={"/charity"}><a>Charity</a></Link>
     <Link href={"/treasury"}><a>Treasury</a></Link>
     <a href={"https://twitter.com/artbyma"}>
