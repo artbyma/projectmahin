@@ -60,4 +60,5 @@ export function handleDiagnosed(event: Diagnosed): void {
   const diagnosis = new Diagnosis(event.params.tokenId.toString());
   diagnosis.roll = state.currentRoll!;
   diagnosis.tokenId = event.params.tokenId.toI32();
+  diagnosis.save();
 }
