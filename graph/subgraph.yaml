@@ -28,6 +28,7 @@ dataSources:
         - event: RollInProgress(int128)
           handler: handleRollInProgress
       file: ./src/mapping.ts
+
   - kind: ethereum
     name: DoctorV2
     network: mainnet
@@ -50,4 +51,7 @@ dataSources:
           handler: handleRollComplete
         - event: RollInProgress(int128)
           handler: handleRollInProgress
+      callHandlers:
+        - function: requestRoll(bool)
+          handler: handleRequestRoll
       file: ./src/mapping.ts

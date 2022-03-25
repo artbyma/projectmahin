@@ -18,6 +18,7 @@ export class State extends Entity {
 
     this.set("rollCount", Value.fromI32(0));
     this.set("diagnosedCount", Value.fromI32(0));
+    this.set("diagnosedTokenIds", Value.fromI32Array(new Array(0)));
   }
 
   save(): void {
@@ -79,6 +80,15 @@ export class State extends Entity {
   set diagnosedCount(value: i32) {
     this.set("diagnosedCount", Value.fromI32(value));
   }
+
+  get diagnosedTokenIds(): Array<i32> {
+    let value = this.get("diagnosedTokenIds");
+    return value!.toI32Array();
+  }
+
+  set diagnosedTokenIds(value: Array<i32>) {
+    this.set("diagnosedTokenIds", Value.fromI32Array(value));
+  }
 }
 
 export class Roll extends Entity {
@@ -88,6 +98,8 @@ export class Roll extends Entity {
 
     this.set("requestedAt", Value.fromBigInt(BigInt.zero()));
     this.set("requestTxHash", Value.fromString(""));
+    this.set("probability", Value.fromBigInt(BigInt.zero()));
+    this.set("diagnoses", Value.fromStringArray(new Array(0)));
   }
 
   save(): void {
@@ -165,6 +177,33 @@ export class Roll extends Entity {
     } else {
       this.set("applyTxHash", Value.fromString(<string>value));
     }
+  }
+
+  get probability(): BigInt {
+    let value = this.get("probability");
+    return value!.toBigInt();
+  }
+
+  set probability(value: BigInt) {
+    this.set("probability", Value.fromBigInt(value));
+  }
+
+  get useFallback(): boolean {
+    let value = this.get("useFallback");
+    return value!.toBoolean();
+  }
+
+  set useFallback(value: boolean) {
+    this.set("useFallback", Value.fromBoolean(value));
+  }
+
+  get diagnoses(): Array<string> {
+    let value = this.get("diagnoses");
+    return value!.toStringArray();
+  }
+
+  set diagnoses(value: Array<string>) {
+    this.set("diagnoses", Value.fromStringArray(value));
   }
 }
 

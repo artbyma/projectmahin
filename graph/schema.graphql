@@ -3,6 +3,7 @@ type State @entity {
   currentRoll: Roll
   rollCount: Int!
   diagnosedCount: Int!
+  diagnosedTokenIds: [Int!]!
 }
 
 type Roll @entity {
@@ -11,6 +12,10 @@ type Roll @entity {
   requestTxHash: String!
   appliedAt: BigInt
   applyTxHash: String
+
+  probability: BigInt!
+  useFallback: Boolean
+  diagnoses: [Diagnosis!]!
 }
 
 type Diagnosis @entity {
