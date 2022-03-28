@@ -1,3 +1,12 @@
+# Project Mahin smart contracts
+
+## TODO
+
+As we approach the end of the 5-year project runtime, we need to update the diagnosis
+contract to consider when a token was minted to not overshoot; this is currently not 
+yet implemented.
+
+
 ## Commands
 
 For a local testnet, start `npx hardhat node` and use `--network localhost`.
