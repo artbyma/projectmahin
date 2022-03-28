@@ -6,6 +6,7 @@ pragma solidity ^0.7.0;
 import "openzeppelin-solidity/contracts/access/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./MahinNFT.sol";
+import "./MintDateRegistry.sol";
 //import "hardhat/console.sol";
 
 
@@ -19,10 +20,12 @@ contract FixedPriceSeller is Ownable {
     bool public enabled = false;
     uint256 public numSold = 0;
     MahinNFT public nftContract;
+    MintDateRegistry public mintDateRegistry;
     address public treasury;
 
-    constructor (address mahinAddress, uint[] memory _idsToSell) {
+    constructor (address mahinAddress, address mintDateRegistryAddress, uint[] memory _idsToSell) {
         nftContract = MahinNFT(mahinAddress);
+        mintDateRegistry = MintDateRegistry(mintDateRegistryAddress);
         idsToSell = _idsToSell;
     }
 
@@ -78,6 +81,8 @@ contract FixedPriceSeller is Ownable {
 
         // Send the token to the buyer
         nftContract.mintToken(tokenId, msg.sender);
+
+        mintDateRegistry.setMintDateForToken(tokenId, block.timestamp);
 
         return tokenId;
     }

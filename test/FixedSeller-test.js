@@ -4,7 +4,7 @@ const { waffle, network } = require("hardhat");
 const provider = waffle.provider;
 
 describe("FixedPriceSeller", function() {
-  let fixedSeller, nftContract;
+  let fixedSeller, nftContract, mintDateRegistry;
 
   // setup a new NFT + seller contract for each tests (but account balances are shared!)
   beforeEach(async () => {
@@ -12,11 +12,17 @@ describe("FixedPriceSeller", function() {
     await nftContract.initToken(1, "name", ["hash1", "hash1"],  ["hash1", "hash1"]);
     await nftContract.initToken(2, "name", ["hash1", "hash1"],  ["hash1", "hash1"]);
 
+    const MintDateRegistry = await ethers.getContractFactory("MintDateRegistry");
+    mintDateRegistry = await MintDateRegistry.deploy();
+    await mintDateRegistry.deployed();
+
     const FixedPriceSeller = await ethers.getContractFactory("FixedPriceSeller");
-    fixedSeller = await FixedPriceSeller.deploy(nftContract.address, [1, 2]);
+    fixedSeller = await FixedPriceSeller.deploy(nftContract.address, mintDateRegistry.address, [1, 2]);
     await fixedSeller.deployed();
     await fixedSeller.enable(true);
     await nftContract.setMinter(fixedSeller.address);
+
+    await mintDateRegistry.addWriter(fixedSeller.address);
   });
 
   it("can get price", async function() {
