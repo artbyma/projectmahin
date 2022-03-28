@@ -64,7 +64,6 @@ export function LogoWithText() {
 function MainContent(props) {
   return <div css={css`
     background: white;
-    margin-bottom: 100px;
   `}>
     {props.children}
   </div>
@@ -114,7 +113,7 @@ function Header() {
       </Link>
     </div>
 
-    <div style={{position: 'absolute', right: 0, top: 0, bottom: 0}} className={"credit"}>
+    <div style={{position: 'absolute', right: 40, top: 0, bottom: 0}} className={"credit"}>
       <div>
         <a href={"https://by-ma.art/"}>a BY MA project</a>
       </div>
@@ -142,7 +141,7 @@ function Navigation() {
   `}>
     <Link href={"/"}><a>Home</a></Link>
     {/*<Link href={"/purchase"}><a>Purchase</a></Link>*/}
-    {/*<Link href={"/randomness"}><a>Randomness</a></Link>*/}
+    <Link href={"/randomness"}><a>Randomness</a></Link>
     <Link href={"/charity"}><a>Charity</a></Link>
     <Link href={"/treasury"}><a>Treasury</a></Link>
     <a href={"https://twitter.com/artbyma"}>

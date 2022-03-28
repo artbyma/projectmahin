@@ -3,8 +3,17 @@
 import React, {useEffect, useState} from "react";
 import {css, jsx} from "@emotion/react";
 import {Layout, MaxWidth, Padding} from "../lib/Layout";
+import { request } from 'graphql-request';
+import {format, fromUnixTime, formatDistanceStrict} from 'date-fns'
+import useSWR from "swr";
+import {parseProbability, useRandomState} from "../lib/useRandomState";
+import BigNumber from "bignumber.js";
 import {useWeb3React} from "../lib/web3wallet/core";
-import {useNFTContract} from "../lib/useNFTContract";
+import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
+
+
+const fetcher = query => request('https://api.studio.thegraph.com/query/23726/project-mahin/v0.0.8', query)
+
 
 
 export default function Randomness() {
@@ -19,6 +28,9 @@ export default function Randomness() {
 
 export function Action(props: {
 }) {
+  const [isRolling, lastRollTime, probability] = useRandomState();
+  const collectiveProbability = new BigNumber(1).minus(new BigNumber(1).minus(probability).pow(42));
+
   return <MaxWidth>
     <Padding css={css`
       font-family: Varta, sans-serif;
@@ -41,6 +53,7 @@ export function Action(props: {
         <div css={css`
           display: flex;
           flex-direction: row;
+          gap: 20px;
           
           > div {
             flex: 1;
@@ -75,16 +88,18 @@ export function Action(props: {
             text-align: center;
           `}>
             <div>
-              Two transactions are required.
+              Current probability (individual / collective):<br/>
+              {probability ? <span>
+                  {new Intl.NumberFormat("en-US", {
+                    style: 'percent', minimumFractionDigits: 2}).format(probability.toNumber()) }
+                </span> : null}
+              {" "}/{" "}
+              {probability ? <span>
+                {new Intl.NumberFormat("en-US", {
+                  style: 'percent', minimumFractionDigits: 2}).format(collectiveProbability.toNumber()) }
+              </span> : null}
             </div>
-            <div>
-              Current probability (individual / collective):<br/> 4% / 33%
-            </div>
-            <div>
-              Current reward:<br/> 0.3 ETH
-            </div>
-            <button>1. Request Randomness</button>
-            <button>2. Apply Randomness</button>
+            <TransactArea />
           </div>
         </div>
       </div>
@@ -93,105 +108,166 @@ export function Action(props: {
 }
 
 
+export function TransactArea() {
+  const [busy, setBusy] = useState(false);
+  const {library, active} = useWeb3React();
+  const [askToConnect, modalProps] = getImperativeModal();
+
+  const handleClick = async () => {
+    setBusy(true)
+    try {
+      if (active) {
+
+      } else {
+        if (await askToConnect()) {
+          //await doPurchase();
+        }
+      }
+    }
+    finally {
+      setBusy(false)
+    }
+  }
+
+  return <>
+    <ConnectModal {...modalProps} />
+    <div>
+      Current reward:<br/> 0 ETH
+    </div>
+    <div>
+      To feed randomness to the smart contract, two transactions are required.
+    </div>
+    <button
+        onClick={handleClick}
+    >1. Request Randomness</button>
+    <button disabled={true}>2. Apply Randomness</button>
+  </>
+}
+
 export function Log(props: {
 }) {
+  const { data, error } = useSWR(
+      `{
+          rolls(first: 50, orderBy: requestedAt, orderDirection: desc) {
+            id
+            requestedAt
+            requestTxHash
+            appliedAt,
+            applyTxHash
+            probability
+            useFallback
+            diagnoses {
+              tokenId
+            }
+          }
+    }`,
+      fetcher
+  );
+
+  let content;
+
+  if (error) {
+    content = 'Failed to load.'
+  }
+  else if (!data) {
+    content = 'Loading...';
+  }
+  else {
+    content = <table css={css`
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    
+    thead tr {
+        background-color: #f63677;
+        color: #ffffff;
+        text-align: left;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+    }
+    
+    .number {
+      text-align: right;
+    }
+    
+    tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+    
+    tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+  `}>
+      <thead>
+        <tr>
+          <th>Requested</th>
+          <th>Applied</th>
+          <th className={"number"}>Odds</th>
+          <th>Random Source</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+      {data.rolls.map(roll => {
+        return <tr>
+          <td>
+            <a href={`https://etherscan.io/tx/${roll.requestTxHash}`}>
+              {format(fromUnixTime(roll.requestedAt), "yyyy-MM-dd HH:mm:ss")}
+            </a>
+          </td>
+          <td>
+            {roll.appliedAt ? <>
+              <a href={`https://etherscan.io/tx/${roll.applyTxHash}`} title={format(fromUnixTime(roll.appliedAt), "yyyy-MM-dd HH:mm:ss")}>
+                after {formatDistanceStrict(fromUnixTime(roll.appliedAt), fromUnixTime(roll.requestedAt))}
+              </a>
+            </> : null}
+          </td>
+          <td className={"number"}>
+            {new Intl.NumberFormat("en-US", {
+              style: 'percent', minimumFractionDigits: 2}).format(parseProbability(roll.probability).toNumber()) }
+          </td>
+          <td>
+            {roll.useFallback ? "In-Chain" : "Chainlink VRF"}
+          </td>
+          <td>
+            {roll.diagnoses.length == 0 ? <>No diagnosis.</> : null}
+            {roll.diagnoses.length > 0
+                ? <>
+                    Diagnosed:{" "}
+                    {roll.diagnoses.map((d, idx) => {
+                      return <>{idx > 0 ? <>, </> : null}<a href={`https://opensea.io/assets/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f/${d.tokenId}`}>{d.tokenId}</a></>
+                    })}
+                  </> : null}
+          </td>
+        </tr>
+      })}
+      </tbody>
+    </table>;
+  }
+
   return <MaxWidth>
     <Padding css={css`
-      font-family: Varta, sans-serif;
-      line-height: 1.5;
-      font-size: 20px;
-    `}>
+    font-family: Varta, sans-serif;
+    line-height: 1.5;
+    font-size: 20px;
+  `}>
       <div css={css`
-        font-family: Courier, monospace;
-        font-size: 14px;
-        
-        button {
-          font-family: inherit;
-          padding: 0.4em;
-        }
-      `}>
+      font-family: Courier, monospace;
+      font-size: 14px;
+      
+      button {
+        font-family: inherit;
+        padding: 0.4em;
+      }
+    `}>
         <h1>
           [log]
         </h1>
 
-        <table css={css`
-          width: 100%;
-          border-collapse: collapse;
-          margin: 25px 0;
-          font-size: 0.9em;
-          
-          thead tr {
-              background-color: #f63677;
-              color: #ffffff;
-              text-align: left;
-          }
-          
-          th, td {
-            padding: 12px 15px;
-          }
-          
-          tbody td:nth-child(3), tfoot td:nth-child(2), thead td:nth-child(3)  {
-            text-align: right;
-          }
-          
-          tbody tr {
-              border-bottom: 1px solid #dddddd;
-          }
-          
-          tbody tr:nth-of-type(even) {
-              background-color: #f3f3f3;
-          }
-        `}>
-          <tbody>
-            <tr>
-              <td>
-                2022-03-12 14:22:00
-              </td>
-              <td>
-                [request]
-              </td>
-              <td>
-                [apply]
-              </td>
-              <td>
-                3.45%
-              </td>
-              <td>
-                -
-              </td>
-              <td>
-                VRF
-              </td>
-              <td>
-                No diagnosis.
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                2022-03-12 14:22:00
-              </td>
-              <td>
-                [request]
-              </td>
-              <td>
-                [apply]
-              </td>
-              <td>
-                3.45%
-              </td>
-              <td>
-                -
-              </td>
-              <td>
-                VRF
-              </td>
-              <td>
-                No diagnosis.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {content}
       </div>
     </Padding>
   </MaxWidth>
@@ -204,10 +280,9 @@ function TechStack() {
     font-size: 18px;
     line-height: 1.5;
     font-weight: 300;
-    margin: 0 0 100px 0;
+    margin: 80px 0 0px 0;
     background: #595551;
     color: white;
-    padding: 40px 0;
     
     h3 {
         margin-top: 0;
