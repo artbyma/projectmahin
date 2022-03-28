@@ -1,5 +1,6 @@
 const {setupMahinNFTContract} = require('./utils');
 const { expect } = require("chai");
+const {BigNumber} = require("bignumber.js");
 
 
 async function initToken(nftContract, tokenId) {
@@ -54,7 +55,8 @@ describe("DoctorV2", function() {
     expect((await doctor.rollProbability())).to.be.equal(0);
 
     // +1y
-    await hre.network.provider.request({method: "evm_mine", params: [createTime + 3600*24*355*1]});
+    let currentChainTime = createTime + 3600*24*355*1;
+    await hre.network.provider.request({method: "evm_mine", params: [currentChainTime]});
 
     await doctor.requestRoll(true);
     expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("16565646809409078765");
@@ -70,10 +72,14 @@ describe("DoctorV2", function() {
     expect((await doctor.rollProbability())).to.be.equal(0);
     expect((await doctor.isRolling())).to.be.equal(false);
 
-    // lets trigger a hit
-    await doctor.setPerSecondProbability("0");
+    // Test what the odds are in 5 years
+    //console.log('---', parseProbability((await doctor.getProbability(createTime + 3600*24*365*15)).toString()).toString());
+    expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("16565646809409078765");
+
+    // lets trigger a hit with 100% artificial odds (probability value 0 = 100%)
+    await doctor.setPerSecondProbability("10000000000000000");
+    expect((await doctor.getProbability(currentChainTime + 1000)).toString()).to.be.equal("0");
     await doctor.requestRoll(true);
-    expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("0");
 
     await hre.network.provider.request({method: "evm_mine", params: []});
     await hre.network.provider.request({method: "evm_mine", params: []});
@@ -83,3 +89,7 @@ describe("DoctorV2", function() {
     expect(await nft.tokenURI(5)).to.equal("hash2");
   });
 });
+
+function parseProbability(probability) {
+  return new BigNumber(1).minus(new BigNumber(probability).div(new BigNumber(2).pow(64)));
+}
