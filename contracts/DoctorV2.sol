@@ -12,7 +12,7 @@ interface IMahin {
 }
 
 
-// Replaces the builtin random generator with a fixed version.
+// Replaces the builtin random generator with a version that fixes the broken randomness values.
 contract DoctorV2 is Randomness, Ownable {
     IMahin public nft;
 

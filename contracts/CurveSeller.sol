@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+// The initial sale contract, selling tokens with increasing prices on one of those
+// fomo curves now fallen out of favor.
 
 pragma solidity ^0.7.0;
 
