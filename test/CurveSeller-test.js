@@ -34,7 +34,7 @@ describe("CurveSeller", function() {
   });
 
   it("fails to purchase w/o enough eth", async function() {
-    expect(curveSeller.purchase()).to.be.revertedWith("not enough eth");
+    await expect(curveSeller.purchase()).to.be.revertedWith("not enough eth");
   });
 
   it("can purchase", async function() {
@@ -56,7 +56,7 @@ describe("CurveSeller", function() {
     expect(await nftContract.totalSupply()).to.equal(2);
 
     // Only two are in the curve, so this will fail
-    expect(curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})).to.be.revertedWith("sold out");
+    await expect(curveSeller.purchase({value: await curveSeller.getPriceToMint(0)})).to.be.revertedWith("sold out");
   });
 
   it('distributes to beneficiary', async () => {

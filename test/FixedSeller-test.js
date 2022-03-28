@@ -36,7 +36,9 @@ describe("FixedPriceSeller", function() {
   });
 
   it("fails to purchase w/o enough eth", async function() {
-    expect(fixedSeller.purchase()).to.be.revertedWith("not enough eth");
+    const [_, __, treasury] = await ethers.getSigners();
+    await fixedSeller.setTreasury(treasury.address);
+    await expect(fixedSeller.purchase()).to.be.revertedWith("not enough eth");
   });
 
   it("can purchase", async function() {
@@ -61,7 +63,7 @@ describe("FixedPriceSeller", function() {
     expect(await provider.getBalance(treasury.address)).to.equal("10000800000000000000000");
 
     // Only two are in the curve, so this will fail
-    expect(fixedSeller.purchase({value: await fixedSeller.mintPrice()})).to.be.revertedWith("sold out");
+    await expect(fixedSeller.purchase({value: await fixedSeller.mintPrice()})).to.be.revertedWith("sold out");
   });
 
   it('distributes to beneficiary', async () => {

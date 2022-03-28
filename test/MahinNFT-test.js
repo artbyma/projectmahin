@@ -58,7 +58,7 @@ describe("MahinNFT", function() {
 
   it("should revert if trying to mint an invalid token", async function() {
     const [signer, account2] = await ethers.getSigners();
-    expect(nft.mintToken(7, signer.address)).to.be.revertedWith("invalid id");
+    await expect(nft.mintToken(7, signer.address)).to.be.revertedWith("invalid id");
   });
 
   it("do a roll", async function() {
@@ -95,7 +95,7 @@ describe("MahinNFT", function() {
   it ('fails to roll if doctor set', async function() {
     const [signer] = await ethers.getSigners();
     await nft.setDoctor(signer.address);
-    expect(nft.requestRoll(true)).to.be.revertedWith("rng-disabled");
+    await expect(nft.requestRoll(true)).to.be.revertedWith("rng-disabled");
   });
 
   it ('doctor can diagnose', async function() {
@@ -103,7 +103,7 @@ describe("MahinNFT", function() {
     await initToken(nft, 5);
     await nft.mintToken(5, signer.address);
 
-    expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
+    await expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
 
     await nft.setDoctor(signer.address);
 
@@ -113,7 +113,7 @@ describe("MahinNFT", function() {
 
     // We can change the doctor a second time
     await nft.setDoctor(signer2.address);
-    expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
+    await expect(nft.diagnose(5)).to.be.revertedWith("not doctor");
   });
 });
 
