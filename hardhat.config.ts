@@ -10,6 +10,8 @@ import { Contract } from "ethers";
 import fs from "fs";
 import path from "path";
 import {arrayify, parseUnits} from "ethers/lib/utils";
+import { util } from "chai";
+import { DeployUtil } from "./scripts/deployHelpers";
 
 
 require('dotenv').config({path: path.join(__dirname, '.env.local')});
@@ -94,27 +96,10 @@ task("deploy", "Deploy the contract", async () => {
   const [signer] = await ethers.getSigners();
   console.log("Working as", signer.address);
 
-  let sourceCodeSubmitters: any[] = [];
-  async function deployContract(name, args) {
-    console.log(`Deploying ${name}...`);
-    const Class = await ethers.getContractFactory(name);
-    const contract = await Class.deploy(...args);
-    console.log('  ...[waiting to mine]')
-    await contract.deployed();
+  const helper = new DeployUtil();
 
-    sourceCodeSubmitters.push(async () => {
-      console.log(`  ...[${name}]`)
-      await run("verify:verify", {
-        address: contract.address,
-        constructorArguments: args
-      });
-    })
-
-    return contract;
-  }
-
-  const nft = await deployContract("MahinNFT", [Configs.mainnet.chainlink]);
-  const curve = await deployContract("CurveSeller", [
+  const nft = await helper.deployContract("MahinNFT", [Configs.mainnet.chainlink]);
+  const curve = await helper.deployContract("CurveSeller", [
       nft.address,
       [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
        17,18,
@@ -133,19 +118,7 @@ task("deploy", "Deploy the contract", async () => {
   console.log("Set IPFS Host");
   await (await nft.setIPFSHost("https://cloudflare-ipfs.com/ipfs/")).wait();
 
-  if (network.name == "mainnet" || network.name == "rinkeby") {
-    console.log("Waiting 5 confirmations for Etherscan before we submit the source code");
-    await new Promise(resolve => {
-      setTimeout(resolve, 60 * 1000);
-    });
-    for (const submitter of sourceCodeSubmitters) {
-      try {
-        await submitter();
-      } catch (e) {
-        console.log("Error submitting validation", e)
-      }
-    }
-  }
+  await helper.complete();
 });
 
 task("prepare", "Optimize SVGs and prepare metadata JSON files")

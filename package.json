@@ -17,7 +17,7 @@
     "@tenderly/hardhat-tenderly": "^1.0.13",
     "chai": "^4.3.0",
     "ethereum-waffle": "^3.2.2",
-    "ethers": "^5.0.30",
+    "ethers": "^5.6.4",
     "hardhat": "^2.9.1",
     "hardhat-contract-sizer": "^2.5.1",
     "ipfs-only-hash": "^2.0.1",
