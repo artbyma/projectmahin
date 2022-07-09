@@ -3,7 +3,7 @@
  * ABDK Math 64.64 Smart Contract Library.  Copyright © 2019 by ABDK Consulting.
  * Author: Mikhail Vladimirov <mikhail.vladimirov@gmail.com>
  */
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 /**
  * Smart contract library of mathematical functions operating with signed
@@ -29,11 +29,13 @@ library ABDKMath64x64 {
      * number.  Revert on overflow.
      *
      * @param x signed 256-bit integer number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function fromInt (int256 x) internal pure returns (int128) {
+    unchecked {
         require (x >= -0x8000000000000000 && x <= 0x7FFFFFFFFFFFFFFF);
         return int128 (x << 64);
+    }
     }
 
     /**
@@ -41,10 +43,12 @@ library ABDKMath64x64 {
      * rounding down.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64-bit integer number
-     */
+   * @return signed 64-bit integer number
+   */
     function toInt (int128 x) internal pure returns (int64) {
+    unchecked {
         return int64 (x >> 64);
+    }
     }
 
     /**
@@ -52,11 +56,13 @@ library ABDKMath64x64 {
      * number.  Revert on overflow.
      *
      * @param x unsigned 256-bit integer number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function fromUInt (uint256 x) internal pure returns (int128) {
+    unchecked {
         require (x <= 0x7FFFFFFFFFFFFFFF);
-        return int128 (x << 64);
+        return int128 (int256 (x << 64));
+    }
     }
 
     /**
@@ -64,11 +70,13 @@ library ABDKMath64x64 {
      * number rounding down.  Revert on underflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return unsigned 64-bit integer number
-     */
+   * @return unsigned 64-bit integer number
+   */
     function toUInt (int128 x) internal pure returns (uint64) {
+    unchecked {
         require (x >= 0);
-        return uint64 (x >> 64);
+        return uint64 (uint128 (x >> 64));
+    }
     }
 
     /**
@@ -76,12 +84,14 @@ library ABDKMath64x64 {
      * number rounding down.  Revert on overflow.
      *
      * @param x signed 128.128-bin fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function from128x128 (int256 x) internal pure returns (int128) {
+    unchecked {
         int256 result = x >> 64;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
@@ -89,49 +99,57 @@ library ABDKMath64x64 {
      * number.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 128.128 fixed point number
-     */
+   * @return signed 128.128 fixed point number
+   */
     function to128x128 (int128 x) internal pure returns (int256) {
+    unchecked {
         return int256 (x) << 64;
+    }
     }
 
     /**
      * Calculate x + y.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function add (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         int256 result = int256(x) + y;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
      * Calculate x - y.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function sub (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         int256 result = int256(x) - y;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
      * Calculate x * y rounding down.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function mul (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         int256 result = int256(x) * y >> 64;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
@@ -139,10 +157,11 @@ library ABDKMath64x64 {
      * number and y is signed 256-bit integer number.  Revert on overflow.
      *
      * @param x signed 64.64 fixed point number
-     * @param y signed 256-bit integer number
-     * @return signed 256-bit integer number
-     */
+   * @param y signed 256-bit integer number
+   * @return signed 256-bit integer number
+   */
     function muli (int128 x, int256 y) internal pure returns (int256) {
+    unchecked {
         if (x == MIN_64x64) {
             require (y >= -0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF &&
             y <= 0x1000000000000000000000000000000000000000000000000);
@@ -169,22 +188,24 @@ library ABDKMath64x64 {
             }
         }
     }
+    }
 
     /**
      * Calculate x * y rounding down, where x is signed 64.64 fixed point number
      * and y is unsigned 256-bit integer number.  Revert on overflow.
      *
      * @param x signed 64.64 fixed point number
-     * @param y unsigned 256-bit integer number
-     * @return unsigned 256-bit integer number
-     */
+   * @param y unsigned 256-bit integer number
+   * @return unsigned 256-bit integer number
+   */
     function mulu (int128 x, uint256 y) internal pure returns (uint256) {
+    unchecked {
         if (y == 0) return 0;
 
         require (x >= 0);
 
-        uint256 lo = (uint256 (x) * (y & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)) >> 64;
-        uint256 hi = uint256 (x) * (y >> 128);
+        uint256 lo = (uint256 (int256 (x)) * (y & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)) >> 64;
+        uint256 hi = uint256 (int256 (x)) * (y >> 128);
 
         require (hi <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
         hi <<= 64;
@@ -193,20 +214,23 @@ library ABDKMath64x64 {
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF - lo);
         return hi + lo;
     }
+    }
 
     /**
      * Calculate x / y rounding towards zero.  Revert on overflow or when y is
      * zero.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function div (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         require (y != 0);
         int256 result = (int256 (x) << 64) / y;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
@@ -214,10 +238,11 @@ library ABDKMath64x64 {
      * integer numbers.  Revert on overflow or when y is zero.
      *
      * @param x signed 256-bit integer number
-     * @param y signed 256-bit integer number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 256-bit integer number
+   * @return signed 64.64-bit fixed point number
+   */
     function divi (int256 x, int256 y) internal pure returns (int128) {
+    unchecked {
         require (y != 0);
 
         bool negativeResult = false;
@@ -238,42 +263,49 @@ library ABDKMath64x64 {
             return int128 (absoluteResult); // We rely on overflow behavior here
         }
     }
+    }
 
     /**
      * Calculate x / y rounding towards zero, where x and y are unsigned 256-bit
      * integer numbers.  Revert on overflow or when y is zero.
      *
      * @param x unsigned 256-bit integer number
-     * @param y unsigned 256-bit integer number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y unsigned 256-bit integer number
+   * @return signed 64.64-bit fixed point number
+   */
     function divu (uint256 x, uint256 y) internal pure returns (int128) {
+    unchecked {
         require (y != 0);
         uint128 result = divuu (x, y);
         require (result <= uint128 (MAX_64x64));
         return int128 (result);
+    }
     }
 
     /**
      * Calculate -x.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function neg (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x != MIN_64x64);
         return -x;
+    }
     }
 
     /**
      * Calculate |x|.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function abs (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x != MIN_64x64);
         return x < 0 ? -x : x;
+    }
     }
 
     /**
@@ -281,24 +313,28 @@ library ABDKMath64x64 {
      * zero.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function inv (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x != 0);
         int256 result = int256 (0x100000000000000000000000000000000) / x;
         require (result >= MIN_64x64 && result <= MAX_64x64);
         return int128 (result);
+    }
     }
 
     /**
      * Calculate arithmetics average of x and y, i.e. (x + y) / 2 rounding down.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function avg (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         return int128 ((int256 (x) + int256 (y)) >> 1);
+    }
     }
 
     /**
@@ -306,15 +342,17 @@ library ABDKMath64x64 {
      * Revert on overflow or in case x * y is negative.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y signed 64.64-bit fixed point number
+   * @return signed 64.64-bit fixed point number
+   */
     function gavg (int128 x, int128 y) internal pure returns (int128) {
+    unchecked {
         int256 m = int256 (x) * int256 (y);
         require (m >= 0);
         require (m <
             0x4000000000000000000000000000000000000000000000000000000000000000);
         return int128 (sqrtu (uint256 (m)));
+    }
     }
 
     /**
@@ -322,49 +360,105 @@ library ABDKMath64x64 {
      * and y is unsigned 256-bit integer number.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @param y uint256 value
-     * @return signed 64.64-bit fixed point number
-     */
+   * @param y uint256 value
+   * @return signed 64.64-bit fixed point number
+   */
     function pow (int128 x, uint256 y) internal pure returns (int128) {
-        uint256 absoluteResult;
-        bool negativeResult = false;
-        if (x >= 0) {
-            absoluteResult = powu (uint256 (x) << 63, y);
-        } else {
-            // We rely on overflow behavior here
-            absoluteResult = powu (uint256 (uint128 (-x)) << 63, y);
-            negativeResult = y & 1 > 0;
-        }
+    unchecked {
+        bool negative = x < 0 && y & 1 == 1;
 
-        absoluteResult >>= 63;
+        uint256 absX = uint128 (x < 0 ? -x : x);
+        uint256 absResult;
+        absResult = 0x100000000000000000000000000000000;
 
-        if (negativeResult) {
-            require (absoluteResult <= 0x80000000000000000000000000000000);
-            return -int128 (absoluteResult); // We rely on overflow behavior here
+        if (absX <= 0x10000000000000000) {
+            absX <<= 63;
+            while (y != 0) {
+                if (y & 0x1 != 0) {
+                    absResult = absResult * absX >> 127;
+                }
+                absX = absX * absX >> 127;
+
+                if (y & 0x2 != 0) {
+                    absResult = absResult * absX >> 127;
+                }
+                absX = absX * absX >> 127;
+
+                if (y & 0x4 != 0) {
+                    absResult = absResult * absX >> 127;
+                }
+                absX = absX * absX >> 127;
+
+                if (y & 0x8 != 0) {
+                    absResult = absResult * absX >> 127;
+                }
+                absX = absX * absX >> 127;
+
+                y >>= 4;
+            }
+
+            absResult >>= 64;
         } else {
-            require (absoluteResult <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
-            return int128 (absoluteResult); // We rely on overflow behavior here
+            uint256 absXShift = 63;
+            if (absX < 0x1000000000000000000000000) { absX <<= 32; absXShift -= 32; }
+            if (absX < 0x10000000000000000000000000000) { absX <<= 16; absXShift -= 16; }
+            if (absX < 0x1000000000000000000000000000000) { absX <<= 8; absXShift -= 8; }
+            if (absX < 0x10000000000000000000000000000000) { absX <<= 4; absXShift -= 4; }
+            if (absX < 0x40000000000000000000000000000000) { absX <<= 2; absXShift -= 2; }
+            if (absX < 0x80000000000000000000000000000000) { absX <<= 1; absXShift -= 1; }
+
+            uint256 resultShift = 0;
+            while (y != 0) {
+                require (absXShift < 64);
+
+                if (y & 0x1 != 0) {
+                    absResult = absResult * absX >> 127;
+                    resultShift += absXShift;
+                    if (absResult > 0x100000000000000000000000000000000) {
+                        absResult >>= 1;
+                        resultShift += 1;
+                    }
+                }
+                absX = absX * absX >> 127;
+                absXShift <<= 1;
+                if (absX >= 0x100000000000000000000000000000000) {
+                    absX >>= 1;
+                    absXShift += 1;
+                }
+
+                y >>= 1;
+            }
+
+            require (resultShift < 64);
+            absResult >>= 64 - resultShift;
         }
+        int256 result = negative ? -int256 (absResult) : int256 (absResult);
+        require (result >= MIN_64x64 && result <= MAX_64x64);
+        return int128 (result);
+    }
     }
 
     /**
      * Calculate sqrt (x) rounding down.  Revert if x < 0.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function sqrt (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x >= 0);
-        return int128 (sqrtu (uint256 (x) << 64));
+        return int128 (sqrtu (uint256 (int256 (x)) << 64));
+    }
     }
 
     /**
      * Calculate binary logarithm of x.  Revert if x <= 0.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function log_2 (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x > 0);
 
         int256 msb = 0;
@@ -378,7 +472,7 @@ library ABDKMath64x64 {
         if (xc >= 0x2) msb += 1;  // No need to shift xc anymore
 
         int256 result = msb - 64 << 64;
-        uint256 ux = uint256 (x) << uint256 (127 - msb);
+        uint256 ux = uint256 (int256 (x)) << uint256 (127 - msb);
         for (int256 bit = 0x8000000000000000; bit > 0; bit >>= 1) {
             ux *= ux;
             uint256 b = ux >> 255;
@@ -388,27 +482,31 @@ library ABDKMath64x64 {
 
         return int128 (result);
     }
+    }
 
     /**
      * Calculate natural logarithm of x.  Revert if x <= 0.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function ln (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x > 0);
 
-        return int128 (
-            uint256 (log_2 (x)) * 0xB17217F7D1CF79ABC9E3B39803F2F6AF >> 128);
+        return int128 (int256 (
+                uint256 (int256 (log_2 (x))) * 0xB17217F7D1CF79ABC9E3B39803F2F6AF >> 128));
+    }
     }
 
     /**
      * Calculate binary exponent of x.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function exp_2 (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x < 0x400000000000000000); // Overflow
 
         if (x < -0x400000000000000000) return 0; // Underflow
@@ -544,19 +642,21 @@ library ABDKMath64x64 {
         if (x & 0x1 > 0)
             result = result * 0x10000000000000000B17217F7D1CF79AB >> 128;
 
-        result >>= uint256 (63 - (x >> 64));
-        require (result <= uint256 (MAX_64x64));
+        result >>= uint256 (int256 (63 - (x >> 64)));
+        require (result <= uint256 (int256 (MAX_64x64)));
 
-        return int128 (result);
+        return int128 (int256 (result));
+    }
     }
 
     /**
      * Calculate natural exponent of x.  Revert on overflow.
      *
      * @param x signed 64.64-bit fixed point number
-     * @return signed 64.64-bit fixed point number
-     */
+   * @return signed 64.64-bit fixed point number
+   */
     function exp (int128 x) internal pure returns (int128) {
+    unchecked {
         require (x < 0x400000000000000000); // Overflow
 
         if (x < -0x400000000000000000) return 0; // Underflow
@@ -564,16 +664,18 @@ library ABDKMath64x64 {
         return exp_2 (
             int128 (int256 (x) * 0x171547652B82FE1777D0FFDA0D23A7D12 >> 128));
     }
+    }
 
     /**
      * Calculate x / y rounding towards zero, where x and y are unsigned 256-bit
      * integer numbers.  Revert on overflow or when y is zero.
      *
      * @param x unsigned 256-bit integer number
-     * @param y unsigned 256-bit integer number
-     * @return unsigned 64.64-bit fixed point number
-     */
+   * @param y unsigned 256-bit integer number
+   * @return unsigned 64.64-bit fixed point number
+   */
     function divuu (uint256 x, uint256 y) private pure returns (uint128) {
+    unchecked {
         require (y != 0);
 
         uint256 result;
@@ -613,68 +715,6 @@ library ABDKMath64x64 {
         require (result <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
         return uint128 (result);
     }
-
-    /**
-     * Calculate x^y assuming 0^0 is 1, where x is unsigned 129.127 fixed point
-     * number and y is unsigned 256-bit integer number.  Revert on overflow.
-     *
-     * @param x unsigned 129.127-bit fixed point number
-     * @param y uint256 value
-     * @return unsigned 129.127-bit fixed point number
-     */
-    function powu (uint256 x, uint256 y) private pure returns (uint256) {
-        if (y == 0) return 0x80000000000000000000000000000000;
-        else if (x == 0) return 0;
-        else {
-            int256 msb = 0;
-            uint256 xc = x;
-            if (xc >= 0x100000000000000000000000000000000) { xc >>= 128; msb += 128; }
-            if (xc >= 0x10000000000000000) { xc >>= 64; msb += 64; }
-            if (xc >= 0x100000000) { xc >>= 32; msb += 32; }
-            if (xc >= 0x10000) { xc >>= 16; msb += 16; }
-            if (xc >= 0x100) { xc >>= 8; msb += 8; }
-            if (xc >= 0x10) { xc >>= 4; msb += 4; }
-            if (xc >= 0x4) { xc >>= 2; msb += 2; }
-            if (xc >= 0x2) msb += 1;  // No need to shift xc anymore
-
-            int256 xe = msb - 127;
-            if (xe > 0) x >>= uint256 (xe);
-            else x <<= uint256 (-xe);
-
-            uint256 result = 0x80000000000000000000000000000000;
-            int256 re = 0;
-
-            while (y > 0) {
-                if (y & 1 > 0) {
-                    result = result * x;
-                    y -= 1;
-                    re += xe;
-                    if (result >=
-                        0x8000000000000000000000000000000000000000000000000000000000000000) {
-                        result >>= 128;
-                        re += 1;
-                    } else result >>= 127;
-                    if (re < -127) return 0; // Underflow
-                    require (re < 128); // Overflow
-                } else {
-                    x = x * x;
-                    y >>= 1;
-                    xe <<= 1;
-                    if (x >=
-                        0x8000000000000000000000000000000000000000000000000000000000000000) {
-                        x >>= 128;
-                        xe += 1;
-                    } else x >>= 127;
-                    if (xe < -127) return 0; // Underflow
-                    require (xe < 128); // Overflow
-                }
-            }
-
-            if (re > 0) result <<= uint256 (re);
-            else if (re < 0) result >>= uint256 (-re);
-
-            return result;
-        }
     }
 
     /**
@@ -682,9 +722,10 @@ library ABDKMath64x64 {
      * number.
      *
      * @param x unsigned 256-bit integer number
-     * @return unsigned 128-bit integer number
-     */
+   * @return unsigned 128-bit integer number
+   */
     function sqrtu (uint256 x) private pure returns (uint128) {
+    unchecked {
         if (x == 0) return 0;
         else {
             uint256 xx = x;
@@ -706,5 +747,6 @@ library ABDKMath64x64 {
             uint256 r1 = x / r;
             return uint128 (r < r1 ? r : r1);
         }
+    }
     }
 }

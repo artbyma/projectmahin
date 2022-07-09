@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 import "openzeppelin-solidity/contracts/access/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "./MahinNFT.sol";
 import "./MintDateRegistry.sol";
 //import "hardhat/console.sol";

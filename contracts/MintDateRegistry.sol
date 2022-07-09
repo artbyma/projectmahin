@@ -10,7 +10,7 @@
 //
 // For this reason, we are now adding a registry that keeps track of the mint date. The new
 // minting contracts will write these dates, for previously minted pieces, we set the date
-// manually. Know that we  know the date each piece was minted, a new random generator contract
+// manually. Now that we know the date each piece was minted, a new random generator contract
 // can ensure that diagnoses for a piece stop once the five year period has passed.
 //
 // This process is not entirely accurate. For example, if the randomness generator is "charged"
@@ -19,10 +19,10 @@
 // The final odds don't have to be exact; in fact, it feels more true to the spirit of this
 // project if the actual odds are *not* mathematically precise.
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import "openzeppelin-solidity/contracts/utils/structs/EnumerableSet.sol";
 
 contract MintDateRegistry {
 

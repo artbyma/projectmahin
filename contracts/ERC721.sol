@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 // Copied from openzeppelin because we want to override the tokenURI() function
 
-import "openzeppelin-solidity/contracts/GSN/Context.sol";
+import "openzeppelin-solidity/contracts/utils/Context.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/IERC721Metadata.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Receiver.sol";
-import "openzeppelin-solidity/contracts/introspection/ERC165.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/introspection/ERC165Storage.sol";
+import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableMap.sol";
+import "openzeppelin-solidity/contracts/utils/structs/EnumerableSet.sol";
+import "openzeppelin-solidity/contracts/utils/structs/EnumerableMap.sol";
 import "openzeppelin-solidity/contracts/utils/Strings.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable {
+abstract contract ERC721 is Context, ERC165Storage, IERC721, IERC721Metadata, IERC721Enumerable {
   using SafeMath for uint256;
   using Address for address;
   using EnumerableSet for EnumerableSet.UintSet;

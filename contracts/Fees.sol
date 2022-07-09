@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
-import "openzeppelin-solidity/contracts/introspection/ERC165.sol";
+import "openzeppelin-solidity/contracts/utils/introspection/ERC165.sol";
+import "openzeppelin-solidity/contracts/utils/introspection/ERC165Storage.sol";
 
 abstract contract IRoyalities {
     function getBeneficiary() internal virtual view returns (address);
@@ -42,7 +43,7 @@ interface IERC2981 is IERC165 {
     function royaltyInfo(uint256 _tokenId) external returns (address receiver, uint256 amount);
 }
 
-abstract contract HasFees is ERC165, IRaribleFees, IRoyalities, IERC2981 {
+abstract contract HasFees is ERC165Storage, IRaribleFees, IRoyalities, IERC2981 {
     /*
      * bytes4(keccak256('getFeeBps(uint256)')) == 0x0ebd4c7f
      * bytes4(keccak256('getFeeRecipients(uint256)')) == 0xb9c4d9fb

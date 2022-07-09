@@ -288,13 +288,17 @@ task("diagnose", "Diagnose")
  */
 module.exports = {
   solidity: {
-    version: "0.7.3",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
-    }
+    compilers: [
+      {
+        version: "0.8.1",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+    ],
   },
   contractSizer: {
     alphaSort: true,

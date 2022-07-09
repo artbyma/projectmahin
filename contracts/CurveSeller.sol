@@ -3,13 +3,13 @@
 // The initial sale contract, selling tokens with increasing prices on one of those
 // fomo curves now fallen out of favor.
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 //import "hardhat/console.sol";
 import "./MahinNFT.sol";
 import "openzeppelin-solidity/contracts/access/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/math/Math.sol";
+import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 
 
 // Sell NFTs using a step function.
@@ -81,7 +81,7 @@ contract CurveSeller is Ownable {
 
         // Send back remainder if overpaid
         if (msg.value - mintPrice > 0) {
-            msg.sender.transfer(msg.value - mintPrice);
+            payable(msg.sender).transfer(msg.value - mintPrice);
         }
 
         return tokenId;
