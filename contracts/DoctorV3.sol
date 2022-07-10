@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
@@ -125,7 +126,7 @@ contract DoctorV3 is Randomness, Ownable {
 
     function getRewardAmount(uint256 rewardAmountTargetTime) public view returns (uint256) {
         // Determine how much ETH to pay out
-        uint256 rewardPeriod = rewardAmountTargetTime - lastCompletedRollTime;
+        uint256 rewardPeriod = rewardAmountTargetTime - lastRollAppliedTime;
         uint256 rewardAmount = Math.min(
             address(this).balance,
             (rewardPeriod * rewardPeriodAmount  / rewardPeriodLength)
@@ -148,8 +149,8 @@ contract DoctorV3 is Randomness, Ownable {
     }
 
     function setLastRollTime(uint timestamp) public onlyOwner {
-        lastRollTime = timestamp;
-        lastCompletedRollTime = timestamp;
+        lastRollAppliedTime = timestamp;
+        lastRollRequestedTime = timestamp;
     }
 
     function setRewardLockDuration(uint256 newDuration) public onlyOwner {

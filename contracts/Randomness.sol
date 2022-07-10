@@ -5,7 +5,9 @@ pragma solidity ^0.8.0;
 import "./ABDKMath64x64.sol";
 import "./ChainlinkVRF.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "openzeppelin-solidity/contracts/utils/math/Math.sol";
 import "./Roles.sol";
+import "./MintDateRegistry.sol";
 
 
 interface IERC721Adapter {
@@ -35,21 +37,28 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     uint public constant denominator           = 10000000000000000; // 100%
 
     uint256 randomSeedBlock = 0;
-    int128 public rollProbability = 0;
-    uint256 public lastRollTime = 0;
-    uint256 public lastCompletedRollTime = 0;
+
+    uint256 public lastRollRequestedTime = 0;
+    uint256 public currentRollRequestedTime = 0;
+
+    // This does not affect randomness; we track the time though, it affects the payout amount
+    // in DoctorV3. The payout intervals can deviate from the probability intervals, as the former
+    // may need to pay additional incentives to achieve an "apply" call.
+    uint256 public lastRollAppliedTime = 0;
 
     bytes32 chainlinkRequestId = 0;
     uint256 chainlinkRandomNumber = 0;
     bytes32 internal chainlinkKeyHash;
     uint256 internal chainlinkFee;
 
+    MintDateRegistry registry;
+
     constructor(VRFConfig memory config, uint _probabilityPerSecond, uint initRollTime) ChainlinkVRF(config.coordinator, config.token) {
         chainlinkFee = config.price;
         chainlinkKeyHash = config.keyHash;
 
-        lastRollTime = initRollTime;
-        lastCompletedRollTime = initRollTime;
+        lastRollAppliedTime = initRollTime;
+        lastRollRequestedTime = initRollTime;
         probabilityPerSecond = _probabilityPerSecond;
     }
 
@@ -57,9 +66,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     // `timestamp`. This will be based on the last time a roll happened, targeting a certain total probability
     // over the period the project is running.
     // Will return 0.80 to indicate that the probability of a diagnosis is 20%.
-    function getProbability(uint256 timestamp) public view returns (int128 probability) {
-        uint256 secondsSinceLastRoll = timestamp.sub(lastRollTime);
-
+    function getProbabilityForDuration(uint256 secondsSinceLastRoll) public view returns (int128 probability) {
         // Say we want totalProbability = 20% over the course of the project's runtime.
         // If we roll 12 times, what should be the probability of each roll so they compound to 20%?
         //    (1 - x) ** 12 = (1 - 20%)
@@ -102,6 +109,17 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
         //    );
     }
 
+    // The probability when rolling at `timestamp`. Wraps when a roll is requested (even if not yet applied).
+    function getProbability(uint256 timestamp) public view returns (int128 probability) {
+        uint256 secondsSinceLastRoll = timestamp.sub(Math.max(currentRollRequestedTime, lastRollRequestedTime));
+        return getProbabilityForDuration(secondsSinceLastRoll);
+    }
+
+    // The probability when rolling now. Wraps when a roll is requested (even if not yet applied).
+    function rollProbability() public view returns (int128 probability) {
+        return getProbability(block.timestamp);
+    }
+
     // Anyone can roll, but the beneficiary is incentivized to do so.
     //
     // # When using Chainlink VRF:
@@ -126,13 +144,8 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             chainlinkRequestId = requestRandomness(chainlinkKeyHash, chainlinkFee, block.timestamp);
         }
 
-        // Calculate the probability for this roll, based on the current lastRollTime, before we update the latter.
-        rollProbability = getProbability(block.timestamp);
-
-        // Set the last roll time, which "consumes" parts of the total probability for a diagnosis
-        lastRollTime = block.timestamp;
-
-        emit RollInProgress(rollProbability);
+        emit RollInProgress(getProbability(block.timestamp));
+        currentRollRequestedTime = block.timestamp;
     }
 
     // Callback: randomness is returned from Chainlink VRF
@@ -179,7 +192,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
         // Roll was started using Chainlink VRF
         else {
             // No response from Chainlink
-            if (chainlinkRandomNumber == 0 && block.timestamp - lastRollTime > 2 hours) {
+            if (chainlinkRandomNumber == 0 && block.timestamp - currentRollRequestedTime > 2 hours) {
                 resetRoll();
                 return;
             }
@@ -189,13 +202,30 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
         }
 
         _applyRandomness(randomness);
-        lastCompletedRollTime = block.timestamp;
+        lastRollAppliedTime = block.timestamp;
+
+        // Set the last roll time, which "consumes" parts of the total probability for a diagnosis
+        lastRollRequestedTime = currentRollRequestedTime;
+
         resetRoll();
     }
 
     function _applyRandomness(bytes32 randomness) internal {
+        int128 baseProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime);
+        uint256 cutOffDate = block.timestamp - 3600*24*365*10;   // 5 year life span. probability is tuned to this value
+        bool hasRegistry = address(registry) != address(0);
+
         for (uint i=0; i<this._totalSupply(); i++) {
             uint256 tokenId = this._tokenByIndex(i);
+
+            // After a time, this token can no longer be diagnosed - it reached it's life span.
+            uint256 mintDate = 0;
+            if (hasRegistry) {
+                mintDate = registry.getMintDateForToken(tokenId);
+            }
+            if (mintDate > 0 && mintDate < cutOffDate) {
+                continue;
+            }
 
             // For each token, mix in the token id to get a new random number
             bytes32 hash = keccak256(abi.encodePacked(randomness, tokenId));
@@ -214,6 +244,20 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             int128 randomNumber = int128(uint128(uint256(hash) >> 192));
             //console.log("RANDOMNUMBER", uint256(int256(randomNumber)));
 
+            int256 rollProbability = baseProbability;
+
+            // If this token was minted *after* the last roll, adjust the probability by the non-active period.
+            if (mintDate > 0 && mintDate > lastRollRequestedTime) {
+                rollProbability -= getProbabilityForDuration(mintDate - lastRollRequestedTime);
+            }
+
+            // These tokens have experienced random generator runs with double the probability, since at the time
+            // we are only planning for the project to run for 5 years.
+            uint256 hardcodedUpgradeDate = 0;
+            if (mintDate > 0 && mintDate < hardcodedUpgradeDate) {
+
+            }
+
             if (randomNumber > rollProbability) {
                 onDiagnosed(tokenId);
             }
@@ -222,9 +266,9 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
 
     function resetRoll() internal {
         randomSeedBlock = 0;
-        rollProbability = 0;
         chainlinkRequestId = 0;
         chainlinkRandomNumber = 0;
+        currentRollRequestedTime = 0;
         emit RollComplete();
     }
 

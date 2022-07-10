@@ -71,16 +71,17 @@ describe("MahinNFT", function() {
     // Div by 18446744073709551616 to get the human-readable probability
     expect((await nft.getProbability(createTime + 3600*24*365*1)).toString()).to.be.equal("17641589817835271556");
     expect((await nft.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("14757395300609573938");
-    expect((await nft.lastRollTime())).to.be.equal(createTime);
-    expect((await nft.rollProbability())).to.be.equal(0);
+    expect((await nft.lastRollAppliedTime())).to.be.equal(createTime);
+    expect((await nft.lastRollRequestedTime())).to.be.equal(createTime);
 
     // +1y
     await hre.network.provider.request({method: "evm_mine", params: [createTime + 3600*24*355*1]});
 
     await nft.requestRoll(true);
     expect((await nft.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("15412060313834570220");
-    expect((await nft.lastRollTime())).to.be.equal(createTime + 3600*24*355*1 + 1);
-    expect((await nft.rollProbability()).toString()).to.be.equal("17663173434413984989");
+    expect((await nft.lastRollRequestedTime())).to.be.equal(createTime);
+    expect((await nft.currentRollRequestedTime())).to.be.equal(createTime + 3600*24*355*1 + 1);
+    expect((await nft.rollProbability()).toString()).to.be.equal("18446744073709551616");
     expect((await nft.isRolling())).to.be.equal(true);
 
     // +2 blocks
@@ -88,8 +89,9 @@ describe("MahinNFT", function() {
     await hre.network.provider.request({method: "evm_mine", params: []});
 
     await nft.applyRoll();
-    expect((await nft.rollProbability())).to.be.equal(0);
+    expect((await nft.rollProbability())).to.be.equal("18446743995393875778");
     expect((await nft.isRolling())).to.be.equal(false);
+    expect((await nft.lastRollRequestedTime())).to.be.equal(createTime + 3600*24*355*1 + 1);
   });
 
   it ('fails to roll if doctor set', async function() {

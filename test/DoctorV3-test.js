@@ -62,8 +62,8 @@ describe("DoctorV3", function() {
     // Div by 18446744073709551616 to get the human-readable probability
     expect((await doctor.getProbability(createTime + 3600*24*365*1)).toString()).to.be.equal("17960620322827803969");
     expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("16140900902422624187");
-    expect((await doctor.lastRollTime())).to.be.equal(createTime);
-    expect((await doctor.rollProbability())).to.be.equal(0);
+    expect((await doctor.lastRollAppliedTime())).to.be.equal(createTime);
+    expect((await doctor.lastRollRequestedTime())).to.be.equal(createTime);
 
     // +1y
     let currentChainTime = createTime + 3600*24*355*1;
@@ -71,15 +71,17 @@ describe("DoctorV3", function() {
 
     await doctor.requestRoll(true);
     expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("16565646809409078765");
-    expect((await doctor.lastRollTime())).to.be.equal(createTime + 3600*24*355*1 + 1);
-    expect((await doctor.rollProbability()).toString()).to.be.equal("17973766523682076299");
+    expect((await doctor.currentRollRequestedTime())).to.be.equal(createTime + 3600*24*355*1 + 1);
+    expect((await doctor.lastRollRequestedTime())).to.be.equal(createTime);
+    expect((await doctor.rollProbability()).toString()).to.be.equal("18446744073709551616");
     expect((await doctor.isRolling())).to.be.equal(true);
 
     // +2 blocks
     await mine2Blocks();
 
     await doctor.applyRoll();
-    expect((await doctor.rollProbability())).to.be.equal(0);
+    expect((await doctor.currentRollRequestedTime())).to.be.equal(0);
+    expect((await doctor.getProbability(createTime + 3600*24*365*5)).toString()).to.be.equal("16565646809409078765");
     expect((await doctor.isRolling())).to.be.equal(false);
 
     // Test what the odds are in 5 years
@@ -216,13 +218,13 @@ describe("DoctorV3", function() {
     const [signer, _, __, ___, funder, signer2] = await ethers.getSigners();
 
     // first it's the init value
-    expect(await doctor.lastCompletedRollTime()).to.equal(createTime);
+    expect(await doctor.lastRollAppliedTime()).to.equal(createTime);
 
     await hre.network.provider.request({method: "evm_mine", params: [createTime + 3600*24]});
     await withBalanceChange(signer.address, async () => { await doctor.requestRoll(true); });
 
     // it is still the init value after requestRoll
-    expect(await doctor.lastCompletedRollTime()).to.equal(createTime);
+    expect(await doctor.lastRollAppliedTime()).to.equal(createTime);
 
     // apply at TARGET
     await mine2Blocks(createTime + 3600*24 + 300);
@@ -232,7 +234,7 @@ describe("DoctorV3", function() {
     });
 
     // timestamp is now set to TARGET + 1
-    expect(await doctor.lastCompletedRollTime()).to.equal(createTime + 3600*24 + 300 + 1);
+    expect(await doctor.lastRollAppliedTime()).to.equal(createTime + 3600*24 + 300 + 1);
   });
 
   it("considers the mint date registry", async function() {
