@@ -37,6 +37,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     uint256 randomSeedBlock = 0;
     int128 public rollProbability = 0;
     uint256 public lastRollTime = 0;
+    uint256 public lastCompletedRollTime = 0;
 
     bytes32 chainlinkRequestId = 0;
     uint256 chainlinkRandomNumber = 0;
@@ -48,6 +49,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
         chainlinkKeyHash = config.keyHash;
 
         lastRollTime = initRollTime;
+        lastCompletedRollTime = initRollTime;
         probabilityPerSecond = _probabilityPerSecond;
     }
 
@@ -110,7 +112,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     // A future block is picked, whose hash will provide the randomness.
     // We accept as low-impact that a miner mining this block could withhold it. A user seed/reveal system
     // to counteract miner withholding introduces too much complexity (need to penalize users etc).
-    function requestRoll(bool useFallback) external {
+    function requestRoll(bool useFallback) public virtual {
         require(!this._isDisabled(), "rng-disabled");
 
         // If a roll is already scheduled, do nothing.
@@ -157,7 +159,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     //
     // In case we do not get a response from Chainlink within 2 hours, this can be called.
     //
-    function applyRoll() external {
+    function applyRoll() public virtual {
         require(isRolling(), "no-roll");
 
         bytes32 randomness;
@@ -187,6 +189,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
         }
 
         _applyRandomness(randomness);
+        lastCompletedRollTime = block.timestamp;
         resetRoll();
     }
 
