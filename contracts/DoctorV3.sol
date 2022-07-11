@@ -90,6 +90,11 @@ contract DoctorV3 is Randomness, Ownable {
     }
 
     function applyRoll() public override {
+        applyRollExtended(false);
+    }
+
+    // Callers can set noPayout=true if they do not seek a reward.
+    function applyRollExtended(bool noPayout) public {
         // Figure out who would be receiving the reward.
         address rewardRecipient;
         uint rewardAmountTargetTime;
@@ -121,7 +126,9 @@ contract DoctorV3 is Randomness, Ownable {
         super.applyRoll();
 
         // Pay out ETH
-        payable(rewardRecipient).transfer(rewardAmount);
+        if (!noPayout) {
+            payable(rewardRecipient).transfer(rewardAmount);
+        }
     }
 
     function getRewardAmount(uint256 rewardAmountTargetTime) public view returns (uint256) {
