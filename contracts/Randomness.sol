@@ -224,7 +224,7 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
     }
 
     function _applyRandomness(bytes32 randomness) internal {
-        int128 baseProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime, false);
+        int128 defaultProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime, false);
         uint256 cutOffDate = block.timestamp - 3600*24*365*10;   // 5 year life span. probability is tuned to this value
         bool hasRegistry = address(registry) != address(0);
 
@@ -257,24 +257,24 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             int128 randomNumber = int128(uint128(uint256(hash) >> 192));
             //console.log("RANDOMNUMBER", uint256(int256(randomNumber)));
 
-            int256 rollProbability;
+            int256 finalProbability;
 
             // If this token was minted *after* the last roll, adjust the probability by the non-active period.
             if (mintDate > 0 && mintDate > lastRollRequestedTime) {
-                rollProbability = getProbabilityForDuration(currentRollRequestedTime - mintDate, false);
+                finalProbability = getProbabilityForDuration(currentRollRequestedTime - mintDate, false);
             } else {
-                rollProbability = baseProbability;
+                finalProbability = defaultProbability;
             }
 
             // These tokens have experienced random generator runs with accelerated probability, since initially
             // we are only planning for the project to run for 5 years, and so were applying the randomness w/
-            // aa higher chance per roll than if we are targeting 10 years.
-            uint256 hardcodedUpgradeDate = 0;   // last roll w/o old %
+            // a higher chance per roll than now that we are targeting 10 years.
+            uint256 hardcodedUpgradeDate = 1634164223;   // date of last roll: 0x0feb6ad6c6433f2293c283c882f7670c59fddf04e2c75671f719fafefed45273
             if (mintDate > 0 && mintDate < hardcodedUpgradeDate) {
-                rollProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime, true);
+                finalProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime, true);
             }
 
-            if (randomNumber > rollProbability) {
+            if (randomNumber > finalProbability) {
                 onDiagnosed(tokenId);
             }
         }

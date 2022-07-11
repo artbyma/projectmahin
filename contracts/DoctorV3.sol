@@ -59,7 +59,7 @@ contract DoctorV3 is Randomness, Ownable {
         return nft.tokenByIndex(index);
     }
 
-    function _isDisabled() public view override returns (bool) {
+    function _isDisabled() public pure override returns (bool) {
         return false;
     }
 
@@ -168,6 +168,10 @@ contract DoctorV3 is Randomness, Ownable {
 
     function setRewardPeriodAmount(uint256 newAmount) public onlyOwner {
         rewardPeriodAmount = newAmount;
+    }
+
+    function setMintDateRegistry(MintDateRegistry r) public onlyOwner {
+        registry = r;
     }
 
     function withdraw() public onlyOwner {

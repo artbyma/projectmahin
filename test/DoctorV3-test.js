@@ -238,6 +238,44 @@ describe("DoctorV3", function() {
   });
 
   it("considers the mint date registry", async function() {
+    const [signer] = await ethers.getSigners();
+    await initToken(nft, 4);
+    await nft.mintToken(4, signer.address);
+    await initToken(nft, 5);
+    await nft.mintToken(5, signer.address);
+    await initToken(nft, 6);
+    await nft.mintToken(6, signer.address);
+
+    const MintDateRegistry = await ethers.getContractFactory("MintDateRegistry");
+    let mintDateRegistry = await MintDateRegistry.deploy();
+    await mintDateRegistry.deployed();
+    await doctor.setMintDateRegistry(mintDateRegistry.address);
+
+    // Increase by enough that over 9 years, it will essentially be a 100% chance
+    doctor.setPerSecondProbability("888468506")
+
+    // Move 11 years into the future. Set mint time of tokens:
+    // - 4 is outside of the life span, and will never be diagnosed
+    // - 5 is close to the end of the life span, and with chance increase above will be diagnosed.
+    // - 6 just began it's life and will not be diagnosed.
+    //
+    // Note that "last roll" is createTime in all cases.
+    await mintDateRegistry.setMintDateForToken(4, createTime);
+    await mintDateRegistry.setMintDateForToken(5, createTime + 100);
+    await mintDateRegistry.setMintDateForToken(6, createTime + 3600*24*365*10 - 100);
+    await hre.network.provider.request({method: "evm_mine", params: [createTime + 3600*24*365*10]});
+
+    await doctor.requestRoll(true);
+    await mine2Blocks();
+    await doctor.applyRoll();
+
+    expect(await nft.tokenURI(4)).to.equal("hash1");
+    expect(await nft.tokenURI(5)).to.equal("hash2");
+    expect(await nft.tokenURI(6)).to.equal("hash1");
+  });
+
+  it("handled 5-year tokens back adjusting", async function() {
+    // just test getProbabilityForDuration()
   });
 });
 
