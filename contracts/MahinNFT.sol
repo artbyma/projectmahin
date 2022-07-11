@@ -38,8 +38,7 @@ contract MahinNFT is Roles, ERC721("Mahin", "MAHIN"), Randomness, HasFees  {
   uint public constant targetProbability     = 1250000000000000;  // 0.125% - over the course of the project; see denominator
 
   constructor(VRFConfig memory vrfConfig)
-    // 0.0000000014151671% - This has been pre-calculated to be 20% over the project period
-    Randomness(vrfConfig, 14151671, block.timestamp) {
+    Randomness(vrfConfig, block.timestamp) {
   }
 
   function withdraw() public onlyOwner {

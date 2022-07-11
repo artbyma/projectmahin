@@ -46,10 +46,8 @@ contract DoctorV3 is Randomness, Ownable {
     uint public rewardLockedAt;
 
     constructor(VRFConfig memory vrfConfig, IMahin _nft)
-        // 0.0000000008468506% - This has been pre-calculated to amount to 12.5%
-        // start time is the deploy of the main ERC contract.
-    Randomness(vrfConfig, 8468506, 1616625854
-    ) {
+        Randomness(vrfConfig, 1634164223)  // date of last roll: 0x0feb6ad6c6433f2293c283c882f7670c59fddf04e2c75671f719fafefed45273
+    {
         nft = _nft;
     }
 
