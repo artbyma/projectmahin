@@ -26,26 +26,6 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 
-
-const Configs = {
-  rinkeby: {
-    chainlink: {
-      'coordinator': '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B',
-      'token': '0x01be23585060835e02b77ef475b0cc51aa1e0709',
-      'keyHash': '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311',
-      'price': '100000000000000000',
-    },
-  },
-  mainnet: {
-    chainlink: {
-      'coordinator': '0xf0d54349aDdcf704F77AE15b96510dEA15cb7952',
-      'token': '0x514910771af9ca656af840dff83e8264ecf986ca',
-      'keyHash': '0xAA77729D3466CA35AE8D28B3BBAC7CC36A5031EFDC430821C02BC31A238AF445',
-      'price': '2000000000000000000',
-    }
-  }
-}
-
 task("deploy-doctor", "Deploy the doctor contract", async () => {
   const {ethers, run, network} = await import('hardhat');
 
@@ -68,6 +48,7 @@ task("deploy-doctor", "Deploy the doctor contract", async () => {
     return contract;
   }
 
+  const {Configs} = require("./scripts/deploy2022July");
   let nft = await getNFTContract("0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f");
   const doctor = await deployContract("DoctorV2",
       [Configs.mainnet.chainlink, nft.address]);
@@ -98,6 +79,7 @@ task("deploy", "Deploy the contract", async () => {
 
   const helper = new DeployUtil();
 
+  const {Configs} = require("./scripts/deploy2022July");
   const nft = await helper.deployContract("MahinNFT", [Configs.mainnet.chainlink]);
   const curve = await helper.deployContract("CurveSeller", [
       nft.address,
