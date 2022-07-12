@@ -1,9 +1,9 @@
 import {useAsyncValue} from "./useAsyncValue";
 import {BigNumber, Contract} from "ethers";
-import {useCurveContract} from "./useCurveContract";
+import {useSaleContract} from "./useSaleContract";
 
 export function useMintPrice() {
-  const contract = useCurveContract();
+  const contract = useSaleContract();
   const [data] = useAsyncValue(async () => getMintPrice(contract), [contract]);
 
   if (!data) {
@@ -22,7 +22,7 @@ export async function getMintPrice(contract?: Contract) {
   } else {
     try {
       const {price, nextPrice, numRemaining} = await (await fetch('/api/price')).json();
-      return [BigNumber.from(price), BigNumber.from(nextPrice), BigNumber.from(numRemaining)];
+      return [BigNumber.from(price), BigNumber.from(nextPrice), numRemaining];
     } catch(e) {
       console.log("Failed to fetch price from server, probably misconfigured.")
       return [BigNumber.from("0"), BigNumber.from("0"), 0];

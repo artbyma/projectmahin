@@ -10,7 +10,7 @@ function getLibrary(provider, connector) {
 }
 
 function MyApp({ Component, pageProps }) {
-  const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_NETWORK);
+  const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_NETWORK ?? 1);
   const connectors = useMemo(() => {
     return getConnectors(CHAIN_ID);
   },[])

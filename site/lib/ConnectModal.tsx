@@ -67,5 +67,5 @@ export function getImperativeModal() {
     }
   }
 
-  return [show, props];
+  return [show, props] as const;
 }

@@ -1,19 +1,17 @@
 /** @jsxRuntime classic /
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react'
-import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import {useState, Fragment} from 'react';
 import {useWeb3React} from "../lib/web3wallet/core";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
 import {getMintPrice, useMintPrice} from "../lib/useMintPrice";
 import {Layout, LogoWithText, MaxWidth, Padding} from "../lib/Layout";
-import {useCurveContract} from "../lib/useCurveContract";
+import {useSaleContract} from "../lib/useSaleContract";
 import {useRouter} from "next/router";
 import Link from "next/link";
 import {Overview} from "../lib/Overview";
-import {useRandomState} from "../lib/useRandomState";
-import BigNumber from "bignumber.js";
+import {useProbabilities} from "../lib/useRandomState";
 
 export default function Home() {
   return (
@@ -128,10 +126,8 @@ function formatMintPrice(price) {
 }
 
 function SaleArea() {
-  const [mintPrice] = useMintPrice();
-  const [isRolling, lastRollTime, probability] = useRandomState();
-
-  const collectiveProbability = new BigNumber(1).minus(new BigNumber(1).minus(probability).pow(42));
+  const [mintPrice, _, numRemaining] = useMintPrice();
+  const {probability, collectiveProbability} = useProbabilities();
 
   return <div css={css`
     font-family: Varta,sans-serif;
@@ -163,7 +159,7 @@ function SaleArea() {
             the next couple of years in terms of gas and random generator fees.
           </p>
           <p>
-            In total, 43 pieces have been minted and are in circulation. 17 are still available. If you'd like
+            In total, 43 pieces have been minted and are in circulation. {numRemaining} are still available. If you'd like
             one of your own, they are currently available for purchase at Ξ {formatMintPrice(mintPrice)} each.
           </p>
           <div  css={css`
@@ -439,6 +435,35 @@ function Mechanics() {
 
 
 function TechStack() {
+  const Contracts = [
+     {
+       label: 'NFT',
+       address: '0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f',
+       hasOpenSea: true
+     },
+    {
+      label: 'DoctorV2',
+      address: '0x155cf7a98b828fab0fa0ac51e42631e324ba0d69',
+      isDeprecated: true,
+    },
+    {
+      label: 'DoctorV3',
+      address: '',
+    },
+    {
+      label: 'CurveSeller',
+      address: '0x47746e3563dc8c3ec09878907f8ce3a3f20082f0',
+      isDeprecated: true,
+    },
+    {
+      label: 'FixedPriceSeller',
+      address: '0x62cab40ecc2afed09182c76a5b05d43d86f0a697',
+    },
+    {
+      label: 'MintDateRegistry',
+      address: '0x56819785480d6da5ebdff288b9b27475fe944bff',
+    },
+  ];
   return <div css={css`
     font-family: Varta,sans-serif;
     font-size: 18px;
@@ -455,6 +480,7 @@ function TechStack() {
         font-size: 35px;
         font-weight: 900;
     }
+    
     .detail {
       font-size: 0.9em;
       margin-bottom: 50px;
@@ -489,17 +515,32 @@ function TechStack() {
     <Padding>
       <h3>Technical Details</h3>
       <p className={"detail"}>
-        <span>
-          0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://etherscan.io/address/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f">Etherscan</a>
-        </span>
-        {" "}&bull;{" "}
-        <span>
-          <a href="https://opensea.io/collection/mahin">OpenSea</a>
-        </span>
+        {
+          Contracts.map((contract, idx) => {
+            return <div css={css`
+              display: flex;
+              flex-direction: row;
+              column-gap: 10px;
+            `} key={idx}>
+              <div>{contract.label}</div>
+              <div>
+                <span>
+                  {contract.address || "(not deployed)"}
+                </span>
+                {" "}&bull;{" "}
+                <span>
+                  <a href={`https://etherscan.io/address/${contract.address}`}>Etherscan</a>
+                </span>
+                {contract.hasOpenSea ? <Fragment>
+                  {" "}&bull;{" "}
+                  <span>
+                    <a href="https://opensea.io/collection/mahin">OpenSea</a>
+                  </span>
+                </Fragment> : null}
+              </div>
+            </div>
+          })
+        }
       </p>
 
       <div className={"section"}>
@@ -621,7 +662,7 @@ function PurchaseButton() {
   const [busy, setBusy] = useState(false);
   const {library, active} = useWeb3React();
   const router = useRouter();
-  const contract = useCurveContract();
+  const contract = useSaleContract();
 
   const doPurchase = async () => {
     const withSigner = contract.connect(library.getSigner());

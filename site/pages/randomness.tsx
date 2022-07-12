@@ -6,10 +6,13 @@ import {Layout, MaxWidth, Padding} from "../lib/Layout";
 import { request } from 'graphql-request';
 import {format, fromUnixTime, formatDistanceStrict} from 'date-fns'
 import useSWR from "swr";
-import {parseProbability, useRandomState} from "../lib/useRandomState";
+import {parseProbability, useProbabilities, useRandomState} from "../lib/useRandomState";
 import BigNumber from "bignumber.js";
 import {useWeb3React} from "../lib/web3wallet/core";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
+import {getMintPrice} from "../lib/useMintPrice";
+import {useSaleContract} from "../lib/useSaleContract";
+import {useDoctorContract} from "../lib/useDoctorContract";
 
 
 const fetcher = query => request('https://api.studio.thegraph.com/query/23726/project-mahin/v0.0.8', query)
@@ -28,8 +31,7 @@ export default function Randomness() {
 
 export function Action(props: {
 }) {
-  const [isRolling, lastRollTime, probability] = useRandomState();
-  const collectiveProbability = new BigNumber(1).minus(new BigNumber(1).minus(probability).pow(42));
+  const {probability, collectiveProbability} = useProbabilities();
 
   return <MaxWidth>
     <Padding css={css`
@@ -112,15 +114,43 @@ export function TransactArea() {
   const [busy, setBusy] = useState(false);
   const {library, active} = useWeb3React();
   const [askToConnect, modalProps] = getImperativeModal();
+  const contract = useDoctorContract();
+
+  const doRoll = async () => {
+    const contractWithSigner = contract.connect(library.getSigner());
+
+    const [price] = await getMintPrice();
+    let tx;
+
+    try {
+      tx = await contractWithSigner.requestRoll(true, {
+        gasLimit: 220000
+      })
+    } catch(e) {
+      console.log(e);
+      return;
+    }
+
+    let receipt;
+    try {
+      receipt = await tx.wait();
+    } catch(e) {
+      console.error(e);
+      alert("Request roll failed.")
+      return;
+    }
+
+    // router.push('/thanks');
+  }
 
   const handleClick = async () => {
     setBusy(true)
     try {
       if (active) {
-
+        doRoll();
       } else {
         if (await askToConnect()) {
-          //await doPurchase();
+          doRoll();
         }
       }
     }

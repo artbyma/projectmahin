@@ -22,7 +22,7 @@ export async function getRandomState(contract?: Contract) {
     //console.log(p, probability)
     return [isRolling, lastRollTime, p];
   } catch(e) {
-    console.log("Failed to fetch random state from server, probably misconfigured.")
+    console.error("Failed to fetch random state from server, probably misconfigured.")
     return [0, 0, new BigNumber("0")];
   }
 }
@@ -30,4 +30,11 @@ export async function getRandomState(contract?: Contract) {
 // Parse a 64.64 fixed point number from the smart contract.
 export function parseProbability(probability: string): BigNumber {
   return new BigNumber(1).minus(new BigNumber(probability).div(new BigNumber(2).pow(64)));
+}
+
+export function useProbabilities() {
+  const [isRolling, lastRollTime, probability] = useRandomState();
+  const numberOfTokens = 42;
+  const collectiveProbability = new BigNumber(1).minus((new BigNumber(1).minus(probability)).pow(numberOfTokens));
+  return {probability, collectiveProbability};
 }

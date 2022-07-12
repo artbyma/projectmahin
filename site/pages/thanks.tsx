@@ -6,7 +6,7 @@ import {Layout, MaxWidth, Padding} from "../lib/Layout";
 import {useWeb3React} from "../lib/web3wallet/core";
 import {useNFTContract} from "../lib/useNFTContract";
 import {useRouter} from "next/router";
-import {useCurveContract} from "../lib/useCurveContract";
+import {useSaleContract} from "../lib/useSaleContract";
 import {getMintPrice} from "../lib/useMintPrice";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
 
@@ -115,7 +115,7 @@ function ConnectButton() {
   const [busy, setBusy] = useState(false);
   const {library, active} = useWeb3React();
   const router = useRouter();
-  const contract = useCurveContract();
+  const contract = useSaleContract();
 
   const [askToConnect, modalProps] = getImperativeModal();
 
