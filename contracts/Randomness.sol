@@ -33,8 +33,9 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
 
     event RollComplete();
 
-    // 0.0000000008468506% - This has been pre-calculated to amount to 12.5% over 10 years
-    uint probabilityPerSecond                  = 8468506;
+    // 0.0000000008468506% - This has been pre-calculated to amount to 12.5% over 10 years.
+    // Previously, when our project runtime was 5 years, it was 8468506.
+    uint probabilityPerSecond                  = 4234253;
     // Previously, probabilityPerSecond was 0.0000000008468506%, based on a 5 year runtime.
     // Tokens which where already affected by the previously larger randomness, now will use:
     uint backAdjustedProbabilityPerSecond      = 3985026;
