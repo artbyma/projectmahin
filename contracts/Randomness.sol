@@ -256,13 +256,15 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             // in the format used by the 64.64 - fixed point library.
 
             int128 randomNumber = int128(uint128(uint256(hash) >> 192));
-            //console.log("RANDOMNUMBER", uint256(int256(randomNumber)));
+//            console.log("-----------");
+//            console.log("RANDOMNUMBER", uint256(int256(randomNumber)));
 
             int256 finalProbability;
 
             // If this token was minted *after* the last roll, adjust the probability by the non-active period.
             if (mintDate > 0 && mintDate > lastRollRequestedTime) {
                 finalProbability = getProbabilityForDuration(currentRollRequestedTime - mintDate, false);
+                //console.log("NEW MINT");
             } else {
                 finalProbability = defaultProbability;
             }
@@ -273,9 +275,15 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             uint256 hardcodedUpgradeDate = 1634164223;   // date of last roll: 0x0feb6ad6c6433f2293c283c882f7670c59fddf04e2c75671f719fafefed45273
             if (mintDate > 0 && mintDate < hardcodedUpgradeDate) {
                 finalProbability = getProbabilityForDuration(currentRollRequestedTime - lastRollRequestedTime, true);
+                //console.log("GENESIS MINT");
             }
 
+//            console.log("PROBABILITY ", uint256(int256(finalProbability)));
+//            console.log("DEFAULT     ", uint256(int256(defaultProbability)));
+
+
             if (randomNumber > finalProbability) {
+                //console.log(" - HIT - ");
                 onDiagnosed(tokenId);
             }
         }
