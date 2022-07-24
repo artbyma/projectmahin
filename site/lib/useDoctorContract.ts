@@ -7,11 +7,9 @@ export function useDoctorContract() {
 
   return useMemo(() => {
     if (!library || !active) {
-      console.log('---return null')
       return null;
     }
 
-    console.log('---return contract', new ethers.Contract(process.env.NEXT_PUBLIC_DOCTOR_ADDRESS, doctorAbi, library))
     return new ethers.Contract(process.env.NEXT_PUBLIC_DOCTOR_ADDRESS, doctorAbi, library)
   }, [library, active]);
 }

@@ -166,9 +166,9 @@ function SaleArea() {
             display: flex;
             flex-direction: row;
           `}>
-            <p>
+            <div>
               <PurchaseButton />
-            </p>
+            </div>
 
             <div css={css`
               font-size: 0.6em;
@@ -514,7 +514,7 @@ function TechStack() {
   `}>
     <Padding>
       <h3>Technical Details</h3>
-      <p className={"detail"}>
+      <div className={"detail"}>
         {
           Contracts.map((contract, idx) => {
             return <div css={css`
@@ -541,7 +541,7 @@ function TechStack() {
             </div>
           })
         }
-      </p>
+      </div>
 
       <div className={"section"}>
         <div className={"sectionHeader"}>Randomness</div>
@@ -673,7 +673,7 @@ function PurchaseButton() {
     try {
       tx = await withSigner.purchase({
         value: price,
-        gasLimit: 220000
+        //gasLimit: 300000
       })
     } catch(e) {
       console.log(e);

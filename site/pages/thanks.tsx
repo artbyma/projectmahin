@@ -45,7 +45,7 @@ export function Content(props: {
 
 export function MyGallery() {
   const { library, active, account } = useWeb3React();
-  const contract = useNFTContract();
+  const contract = useNFTContract()!;
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<null|{name: string, url: string}[]>(null);
 
@@ -70,7 +70,7 @@ export function MyGallery() {
         setData(tokens);
       }
       catch(e) {
-        console.log("error occured during load", e)
+        console.log("error occurred during load", e)
       }
     }
     finally {

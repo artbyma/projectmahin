@@ -15,10 +15,9 @@ export function useMintPrice() {
 
 export async function getMintPrice(contract?: Contract) {
   if (contract) {
-    const mintPrice = await contract.getPriceToMint(0);
-    const nextPrice = await contract.getPriceToMint(1);
+    const mintPrice = await contract.mintPrice();
     const numRemaining = await contract.numRemaining();
-    return [mintPrice, nextPrice, numRemaining];
+    return [mintPrice, mintPrice, numRemaining.toNumber()];
   } else {
     try {
       const {price, nextPrice, numRemaining} = await (await fetch('/api/price')).json();

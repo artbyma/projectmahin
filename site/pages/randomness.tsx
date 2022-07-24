@@ -1,18 +1,16 @@
 /** @jsxRuntime classic /
  /** @jsx jsx */
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useState} from "react";
 import {css, jsx} from "@emotion/react";
 import {Layout, MaxWidth, Padding} from "../lib/Layout";
 import { request } from 'graphql-request';
 import {format, fromUnixTime, formatDistanceStrict} from 'date-fns'
 import useSWR from "swr";
 import {parseProbability, useProbabilities, useRandomState} from "../lib/useRandomState";
-import BigNumber from "bignumber.js";
 import {useWeb3React} from "../lib/web3wallet/core";
 import {ConnectModal, getImperativeModal} from "../lib/ConnectModal";
-import {getMintPrice} from "../lib/useMintPrice";
-import {useSaleContract} from "../lib/useSaleContract";
 import {useDoctorContract} from "../lib/useDoctorContract";
+import {formatEther} from "@ethersproject/units";
 
 
 const fetcher = query => request('https://api.studio.thegraph.com/query/23726/project-mahin/v0.0.8', query)
@@ -115,17 +113,14 @@ export function TransactArea() {
   const {library, active} = useWeb3React();
   const [askToConnect, modalProps] = getImperativeModal();
   const contract = useDoctorContract();
+  const [isRolling,,,rewardAmount] = useRandomState();
 
-  const doRoll = async () => {
+  const requestRoll = async () => {
     const contractWithSigner = contract.connect(library.getSigner());
 
-    const [price] = await getMintPrice();
     let tx;
-
     try {
-      tx = await contractWithSigner.requestRoll(true, {
-        gasLimit: 220000
-      })
+      tx = await contractWithSigner.requestRoll(true)
     } catch(e) {
       console.log(e);
       return;
@@ -139,18 +134,52 @@ export function TransactArea() {
       alert("Request roll failed.")
       return;
     }
-
-    // router.push('/thanks');
   }
 
-  const handleClick = async () => {
+  const applyRoll = async () => {
+    const contractWithSigner = contract.connect(library.getSigner());
+
+    let tx;
+    try {
+      tx = await contractWithSigner.applyRoll();
+    } catch(e) {
+      console.log(e);
+      alert("Transaction Simulation Failed. Make sure at least two blocks have passed since randomness was requested.")
+      return;
+    }
+
+    let receipt;
+    try {
+      receipt = await tx.wait();
+    } catch(e) {
+      console.error(e);
+      alert("Apply roll failed.")
+      return;
+    }
+  }
+
+  const handleRequestRoll = async () => {
     setBusy(true)
     try {
       if (active) {
-        doRoll();
+        requestRoll();
       } else {
         if (await askToConnect()) {
-          doRoll();
+        }
+      }
+    }
+    finally {
+      setBusy(false)
+    }
+  }
+
+  const handleApplyRoll = async () => {
+    setBusy(true)
+    try {
+      if (active) {
+        applyRoll();
+      } else {
+        if (await askToConnect()) {
         }
       }
     }
@@ -162,15 +191,21 @@ export function TransactArea() {
   return <>
     <ConnectModal {...modalProps} />
     <div>
-      Current reward:<br/> 0 ETH
+      Current reward:<br/> {rewardAmount ? formatEther(rewardAmount) : '0'} ETH
     </div>
     <div>
       To feed randomness to the smart contract, two transactions are required.
     </div>
-    <button
-        onClick={handleClick}
-    >1. Request Randomness</button>
-    <button disabled={true}>2. Apply Randomness</button>
+    {!active ? <button onClick={handleRequestRoll}>Connect Wallet</button>
+        : <Fragment>
+            <button
+                disabled={isRolling}
+                onClick={handleRequestRoll}
+            >
+              1. Request Randomness
+            </button>
+            <button disabled={!isRolling} onClick={handleApplyRoll}>2. Apply Randomness</button>
+        </Fragment>}
   </>
 }
 
@@ -241,8 +276,8 @@ export function Log(props: {
         </tr>
       </thead>
       <tbody>
-      {data.rolls.map(roll => {
-        return <tr>
+      {data.rolls.map((roll, idx) => {
+        return <tr key={idx}>
           <td>
             <a href={`https://etherscan.io/tx/${roll.requestTxHash}`}>
               {format(fromUnixTime(roll.requestedAt), "yyyy-MM-dd HH:mm:ss")}

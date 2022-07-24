@@ -9,10 +9,12 @@ export default async function handler(req, res) {
   const isRolling = await doctor.isRolling();
   const lastRollTime = await doctor.lastRollRequestedTime();
   const probability = await doctor.getProbability(Math.round(Date.now() / 1000));
+  const rewardAmount = await doctor.getRewardAmount((await provider.getBlock("latest")).timestamp);
 
   res.status(200).json({
-    isRolling: isRolling.toString(),
+    isRolling: isRolling,
     lastRollTime: lastRollTime.toString(),
-    probability: probability.toString()
+    probability: probability.toString(),
+    rewardAmount: rewardAmount
   });
 }

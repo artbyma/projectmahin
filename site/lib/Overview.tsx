@@ -24,8 +24,8 @@ export function Overview() {
       grid-template-columns: repeat(4, 1fr);
     }
   `} onMouseOver={() => setHover(false)} onMouseOut={() => setHover(false)}>
-    {all.map((img) => {
-      return  <img src={`/assets/${img.set}-${img.id}.${isHover ? '2' : '1'}.${img.type}`} style={{
+    {all.map((img, idx) => {
+      return  <img key={idx} src={`/assets/${img.set}-${img.id}.${isHover ? '2' : '1'}.${img.type}`} style={{
         width: '100%',
         imageRendering: 'pixelated'
       }} />
