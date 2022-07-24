@@ -85,24 +85,26 @@ async function main() {
   await helper.complete();
 
   // During testing, this was useful to see how often we got a diagnosis:
-  // console.log('[requestRoll]')
-  // await doctorV3.requestRoll(true);
-  //
-  // // Mine at least two blocks
-  // await doctorV3.requestRoll(true);
-  // await doctorV3.requestRoll(true);
-  // // await ethers.provider.send('evm_increaseBlocks', [
-  // //   ethers.utils.hexValue(10) // hex encoded number of blocks to increase
-  // // ]);
-  // //
-  // // await ethers.provider.send('evm_increaseTime', [
-  // //   ethers.utils.hexValue(24 * 3600 * 360) // hex encoded number of seconds
-  // // ])
-  //
-  // console.log('[applyRoll]')
-  // const tx = await doctorV3.applyRoll();
-  // const response = await tx.wait();
-  // console.log(response.logs.map(l => doctorV3.interface.parseLog(l)));
+  if (false) {
+    console.log('[requestRoll]')
+    await doctorV3.requestRoll(true);
+
+    // Mine at least two blocks
+    await doctorV3.requestRoll(true);
+    await doctorV3.requestRoll(true);
+    // await ethers.provider.send('evm_increaseBlocks', [
+    //   ethers.utils.hexValue(10) // hex encoded number of blocks to increase
+    // ]);
+    //
+    // await ethers.provider.send('evm_increaseTime', [
+    //   ethers.utils.hexValue(24 * 3600 * 360) // hex encoded number of seconds
+    // ])
+
+    console.log('[applyRoll]')
+    const tx = await doctorV3.applyRoll();
+    const response = await tx.wait();
+    console.log(response.logs.map(l => doctorV3.interface.parseLog(l)));
+  }
 }
   
   main()
