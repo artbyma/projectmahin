@@ -240,6 +240,10 @@ abstract contract Randomness is ChainlinkVRF, IERC721Adapter {
             if (mintDate > 0 && mintDate < cutOffDate) {
                 continue;
             }
+            if (mintDate > 0 && mintDate >= currentRollRequestedTime) {
+                // was minted after roll was requested
+                continue;
+            }
 
             // For each token, mix in the token id to get a new random number
             bytes32 hash = keccak256(abi.encodePacked(randomness, tokenId));
