@@ -289,6 +289,12 @@ module.exports = {
   },
   //defaultNetwork: "rinkeby",
   networks: {
+    // local mainnet fork. accounts not defined so that they match the default accounts that "hardhat node" funds.
+    localhost: {
+      url: 'http://localhost:8545'
+    },
+
+    // live  networks
     rinkeby: {
       url: process.env.RINKEBY_JSON_RPC_URL,
       accounts: {

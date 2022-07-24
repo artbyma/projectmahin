@@ -9,11 +9,14 @@ yet implemented.
 
 ## Commands
 
-For a local testnet, start `npx hardhat node` and use `--network localhost`.
-
     $ npx hardhat compile
     $ npx hardhat test
 
+For a local testnet:
+
+  - start `npx hardhat node --fork ....`
+  - then use `--network localhost` on commands.
+  - 
 
 ### Publish contracts / init tokens 
 
