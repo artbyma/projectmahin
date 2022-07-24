@@ -8,6 +8,8 @@ import "openzeppelin-solidity/contracts/utils/math/Math.sol";
 
 
 interface IMahin {
+    // Coincidence that we get access to the last element of the Piece struct, the uint8, like this.
+    function pieces(uint256) view external returns (string memory, uint8);
     function totalSupply() external view returns (uint256);
     function tokenByIndex(uint256 index) external view returns (uint256);
     function diagnose(uint256 tokenId) external;
@@ -33,6 +35,10 @@ interface IMahin {
 // as time since the last roll increases.
 contract DoctorV3 is Randomness, Ownable {
     IMahin public nft;
+
+    event DiagnosedDoctor(
+        uint256 indexed tokenId
+    );
 
     // For how long the reward is locked to the requestRoll() caller.
     uint public rewardLockDuration = 3600;
@@ -64,6 +70,14 @@ contract DoctorV3 is Randomness, Ownable {
     }
 
     function onDiagnosed(uint256 tokenId) internal override {
+        // Prevent repeat diagnosis. Is a no-op in principal
+        (string memory ___, uint8 state) = nft.pieces(tokenId);
+        if (state == 1) {
+            emit DiagnosedDoctor(tokenId);
+            //console.log(' - REPEAT HIT - ');
+            return;
+        }
+
         nft.diagnose(tokenId);
     }
 
