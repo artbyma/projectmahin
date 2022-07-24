@@ -1,5 +1,3 @@
-import { getWeeksInMonth } from 'date-fns';
-import {parseEther, parseUnits} from 'ethers/lib/utils';
 import {ethers} from 'hardhat';
 import { DeployUtil } from './deployHelpers';
 
@@ -26,7 +24,11 @@ export const Configs = {
  * July 2022 Upgrades.
  */
 async function main() {
-  const helper = new DeployUtil();
+  // On a local forked hardhat node, this allows the impersonate the actual deployer address.
+  //const deployer = await ethers.getImpersonatedSigner("0x4bacb7664404f1a6157d37EA2dCD1669A556d562");
+  const deployer = ethers.getSigners()[0];
+
+  const helper = new DeployUtil(deployer);
 
   // Manually deployed previously already:
   //
@@ -48,18 +50,18 @@ async function main() {
   // await mintDateRegistry.addWriter(fixedPriceSeller.address);
 
 
-  const fixedPriceSeller = await ethers.getContractAt("FixedPriceSeller", "0x62cab40ecc2afed09182c76a5b05d43d86f0a697");
-  const mintDateRegistry = await ethers.getContractAt("MintDateRegistry", "0x56819785480d6da5ebdff288b9b27475fe944bff");
+  const fixedPriceSeller = await ethers.getContractAt("FixedPriceSeller", "0x62cab40ecc2afed09182c76a5b05d43d86f0a697", deployer);
+  const mintDateRegistry = await ethers.getContractAt("MintDateRegistry", "0x56819785480d6da5ebdff288b9b27475fe944bff", deployer);
 
   // Treasury wallet has not set been set up.
   await fixedPriceSeller.setTreasury("0x336d967ffd8984fb1b00a9e4d17823ae4e068f8a");
 
   // Shutdown old CurveSeller
-  const curveSeller = await ethers.getContractAt("CurveSeller", "0x47746e3563dc8c3ec09878907f8ce3a3f20082f0");
+  const curveSeller = await ethers.getContractAt("CurveSeller", "0x47746e3563dc8c3ec09878907f8ce3a3f20082f0", deployer);
   await curveSeller.enable(false);
 
   // Install fixed price minter
-  const nftContract = await ethers.getContractAt("MahinNFT", "0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f")
+  const nftContract = await ethers.getContractAt("MahinNFT", "0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f", deployer)
   await nftContract.setMinter(fixedPriceSeller.address);
 
   // Enable the new seller
@@ -76,10 +78,31 @@ async function main() {
   // Allow the new doctor to diagnose
   await nftContract.setDoctor(doctorV3.address);
 
-  const [funder,] = await ethers.getSigners();
-  await funder.sendTransaction({to: doctorV3.address,  value: parseEther("1.0")});
+  // Fund the doctor with some reward money
+  // const [funder,] = await ethers.getSigners();
+  // await funder.sendTransaction({to: doctorV3.address,  value: parseEther("1.0")});
 
   await helper.complete();
+
+  // During testing, this was useful to see how often we got a diagnosis:
+  // console.log('[requestRoll]')
+  // await doctorV3.requestRoll(true);
+  //
+  // // Mine at least two blocks
+  // await doctorV3.requestRoll(true);
+  // await doctorV3.requestRoll(true);
+  // // await ethers.provider.send('evm_increaseBlocks', [
+  // //   ethers.utils.hexValue(10) // hex encoded number of blocks to increase
+  // // ]);
+  // //
+  // // await ethers.provider.send('evm_increaseTime', [
+  // //   ethers.utils.hexValue(24 * 3600 * 360) // hex encoded number of seconds
+  // // ])
+  //
+  // console.log('[applyRoll]')
+  // const tx = await doctorV3.applyRoll();
+  // const response = await tx.wait();
+  // console.log(response.logs.map(l => doctorV3.interface.parseLog(l)));
 }
   
   main()
