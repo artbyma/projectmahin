@@ -306,6 +306,13 @@ module.exports = {
       accounts: {
         mnemonic: process.env.MAIN_MNEMONIC
       }
+    },
+    
+    tenderly: {
+      url: 'https://rpc.tenderly.co/fork/...',
+      accounts: {
+        mnemonic: process.env.MAIN_MNEMONIC
+      }
     }
   },
   etherscan: {
