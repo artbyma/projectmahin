@@ -1,5 +1,5 @@
 import { getWeeksInMonth } from 'date-fns';
-import { parseUnits } from 'ethers/lib/utils';
+import {parseEther, parseUnits} from 'ethers/lib/utils';
 import {ethers} from 'hardhat';
 import { DeployUtil } from './deployHelpers';
 
@@ -47,11 +47,12 @@ async function main() {
   // // Allow fixedPriceSeller to write minting dates
   // await mintDateRegistry.addWriter(fixedPriceSeller.address);
 
+
   const fixedPriceSeller = await ethers.getContractAt("FixedPriceSeller", "0x62cab40ecc2afed09182c76a5b05d43d86f0a697");
   const mintDateRegistry = await ethers.getContractAt("MintDateRegistry", "0x56819785480d6da5ebdff288b9b27475fe944bff");
 
   // Treasury wallet has not set been set up.
-  fixedPriceSeller.setTreasury("0x336d967ffd8984fb1b00a9e4d17823ae4e068f8a");
+  await fixedPriceSeller.setTreasury("0x336d967ffd8984fb1b00a9e4d17823ae4e068f8a");
 
   // Shutdown old CurveSeller
   const curveSeller = await ethers.getContractAt("CurveSeller", "0x47746e3563dc8c3ec09878907f8ce3a3f20082f0");
@@ -75,14 +76,10 @@ async function main() {
   // Allow the new doctor to diagnose
   await nftContract.setDoctor(doctorV3.address);
 
+  const [funder,] = await ethers.getSigners();
+  await funder.sendTransaction({to: doctorV3.address,  value: parseEther("1.0")});
+
   await helper.complete();
-
-
-  // test system:
-  //   testh curveseller is broken
-  //   test that we can purchase a token via fixedPriceseller
-  //   run random gen see what happens
-  //      repeat this last thing a couple of times...
 }
   
   main()
