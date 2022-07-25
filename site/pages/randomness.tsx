@@ -113,7 +113,7 @@ export function TransactArea() {
   const {library, active} = useWeb3React();
   const [askToConnect, modalProps] = getImperativeModal();
   const contract = useDoctorContract();
-  const [isRolling,,,rewardAmount] = useRandomState();
+  const [isRolling,,,rewardAmount] = useRandomState({autoRefreshInterval: 5000});
 
   const requestRoll = async () => {
     const contractWithSigner = contract.connect(library.getSigner());
@@ -156,6 +156,11 @@ export function TransactArea() {
       alert("Apply roll failed.")
       return;
     }
+
+    // const rollComplete = '0x9e536557517308e18caa7e840b8a94b2b3ff8ee993f14c21a0e17cb4b8157b34';
+    // const topic = receipt.events[0]['topics'][0];
+
+    alert("Randomness applied. Please wait a couple of minutes and refresh the page to see the outcome.")
   }
 
   const handleRequestRoll = async () => {

@@ -2,12 +2,20 @@ import {useAsyncValue} from "./useAsyncValue";
 import {Contract} from "ethers";
 import {useDoctorContract} from "./useDoctorContract";
 import { BigNumber } from "bignumber.js";
+import { useInterval } from "./useInterval";
 
 
-// XXX ability to auto-refresh this...
-export function useRandomState() {
+export function useRandomState(opts?: {autoRefreshInterval?: number}) {
   const contract = useDoctorContract();
-  const [data] = useAsyncValue(async () => getRandomState(contract), [contract]);
+  const [data, {reload}] = useAsyncValue(async () => getRandomState(contract), [contract]);
+
+  useInterval(
+    () => {      
+      reload();
+    },
+    opts?.autoRefreshInterval ?? null,
+  );
+
 
   if (!data) {
     return [undefined, undefined, undefined, undefined];
