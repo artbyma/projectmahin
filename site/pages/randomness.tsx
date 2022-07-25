@@ -196,7 +196,7 @@ export function TransactArea() {
     <div>
       To feed randomness to the smart contract, two transactions are required.
     </div>
-    {!active ? <button onClick={handleRequestRoll}>Connect Wallet</button>
+    {/* {!active ? <button onClick={handleRequestRoll}>Connect Wallet</button>
         : <Fragment>
             <button
                 disabled={isRolling}
@@ -205,7 +205,7 @@ export function TransactArea() {
               1. Request Randomness
             </button>
             <button disabled={!isRolling} onClick={handleApplyRoll}>2. Apply Randomness</button>
-        </Fragment>}
+        </Fragment>} */}
   </>
 }
 
