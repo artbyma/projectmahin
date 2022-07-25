@@ -9,7 +9,11 @@ For a local testnet:
 
   - start `npx hardhat node --fork ....`
   - then use `--network localhost` on commands.
-  - 
+
+To deploy the website:
+
+   $ vercel
+   
 
 ### Publish contracts / init tokens 
 
