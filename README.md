@@ -12,8 +12,8 @@ For a local testnet:
 
 To deploy the website:
 
-   $ vercel
-   
+   $ cd site && vercel --prod
+
 
 ### Publish contracts / init tokens 
 
