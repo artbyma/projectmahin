@@ -202,7 +202,7 @@ function SaleArea() {
           What is happening now.
         </h4>
         <p  style={{textAlign: 'right'}}>
-          Over the next 5 years, each piece faces a potential breast cancer diagnosis.
+          Over the next 10 years, each piece faces a potential breast cancer diagnosis.
         </p>
         <div css={css`
            text-align: center;
@@ -417,14 +417,14 @@ function Mechanics() {
 
         <div className={"fact"}>
           <div className={"number"}>
-            5 years
+            10 years
           </div>
           <div className={"text"}>
             minimum runtime of the project.
           </div>
           <div className={"detail"}>
             While the artwork will exist on the blockchain forever, the randomness generator will gradually wind
-            down after 5 years, making new diagnosis increasingly unlikely, while never excluding the possibility
+            down after 10 years, making new diagnosis increasingly unlikely, while never excluding the possibility
             entirely.
           </div>
         </div>

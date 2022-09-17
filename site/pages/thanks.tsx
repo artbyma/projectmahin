@@ -35,7 +35,7 @@ export function Content(props: {
     </p>
     <h3>What happens now?</h3>
     <p>
-      Over the next 5 years, there is a 12% chance (1 in 8) that your pieces will be diagnosed with breast cancer.
+      Over the next 10 years, there is a 12% chance (1 in 8) that your pieces will be diagnosed with breast cancer.
       This will be reflected in your NFT. If so, secondary sale royalties will increase from 5% to 15% -
       all are donated to Breast Cancer Now UK.
     </p>

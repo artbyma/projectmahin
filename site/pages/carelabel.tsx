@@ -34,7 +34,7 @@ export function Content(props: {
 
       <p>Experimenting with the technology of blockchain to create a virtual, autonomous work of art, Project Mahin is an ongoing performance piece that pairs dynamic art with the undiscriminating and distressing nature of breast cancer diagnoses.</p>
 
-      <p>Project Mahin was initiated on March 21st, 2021 with an aim to raise awareness and funds for breast cancer research. A durational piece, set to last 5 years, the project has been created to honour the artist’s mother Mahin, who was diagnosed with breast cancer in late 2019.</p>
+      <p>Project Mahin was initiated on March 21st, 2021 with an aim to raise awareness and funds for breast cancer research. A durational piece, set to last 10 years, the project has been created to honour the artist’s mother Mahin, who was diagnosed with breast cancer in late 2019.</p>
 
       <p>Launched on the same date as Mahin’s birthday, the project began with 60 illustrations of beautifully diverse and unique pairs of breasts. Over time, each pair of breasts will be subject to a 13% chance of developing invasive breast cancer. Project Mahin visualises this very real statistic by permanently transforming the diagnosed pairs into post-cancer, post-surgery breasts. As in life, which pair is ultimately affected is entirely random. The performance thus mirrors life’s indiscriminate selection, allowing owners to witness and experience the arbitrary character of a breast cancer diagnosis. This process draws its significance from the artwork's embrace of the underlying blockchain technology, which allows the process of diagnosis to be entirely outside of any human control.</p>
 
