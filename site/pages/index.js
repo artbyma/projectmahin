@@ -15,10 +15,8 @@ import {useProbabilities} from "../lib/useRandomState";
 
 export default function Home() {
   return (
-    <Layout hideHeader={true}>
+    <Layout hideHeader={false}>
       <Hero />
-
-      <Gallery />
 
       <SaleArea />
       <Mechanics />
@@ -31,6 +29,8 @@ export default function Home() {
 
 
 function Hero() {
+  const {probability, collectiveProbability} = useProbabilities();
+
   return <div css={css`
     background: #f63677;
     color: white;
@@ -46,7 +46,6 @@ function Hero() {
       line-height: 1.1;
     }
     p {
-      margin-top: 30px;
       font-size: 22px;
     }
     a {
@@ -61,15 +60,27 @@ function Hero() {
       justify-content: space-evenly;
       align-items: center;
       text-align: center;
+      gap: 50px;
+    }
+
+    .randomState {
+      border-left: 1px solid #ffffffb0;
     }
     
-    @media (max-width: 700px) {
+    @media (max-width: 1000px) {
+      .randomState {
+        border-left: 0;
+      }
       .divided {
         flex-direction: column;
       }
       .bncLogo {
         margin-top: 40px;
       }
+    }    
+
+    .heroText {
+      text-align: left;
     }
     
     .divided .bncLogo {
@@ -79,19 +90,94 @@ function Hero() {
   >
     <MaxWidth>
       <Padding>
-        <div className={"divided"}>
-          <div>
-            <LogoWithText />
-          </div>
-        </div>
-        <h1>
-          An autonomous crypto art experiment.
+        <h1 css={css`
+          max-width: 800px;
+          margin: 0 auto;
+          padding-bottom: 30px;
+        `}>
+          A unique blockchain experiment combining art, smart contracts and charity.
         </h1>
-        {/*<p>*/}
-        {/*  The 24 unique NFTs represent woman of every age and background. Just as 1 in 8 woman will develop invasive*/}
-        {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
-        {/*  they do, the art work changes shape to represent this.*/}
-        {/*</p>*/}
+        <div className={"divided"}>          
+          <div className="heroText">            
+            <p css={css`
+              font-size: 20px !important;
+              line-height: 1.5em;
+              margin: 0;
+            `}>
+              1 in 8 woman will develop invasive breast cancer over the course of their lives.
+              60 unique illustrations represent women of every age and background, and face the same,
+              unpredictable odds. When diagnosed, the token will permanently change state.
+            </p>            
+          </div>
+          <div css={css`
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+
+              h4 {
+                margin: 0;
+                font-size: 20px !important;
+                font-weight: 100;
+              }
+            `} className="randomState">
+              <h4>Current risk of diagnosis</h4>              
+              <div css={css`
+                text-align: center;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                @media (max-width: 700px) {
+                  flex-direction: column;
+                  align-items: flex-end;
+                }
+  
+                > div {
+                    margin: 25px;
+                    margin-top: 10px;
+                }
+                  
+                @media (max-width: 700px) {
+                  flex-direction: column;
+                  align-items: flex-end;
+                }
+  
+                strong {
+                  font-weight: 300;
+                  font-size: 0.9em;
+                }
+                .number {
+                    font-size: 44px;
+                }
+                .detail {
+                    font-size: 0.9em;
+                }
+              `}>
+                <div>
+                  <strong>individually</strong>
+                  <div className={"number"}>
+                    {probability ? <div>
+                      {new Intl.NumberFormat("en-US", {
+                        style: 'percent', minimumFractionDigits: 2}).format(probability.toNumber()) }
+                    </div> : null}
+                  </div>
+                </div>
+                <div>
+                  <strong>collectively</strong>
+                  <div className={"number"}>
+                    {probability ? <div>
+                      {new Intl.NumberFormat("en-US", {
+                        style: 'percent', minimumFractionDigits: 2}).format(collectiveProbability.toNumber()) }
+                    </div> : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+        </div>        
 
         <div>
           <a
@@ -126,18 +212,15 @@ function formatMintPrice(price) {
 }
 
 function SaleArea() {
-  const [mintPrice, _, numRemaining] = useMintPrice();
-  const {probability, collectiveProbability} = useProbabilities();
+  const [mintPrice, _, numRemaining] = useMintPrice();  
 
   return <div css={css`
     font-family: Varta,sans-serif;
     font-size: 18px;
     line-height: 1.5;
     font-weight: 300;
-    margin: 80px 0 0;
+    margin: 0px 0 0;
     padding: 20px 0 80px;
-    
-    background: #fafafa;
     
     h4 {
       text-align: left;
@@ -150,107 +233,52 @@ function SaleArea() {
         <div css={css`
         `}>
           <h4>
-            What happened so far.
+            Become a Collector
           </h4>
-          <p>
-            In March, we raised about $17,000, which has been donated to Breast Cancer Now. In addition to this,
-            3 ETH (25% of the project's income) has been allocated to {" "}
-            <a href={"0x47746e3563dc8c3ec09878907f8ce3a3f20082f0"}>its treasury</a> to support the project over
-            the next couple of years in terms of gas and random generator fees.
+
+          <div  css={css`
+            display: flex;
+            flex-direction: row;
+          `}>
+            <div css={css`
+              strong {
+                font-size: 1.3em;
+                width: 3em;
+                text-align: right;
+              }
+
+              div {
+                display: inline-block;
+                margin-right: 20px;
+              }
+            `}>
+              <div><strong>{numRemaining}</strong> Remaining</div>
+              <div><strong>60</strong> Total</div>
+              <div><strong>Ξ {formatMintPrice(mintPrice)}</strong> Mint Price</div>
+            </div>
+          </div>
+
+          <div css={css`margin-top: 30px; margin-bottom: 20px;`}>
+            <PurchaseButton />
+          </div>
+
+          <p css={css`font-size: 16px; max-width: 800px;`}>
+            You will mint a random piece. 75% of the purchase price is donated {" "}
+            <Link href="/charity"><a>to charity</a></Link>. 
+            The remaining 25% go to the project's <Link href="/treasury"><a>treasury</a></Link>.
+            The same split applies to any secondary sale royalties.
           </p>
-          <p>
-            In total, 43 pieces have been minted and are in circulation. {numRemaining} are still available. If you'd like
-            one of your own, they are currently available for purchase at Ξ {formatMintPrice(mintPrice)} each.
-          </p>
+
           <div  css={css`
             display: flex;
             flex-direction: row;
           `}>
             <div>
-              <PurchaseButton />
-            </div>
-
-            <div css={css`
-              font-size: 0.6em;
-              display: flex;
-              margin-left: 30px;
-              flex-direction: row;
-              @media (max-width: 700px) {
-                flex-direction: column;
-                align-items: center;
-              }
-            `}>
-              <div><img src={"/img/bcn-aid.png"} alt={"Breast Cancer Now Logo"} style={{width: '60px', marginRight: '10px'}} /></div>
-              <div>
-                <strong>Royalty Statement</strong>
-                <p>
-                  For each item sold, 75% of the purchase price, plus 100% of any secondary royalties, will be donated to
-                  Breast Cancer Now, a charity registered in England and Wales (No. 1160558), Scotland (SC045584) and Isle of Man (No. 1200).
-                </p>
-                <p>
-                  You can follow the flow of funds at <a href={"https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc#internaltx"}>this address</a>.
-                </p>
-                <p>
-                  The remaining funds are used to cover gas fees for contract deployment and maintaining the random generator.
-                </p>
-              </div>
+              
             </div>
           </div>
         </div>
-
-        <h4 style={{textAlign: 'right'}}>
-          What is happening now.
-        </h4>
-        <p  style={{textAlign: 'right'}}>
-          Over the next 10 years, each piece faces a potential breast cancer diagnosis.
-        </p>
-        <div css={css`
-           text-align: center;
-           display: flex;
-           flex-direction: row;
-           align-items: center;
-           justify-content: flex-end;
-           > div {
-              margin: 30px;
-           }
-
-           @media (max-width: 700px) {
-            flex-direction: column;
-            align-items: flex-end;
-          }
-
-           strong {
-            font-weight: 300;
-           }
-           .number {
-              font-size: 44px;
-           }
-           .detail {
-              font-size: 0.9em;
-           }
-         `}>
-          <div>
-            <strong>Current risk of diagnosis<br/>(individually)</strong>
-            <div className={"number"}>
-              {probability ? <div>
-                {new Intl.NumberFormat("en-US", {
-                  style: 'percent', minimumFractionDigits: 2}).format(probability.toNumber()) }
-              </div> : null}
-            </div>
-          </div>
-          <div>
-            <strong>Current risk of diagnosis <br/>(collectively)</strong>
-            <div className={"number"}>
-              {probability ? <div>
-                {new Intl.NumberFormat("en-US", {
-                  style: 'percent', minimumFractionDigits: 2}).format(collectiveProbability.toNumber()) }
-              </div> : null}
-            </div>
-          </div>
-          {/*<div style={{flex: 1, textAlign: 'right'}}>*/}
-          {/*</div>*/}
-        </div>
-      </Padding>
+        </Padding>
     </MaxWidth>
   </div>
 }
@@ -314,6 +342,7 @@ function Mechanics() {
     line-height: 1.5;
     font-weight: 300;
     padding: 50px 0;
+    background: #fafafa;
     
     h3 {
         margin-top: 0;
@@ -448,7 +477,7 @@ function TechStack() {
     },
     {
       label: 'DoctorV3',
-      address: '',
+      address: '0x15afc6fb4b76727a725709d7cd61742e4c3d2897',
     },
     {
       label: 'CurveSeller',
@@ -584,80 +613,6 @@ function TechStack() {
 }
 
 
-function Gallery() {
-  return <div style={{
-    margin: '30px 0 10'
-  }}>
-    <MaxWidth>
-      <Padding>
-        <div css={css`
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          
-          h1 {
-            font-weight: 900;
-            font-size: 32px;
-          }
-          
-          p {
-            font-size: 20px;
-          }
-          
-          .previews { 
-            flex-shrink: 0;
-            margin-left: 50px;
-          }
-          
-          @media (max-width: 700px) {
-            flex-direction: column;
-            
-            .previews { 
-              flex-shrink: 0;
-              margin-left: 0px;
-            }
-          }
-        `}>
-          <div style={{flex: 1, marginRight: '30px', marginTop: '80px'}}>
-            <h1>
-              A unique experiment combining art, smart contracts and charity.
-            </h1>
-            <p>
-              1 in 8 woman will develop invasive breast cancer over the course of their lives.
-              60 unique illustrations represent women of every age and background, and face the same,
-              unpredictable odds. When diagnosed, the illustration will update.
-            </p>
-          </div>
-          <div classsName={"previews"}>
-            <style jsx>{`
-              .image {
-                height: 170px;
-                margin: 10px;
-              }
-              
-              .videos {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-direction: row;
-              }
-            `}</style>
-
-            <div style={{fontStyle: 'italic', fontWeight: 400, textAlign: 'center'}}>
-              1/8 real-life odds of a breast-cancer diagnosis.
-            </div>
-            <div className={"videos"}>
-              <video src={"/img/example-set1.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} playsInline={true} />
-              <video src={"/img/example-set2.mp4"} muted={true} loop={true} autoPlay={true} className={"image"} playsInline={true}  />
-            </div>
-          </div>
-        </div>
-      </Padding>
-    </MaxWidth>
-  </div>
-}
-
-
 function PurchaseButton() {
   const [busy, setBusy] = useState(false);
   const {library, active} = useWeb3React();
@@ -725,7 +680,7 @@ function PurchaseButton() {
        font-size: 18px;
       `}
     >
-      {busy ? "Waiting..." : active ? "Purchase" : "Connect to Purchase"}
+      {busy ? "Waiting..." : active ? "Purchase" : "Connect to Mint"}
     </button>
   </Fragment>
 }

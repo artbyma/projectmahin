@@ -55,7 +55,7 @@ export function LogoWithText() {
       font-size: 40px;
     }
   `}>
-    <SvgLogo style={{width: '130px', height: '130px'}} />
+    <SvgLogo style={{width: '160px', height: '160px'}} />
     <div className={"text"}>Project<br />Mahin</div>
   </div>
 }
