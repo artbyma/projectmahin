@@ -55,3 +55,30 @@ dataSources:
         - function: requestRoll(bool)
           handler: handleRequestRoll
       file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: DoctorV3
+    network: mainnet
+    source:
+      address: "0x15afc6fb4b76727a725709d7cd61742e4c3d2897"
+      startBlock: 12733067
+      abi: DoctorV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - RollComplete
+        - RollInProgress
+      abis:
+        - name: DoctorV2
+          file: ./abis/DoctorV2.json
+      eventHandlers:
+        - event: RollComplete()
+          handler: handleRollComplete
+        - event: RollInProgress(int128)
+          handler: handleRollInProgress
+      callHandlers:
+        - function: requestRoll(bool)
+          handler: handleRequestRoll
+      file: ./src/mapping.ts
