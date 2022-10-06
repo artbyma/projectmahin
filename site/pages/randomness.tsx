@@ -13,7 +13,7 @@ import {useDoctorContract} from "../lib/useDoctorContract";
 import {formatEther} from "@ethersproject/units";
 
 
-const fetcher = query => request('https://api.studio.thegraph.com/query/23726/project-mahin/v0.0.8', query)
+const fetcher = query => request('https://api.studio.thegraph.com/query/23726/project-mahin/v0.0.10', query)
 
 
 
