@@ -31,7 +31,7 @@ export function Content(props: {
     </p>
     <MyGallery />
     <p>
-      You can also find the full collection on <a href={"https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f"}>OpenSea</a>.
+      You can also find the full collection on <a href={"https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f"}>reservoir.market</a>.
     </p>
     <h3>What happens now?</h3>
     <p>
