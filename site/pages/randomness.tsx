@@ -308,7 +308,7 @@ export function Log(props: {
                 ? <>
                     Diagnosed:{" "}
                     {roll.diagnoses.map((d, idx) => {
-                      return <>{idx > 0 ? <>, </> : null}<a href={`https://opensea.io/assets/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f/${d.tokenId}`}>{d.tokenId}</a></>
+                      return <>{idx > 0 ? <>, </> : null}<a href={`https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f/${d.tokenId}`}>{d.tokenId}</a></>
                     })}
                   </> : null}
           </td>

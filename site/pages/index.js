@@ -181,7 +181,7 @@ function Hero() {
 
         <div>
           <a
-              href={"https://opensea.io/collection/mahin"}
+              href={"https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f"}
               css={css`
                 margin-top: 40px;
                 display: inline-block;
@@ -193,7 +193,7 @@ function Hero() {
                font-size: 18px;
               `}
           >
-            Browse on OpenSea
+              Browse on reservoir.market
           </a>
         </div>
       </Padding>
@@ -563,7 +563,9 @@ function TechStack() {
                 {contract.hasOpenSea ? <Fragment>
                   {" "}&bull;{" "}
                   <span>
-                    <a href="https://opensea.io/collection/mahin">OpenSea</a>
+                    <a href="https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f">
+                      reservoir.market
+                    </a>
                   </span>
                 </Fragment> : null}
               </div>
