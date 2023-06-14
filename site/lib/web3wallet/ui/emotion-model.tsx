@@ -1,5 +1,5 @@
-import styled from '@emotion/styled'
-import React from 'react';
+import styled from "@emotion/styled";
+import React from "react";
 
 interface ILightboxStyleProps {
   show: boolean;
@@ -61,9 +61,8 @@ const SHitbox = styled.div`
   bottom: 0;
 `;
 
-
 interface IModalProps {
-  show: boolean,
+  show: boolean;
   onRequestClose: () => void;
   lightboxOpacity: number;
 }
@@ -73,9 +72,8 @@ interface IModalState {
 }
 
 const INITIAL_STATE: IModalState = {
-  lightboxOffset: 0
+  lightboxOffset: 0,
 };
-
 
 export class Modal extends React.Component<IModalProps, IModalState> {
   constructor(props: IModalProps) {
@@ -86,7 +84,7 @@ export class Modal extends React.Component<IModalProps, IModalState> {
   public mainModalCard?: HTMLDivElement | null;
 
   public state: IModalState = {
-    ...INITIAL_STATE
+    ...INITIAL_STATE,
   };
 
   public componentDidUpdate(prevProps: IModalProps, prevState: IModalState) {
@@ -95,8 +93,8 @@ export class Modal extends React.Component<IModalProps, IModalState> {
       const lightboxOffset = lightboxRect.top > 0 ? lightboxRect.top : 0;
 
       if (
-          lightboxOffset !== INITIAL_STATE.lightboxOffset &&
-          lightboxOffset !== this.state.lightboxOffset
+        lightboxOffset !== INITIAL_STATE.lightboxOffset &&
+        lightboxOffset !== this.state.lightboxOffset
       ) {
         this.setState({ lightboxOffset });
       }
@@ -109,20 +107,20 @@ export class Modal extends React.Component<IModalProps, IModalState> {
     const { show, onRequestClose, lightboxOpacity } = this.props;
 
     return (
-        <SLightbox
-            offset={lightboxOffset}
-            opacity={lightboxOpacity}
-            ref={c => (this.lightboxRef = c)}
-            show={show}
-            style={{
-              display: !show ? 'none' : 'block'
-            }}
-        >
-          <SModalContainer show={show}>
-            <SHitbox onClick={onRequestClose} />
-            {this.props.children}
-          </SModalContainer>
-        </SLightbox>
+      <SLightbox
+        offset={lightboxOffset}
+        opacity={lightboxOpacity}
+        ref={(c) => (this.lightboxRef = c)}
+        show={show}
+        style={{
+          display: !show ? "none" : "block",
+        }}
+      >
+        <SModalContainer show={show}>
+          <SHitbox onClick={onRequestClose} />
+          {this.props.children}
+        </SModalContainer>
+      </SLightbox>
     );
   };
 }

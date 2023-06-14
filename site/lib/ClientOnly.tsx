@@ -1,6 +1,6 @@
 import React from "react";
 
-export function ClientOnly(props: {children: any}) {
+export function ClientOnly(props: { children: any }) {
   const [hasMounted, setHasMounted] = React.useState(false);
   React.useEffect(() => {
     setHasMounted(true);

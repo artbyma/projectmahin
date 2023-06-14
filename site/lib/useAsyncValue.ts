@@ -1,11 +1,17 @@
-import {useCallback, useEffect, useState} from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export function useAsyncValue<T>(call: () => Promise<T>, deps?: any): [T, {
-  loading: boolean,
-  reload: () => void
-}] {
+export function useAsyncValue<T>(
+  call: () => Promise<T>,
+  deps?: any
+): [
+  T,
+  {
+    loading: boolean;
+    reload: () => void;
+  }
+] {
   const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState<T|undefined>(undefined);
+  const [value, setValue] = useState<T | undefined>(undefined);
 
   // recreate callback when deps change
   const reload = useCallback(async () => {
@@ -14,7 +20,7 @@ export function useAsyncValue<T>(call: () => Promise<T>, deps?: any): [T, {
       const result = await call();
       setValue(result);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }, deps ?? []);
 
@@ -23,5 +29,5 @@ export function useAsyncValue<T>(call: () => Promise<T>, deps?: any): [T, {
     reload();
   }, [reload]);
 
-  return [value, {loading, reload}];
+  return [value, { loading, reload }];
 }

@@ -10,20 +10,20 @@
  * different browser plugins which can inject themselves, but there is only one connector which
  **/
 
-import {getProviderInfo} from "./providerdb";
-import {AbstractConnector} from "@web3-react/abstract-connector";
-import {detectInjectedProvider} from "./detectInjected";
-
+import { getProviderInfo } from "./providerdb";
+import { AbstractConnector } from "@web3-react/abstract-connector";
+import { detectInjectedProvider } from "./detectInjected";
 
 // This is used to map a `web3-react` connector implementation to an entry in the provider metadata list.
 export interface Connector {
-  provider: string,                  // the id of the provider in our database.
-  connector: AbstractConnector,      // the connector class to establish a connection
+  provider: string; // the id of the provider in our database.
+  connector: AbstractConnector; // the connector class to establish a connection
 }
 
 // Various ways to specify a set of connectors
-export type ConnectorSet = Connector[]|{[provider: string]: AbstractConnector};
-
+export type ConnectorSet =
+  | Connector[]
+  | { [provider: string]: AbstractConnector };
 
 /**
  * Return a list of connectors, and their provider information attached.
@@ -32,15 +32,15 @@ export function resolveConnectors(set: ConnectorSet) {
   let connectors: Connector[];
   if (!Array.isArray(set)) {
     connectors = Object.entries(set).map(([id, connector]) => {
-      return {provider: id, connector};
-    })
+      return { provider: id, connector };
+    });
   } else {
     connectors = set;
   }
 
-  return connectors.map(connector => {
+  return connectors.map((connector) => {
     let info;
-    if (connector.provider == 'injected') {
+    if (connector.provider == "injected") {
       // the provider id "injected" is special - we try to autodetect it.
       info = detectInjectedProvider();
     } else {
@@ -51,16 +51,15 @@ export function resolveConnectors(set: ConnectorSet) {
       info,
       connector: connector.connector,
       // connector and provider id are the same, expect for the "injected" connector, which can map to multiple providers.
-      connectorId: connector.provider
+      connectorId: connector.provider,
     };
-  })
+  });
 }
-
 
 /**
  * Find the connector for the given provider id.
  */
 export function findConnectorById(set: ConnectorSet, id: string) {
   const providers = resolveConnectors(set);
-  return providers.find(p => p.connectorId == id);
+  return providers.find((p) => p.connectorId == id);
 }

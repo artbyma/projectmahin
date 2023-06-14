@@ -1,32 +1,34 @@
-import {IProviderInfo} from "./types";
+import { IProviderInfo } from "./types";
 import * as standardProviders from "./standardProviders";
 import * as injectedProviders from "./injectedProviders";
-import {FALLBACK} from "./injectedProviders";
+import { FALLBACK } from "./injectedProviders";
 
 // Index provider metadata records by id
 const providerInfoById = [
   ...Object.values(standardProviders),
-  ...Object.values(injectedProviders)
-].reduce((d, item) => { d[item.id] = item; return d; }, {})
-
+  ...Object.values(injectedProviders),
+].reduce((d, item) => {
+  d[item.id] = item;
+  return d;
+}, {});
 
 /**
  * We give each supported provider an ID. Use it to query the info we have about this
  * provider, such as the name or logo.
  */
 export function getProviderInfo(id: string): IProviderInfo {
-  const info = id == 'injected' ? FALLBACK : providerInfoById[id];
+  const info = id == "injected" ? FALLBACK : providerInfoById[id];
   if (!info) {
     throw new Error(`Invalid provider id: ${id}`);
   }
   return {
     ...info,
-    description: getProviderDescription(info)
-  }
+    description: getProviderDescription(info),
+  };
 }
 
 export function getProviderDescription(
-    providerInfo: Partial<IProviderInfo>
+  providerInfo: Partial<IProviderInfo>
 ): string {
   if (providerInfo.description) {
     return providerInfo.description;
