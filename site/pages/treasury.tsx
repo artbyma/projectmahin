@@ -1,5 +1,3 @@
-/** @jsxRuntime classic /
- /** @jsx jsx */
 import React, {useEffect, useState} from "react";
 import {css, jsx} from "@emotion/react";
 import {Layout, MaxWidth, Padding} from "../lib/Layout";
@@ -62,7 +60,7 @@ function Content() {
             <a href="https://etherscan.io/address/0x83cB05402E875B5ca953e6eAa639F723d92BC4fc">Charity Wallet</a>
           </strong>:
           75% of the proceeds of every sale go to this wallet. They are then converted to fiat if necessary, and sent
-          to our <Link href={"/charity"}><a>charity partner</a></Link>.
+          to our <Link legacyBehavior href={"/charity"}><a>charity partner</a></Link>.
 
           {/* See also the tx log */}
         </p>

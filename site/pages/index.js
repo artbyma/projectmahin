@@ -1,5 +1,3 @@
-/** @jsxRuntime classic /
-/** @jsx jsx */
 import { css, jsx } from '@emotion/react'
 import 'tippy.js/dist/tippy.css';
 import {useState, Fragment} from 'react';
@@ -12,6 +10,7 @@ import {useRouter} from "next/router";
 import Link from "next/link";
 import {Overview} from "../lib/Overview";
 import {useProbabilities} from "../lib/useRandomState";
+import {ClientOnly} from "../lib/ClientOnly";
 
 export default function Home() {
   return (
@@ -259,13 +258,13 @@ function SaleArea() {
           </div>
 
           <div css={css`margin-top: 30px; margin-bottom: 20px;`}>
-            <PurchaseButton />
+            <ClientOnly><PurchaseButton /></ClientOnly>
           </div>
 
           <p css={css`font-size: 16px; max-width: 800px;`}>
             You will mint a random piece. 75% of the purchase price is donated {" "}
-            <Link href="/charity"><a>to charity</a></Link>. 
-            The remaining 25% go to the project's <Link href="/treasury"><a>treasury</a></Link>.
+            <Link legacyBehavior href="/charity"><a>to charity</a></Link>. 
+            The remaining 25% go to the project's <Link legacyBehavior href="/treasury"><a>treasury</a></Link>.
             The same split applies to any secondary sale royalties.
           </p>
 
@@ -578,7 +577,7 @@ function TechStack() {
         <div className={"sectionHeader"}>Randomness</div>
         <p>
           Chainlink VRF provides the randomness to the contract. The randomness generator can be triggered by anyone,
-          at any time. In addition, there is a fallback randomness source based on block-randomness. See <Link href={"/randomness"}><a>Randomness.</a></Link>
+          at any time. In addition, there is a fallback randomness source based on block-randomness. See <Link legacyBehavior href={"/randomness"}><a>Randomness.</a></Link>
         </p>
       </div>
 

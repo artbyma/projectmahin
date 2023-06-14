@@ -1,5 +1,3 @@
-/** @jsxRuntime classic /
- /** @jsx jsx */
 import React, {useEffect, useState} from "react";
 import {css, jsx} from "@emotion/react";
 import {Layout, MaxWidth, Padding} from "../lib/Layout";
