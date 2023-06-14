@@ -103,7 +103,7 @@ function Header() {
     }
   `}>
     <div className={"header"}>
-      <Link legacyBehavior legacyBehavior href={"/"}>
+      <Link legacyBehavior href={"/"}>
         <a href={""}>
           <SvgLogo style={{width: '1em', height: '1em', marginRight: '10px'}} color={"#f63677"} />
           Project Mahin
@@ -137,7 +137,7 @@ function Navigation() {
       text-decoration: underline;
     }
   `}>
-    <Link legacyBehavior legacyBehavior href={"/"}><a>Home</a></Link>
+    <Link legacyBehavior href={"/"}><a>Home</a></Link>
     {/*<Link legacyBehavior href={"/purchase"}><a>Purchase</a></Link>*/}
     <Link legacyBehavior href={"/randomness"}><a>Randomness</a></Link>
     <Link legacyBehavior href={"/charity"}><a>Charity</a></Link>
