@@ -8,7 +8,6 @@ Solution: Merge all three:
 - The provider packages from web3-react.
 - The logos, icons and modal from web3-modal.
 
-
 Usage:
 
 ```

@@ -1,6 +1,6 @@
-import {useAsyncValue} from "./useAsyncValue";
-import {BigNumber, Contract} from "ethers";
-import {useSaleContract} from "./useSaleContract";
+import { useAsyncValue } from "./useAsyncValue";
+import { BigNumber, Contract } from "ethers";
+import { useSaleContract } from "./useSaleContract";
 
 export function useMintPrice() {
   const contract = useSaleContract();
@@ -12,7 +12,6 @@ export function useMintPrice() {
   return data;
 }
 
-
 export async function getMintPrice(contract?: Contract) {
   if (contract) {
     const mintPrice = await contract.mintPrice();
@@ -20,10 +19,12 @@ export async function getMintPrice(contract?: Contract) {
     return [mintPrice, mintPrice, numRemaining.toNumber()];
   } else {
     try {
-      const {price, nextPrice, numRemaining} = await (await fetch('/api/price')).json();
+      const { price, nextPrice, numRemaining } = await (
+        await fetch("/api/price")
+      ).json();
       return [BigNumber.from(price), BigNumber.from(nextPrice), numRemaining];
-    } catch(e) {
-      console.log("Failed to fetch price from server, probably misconfigured.")
+    } catch (e) {
+      console.log("Failed to fetch price from server, probably misconfigured.");
       return [BigNumber.from("0"), BigNumber.from("0"), 0];
     }
   }

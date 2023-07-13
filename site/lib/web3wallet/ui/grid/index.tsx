@@ -1,9 +1,9 @@
-import styled from '@emotion/styled'
-import {ThemeColors} from "./types";
-import {Connector} from "./Connector";
-import {ConnectorSet, resolveConnectors} from "../../Connector";
-import {IProviderInfo} from "../../providerdb/types";
-import {useWeb3React} from "../../core";
+import styled from "@emotion/styled";
+import { ThemeColors } from "./types";
+import { Connector } from "./Connector";
+import { ConnectorSet, resolveConnectors } from "../../Connector";
+import { IProviderInfo } from "../../providerdb/types";
+import { useWeb3React } from "../../core";
 
 export interface IThemeConfig {
   name: string;
@@ -21,8 +21,8 @@ const darkTheme: IThemeConfig = {
     main: "rgb(199, 199, 199)",
     secondary: "rgb(136, 136, 136)",
     border: "rgba(195, 195, 195, 0.14)",
-    hover: "rgb(16, 26, 32)"
-  }
+    hover: "rgb(16, 26, 32)",
+  },
 };
 
 const lightTheme: IThemeConfig = {
@@ -32,16 +32,15 @@ const lightTheme: IThemeConfig = {
     main: "rgb(12, 12, 13)",
     secondary: "rgb(169, 169, 188)",
     border: "rgba(195, 195, 195, 0.14)",
-    hover: "rgba(195, 195, 195, 0.14)"
-  }
+    hover: "rgba(195, 195, 195, 0.14)",
+  },
 };
 
 export const themesList: ThemesList = {
   default: lightTheme,
   [lightTheme.name]: lightTheme,
-  [darkTheme.name]: darkTheme
+  [darkTheme.name]: darkTheme,
 };
-
 
 interface IModalCardStyleProps {
   show?: boolean;
@@ -72,29 +71,33 @@ const SModalCard = styled.div<IModalCardStyleProps>`
 `;
 
 export function Grid(props: {
-  themeColors: ThemeColors,
-  connectors?: ConnectorSet,
-  onClick: (connector: any, provider: IProviderInfo) => void
+  themeColors: ThemeColors;
+  connectors?: ConnectorSet;
+  onClick: (connector: any, provider: IProviderInfo) => void;
 }) {
-  const {themeColors} = props;
-  const {connectors: contextConnectors} = useWeb3React();
+  const { themeColors } = props;
+  const { connectors: contextConnectors } = useWeb3React();
   const connectors = props.connectors || contextConnectors;
   const providers = resolveConnectors(connectors);
 
-  return <SModalCard
-    themeColors={themeColors}
-    maxWidth={providers.length < 3 ? 500 : 800}
-    show={true}
-  >
-    {providers.map(({connector, info}) => {
-      return <Connector
-          key={info.id}
-          name={info.name}
-          logo={info.logo}
-          description={info.description}
-          themeColors={themeColors}
-          onClick={() => props.onClick(connector, info)}
-      />
-    })}
-  </SModalCard>
+  return (
+    <SModalCard
+      themeColors={themeColors}
+      maxWidth={providers.length < 3 ? 500 : 800}
+      show={true}
+    >
+      {providers.map(({ connector, info }) => {
+        return (
+          <Connector
+            key={info.id}
+            name={info.name}
+            logo={info.logo}
+            description={info.description}
+            themeColors={themeColors}
+            onClick={() => props.onClick(connector, info)}
+          />
+        );
+      })}
+    </SModalCard>
+  );
 }

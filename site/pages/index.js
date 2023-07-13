@@ -1,18 +1,31 @@
+<<<<<<< HEAD
 /** @jsxRuntime classic /
 /** @jsx jsx */
 import { css, jsx } from "@emotion/react";
 import Tippy from "@tippyjs/react";
+=======
+import { css, jsx } from "@emotion/react";
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 import "tippy.js/dist/tippy.css";
 import { useState, Fragment } from "react";
 import { useWeb3React } from "../lib/web3wallet/core";
 import { ConnectModal, getImperativeModal } from "../lib/ConnectModal";
 import { getMintPrice, useMintPrice } from "../lib/useMintPrice";
 import { Layout, LogoWithText, MaxWidth, Padding } from "../lib/Layout";
+<<<<<<< HEAD
 import { useCurveContract } from "../lib/useCurveContract";
 import { useRouter } from "next/router";
 import { Overview } from "../lib/Overview";
 import { useRandomState } from "../lib/useRandomState";
 import BigNumber from "bignumber.js";
+=======
+import { useSaleContract } from "../lib/useSaleContract";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { Overview } from "../lib/Overview";
+import { useProbabilities } from "../lib/useRandomState";
+import { ClientOnly } from "../lib/ClientOnly";
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 
 export default function Home() {
   return (
@@ -31,6 +44,7 @@ export default function Home() {
 }
 
 function Hero() {
+<<<<<<< HEAD
   return (
     <div
       css={css`
@@ -56,6 +70,34 @@ function Hero() {
           font-weight: bold;
         }
 
+=======
+  const { probability, collectiveProbability } = useProbabilities();
+
+  return (
+    <div
+      css={css`
+        background: #f63677;
+        color: white;
+        padding: 50px 0;
+
+        font-family: Varta, sans-serif;
+        text-align: center;
+
+        h1 {
+          font-size: 40px;
+          margin-top: 45px;
+          margin-bottom: 5px;
+          line-height: 1.1;
+        }
+        p {
+          font-size: 22px;
+        }
+        a {
+          color: #f63677;
+          font-weight: bold;
+        }
+
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
         .divided {
           margin: 0 auto;
           display: flex;
@@ -63,9 +105,23 @@ function Hero() {
           justify-content: space-evenly;
           align-items: center;
           text-align: center;
+<<<<<<< HEAD
         }
 
         @media (max-width: 700px) {
+=======
+          gap: 50px;
+        }
+
+        .randomState {
+          border-left: 1px solid #ffffffb0;
+        }
+
+        @media (max-width: 1000px) {
+          .randomState {
+            border-left: 0;
+          }
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
           .divided {
             flex-direction: column;
           }
@@ -73,6 +129,7 @@ function Hero() {
             margin-top: 40px;
           }
         }
+<<<<<<< HEAD
 
         .divided .bncLogo {
           width: 250px;
@@ -101,6 +158,126 @@ function Hero() {
           {/*  breast cancer over the course of their lives, so will a percentage of the NFTs face this diagnosis. When*/}
           {/*  they do, the art work changes shape to represent this.*/}
           {/*</p>*/}
+=======
+
+        .heroText {
+          text-align: left;
+        }
+
+        .divided .bncLogo {
+          width: 250px;
+        }
+      `}
+    >
+      <MaxWidth>
+        <Padding>
+          <h1
+            css={css`
+              max-width: 800px;
+              margin: 0 auto;
+              padding-bottom: 30px;
+            `}
+          >
+            A unique blockchain experiment combining art, smart contracts and
+            charity.
+          </h1>
+          <div className={"divided"}>
+            <div className="heroText">
+              <p
+                css={css`
+                  font-size: 20px !important;
+                  line-height: 1.5em;
+                  margin: 0;
+                `}
+              >
+                1 in 8 woman will develop invasive breast cancer over the course
+                of their lives. 60 unique illustrations represent women of every
+                age and background, and face the same, unpredictable odds. When
+                diagnosed, the token will permanently change state.
+              </p>
+            </div>
+            <div
+              css={css`
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                h4 {
+                  margin: 0;
+                  font-size: 20px !important;
+                  font-weight: 100;
+                }
+              `}
+              className="randomState"
+            >
+              <h4>Current risk of diagnosis</h4>
+              <div
+                css={css`
+                  text-align: center;
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  justify-content: center;
+
+                  @media (max-width: 700px) {
+                    flex-direction: column;
+                    align-items: flex-end;
+                  }
+
+                  > div {
+                    margin: 25px;
+                    margin-top: 10px;
+                  }
+
+                  @media (max-width: 700px) {
+                    flex-direction: column;
+                    align-items: flex-end;
+                  }
+
+                  strong {
+                    font-weight: 300;
+                    font-size: 0.9em;
+                  }
+                  .number {
+                    font-size: 44px;
+                  }
+                  .detail {
+                    font-size: 0.9em;
+                  }
+                `}
+              >
+                <div>
+                  <strong>individually</strong>
+                  <div className={"number"}>
+                    {probability ? (
+                      <div>
+                        {new Intl.NumberFormat("en-US", {
+                          style: "percent",
+                          minimumFractionDigits: 2,
+                        }).format(probability.toNumber())}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+                <div>
+                  <strong>collectively</strong>
+                  <div className={"number"}>
+                    {probability ? (
+                      <div>
+                        {new Intl.NumberFormat("en-US", {
+                          style: "percent",
+                          minimumFractionDigits: 2,
+                        }).format(collectiveProbability.toNumber())}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 
           <div>
             <a
@@ -137,6 +314,7 @@ function formatMintPrice(price) {
 }
 
 function SaleArea() {
+<<<<<<< HEAD
   const [mintPrice] = useMintPrice();
   const [isRolling, lastRollTime, probability] = useRandomState();
 
@@ -182,12 +360,39 @@ function SaleArea() {
               still available. If you'd like one of your own, they are currently
               available for purchase at Ξ {formatMintPrice(mintPrice)} each.
             </p>
+=======
+  const [mintPrice, _, numRemaining] = useMintPrice();
+
+  return (
+    <div
+      css={css`
+        font-family: Varta, sans-serif;
+        font-size: 18px;
+        line-height: 1.5;
+        font-weight: 300;
+        margin: 0px 0 0;
+        padding: 20px 0 80px;
+
+        h4 {
+          text-align: left;
+          font-size: 44px;
+          margin-bottom: 0em;
+        }
+      `}
+    >
+      <MaxWidth>
+        <Padding>
+          <div css={css``}>
+            <h4>Become a Collector</h4>
+
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
             <div
               css={css`
                 display: flex;
                 flex-direction: row;
               `}
             >
+<<<<<<< HEAD
               <p>
                 <PurchaseButton />
               </p>
@@ -201,10 +406,24 @@ function SaleArea() {
                   @media (max-width: 700px) {
                     flex-direction: column;
                     align-items: center;
+=======
+              <div
+                css={css`
+                  strong {
+                    font-size: 1.3em;
+                    width: 3em;
+                    text-align: right;
+                  }
+
+                  div {
+                    display: inline-block;
+                    margin-right: 20px;
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
                   }
                 `}
               >
                 <div>
+<<<<<<< HEAD
                   <img
                     src={"/img/bcn-aid.png"}
                     alt={"Breast Cancer Now Logo"}
@@ -307,6 +526,56 @@ function SaleArea() {
             {/*<div style={{flex: 1, textAlign: 'right'}}>*/}
             {/*</div>*/}
           </div>
+=======
+                  <strong>{numRemaining}</strong> Remaining
+                </div>
+                <div>
+                  <strong>60</strong> Total
+                </div>
+                <div>
+                  <strong>Ξ {formatMintPrice(mintPrice)}</strong> Mint Price
+                </div>
+              </div>
+            </div>
+
+            <div
+              css={css`
+                margin-top: 30px;
+                margin-bottom: 20px;
+              `}
+            >
+              <ClientOnly>
+                <PurchaseButton />
+              </ClientOnly>
+            </div>
+
+            <p
+              css={css`
+                font-size: 16px;
+                max-width: 800px;
+              `}
+            >
+              You will mint a random piece. 75% of the purchase price is donated{" "}
+              <Link legacyBehavior href="/charity">
+                <a>to charity</a>
+              </Link>
+              . The remaining 25% go to the project's{" "}
+              <Link legacyBehavior href="/treasury">
+                <a>treasury</a>
+              </Link>
+              . The same split applies to any secondary sale royalties.
+            </p>
+
+            <div
+              css={css`
+                display: flex;
+                flex-direction: row;
+              `}
+            >
+              <div></div>
+            </div>
+          </div>
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
         </Padding>
       </MaxWidth>
     </div>
@@ -392,6 +661,10 @@ function Mechanics() {
         line-height: 1.5;
         font-weight: 300;
         padding: 50px 0;
+<<<<<<< HEAD
+=======
+        background: #fafafa;
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 
         h3 {
           margin-top: 0;
@@ -505,11 +778,19 @@ function Mechanics() {
           </div>
 
           <div className={"fact"}>
+<<<<<<< HEAD
             <div className={"number"}>5 years</div>
             <div className={"text"}>minimum runtime of the project.</div>
             <div className={"detail"}>
               While the artwork will exist on the blockchain forever, the
               randomness generator will gradually wind down after 5 years,
+=======
+            <div className={"number"}>10 years</div>
+            <div className={"text"}>minimum runtime of the project.</div>
+            <div className={"detail"}>
+              While the artwork will exist on the blockchain forever, the
+              randomness generator will gradually wind down after 10 years,
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
               making new diagnosis increasingly unlikely, while never excluding
               the possibility entirely.
             </div>
@@ -521,6 +802,38 @@ function Mechanics() {
 }
 
 function TechStack() {
+<<<<<<< HEAD
+=======
+  const Contracts = [
+    {
+      label: "NFT",
+      address: "0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f",
+      hasOpenSea: true,
+    },
+    {
+      label: "DoctorV2",
+      address: "0x155cf7a98b828fab0fa0ac51e42631e324ba0d69",
+      isDeprecated: true,
+    },
+    {
+      label: "DoctorV3",
+      address: "0x15afc6fb4b76727a725709d7cd61742e4c3d2897",
+    },
+    {
+      label: "CurveSeller",
+      address: "0x47746e3563dc8c3ec09878907f8ce3a3f20082f0",
+      isDeprecated: true,
+    },
+    {
+      label: "FixedPriceSeller",
+      address: "0x62cab40ecc2afed09182c76a5b05d43d86f0a697",
+    },
+    {
+      label: "MintDateRegistry",
+      address: "0x56819785480d6da5ebdff288b9b27475fe944bff",
+    },
+  ];
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
   return (
     <div
       css={css`
@@ -538,6 +851,7 @@ function TechStack() {
           margin-bottom: 0.5em;
           font-size: 35px;
           font-weight: 900;
+<<<<<<< HEAD
         }
         .detail {
           font-size: 0.9em;
@@ -558,6 +872,29 @@ function TechStack() {
           margin-top: 30px;
         }
 
+=======
+        }
+
+        .detail {
+          font-size: 0.9em;
+          margin-bottom: 50px;
+        }
+
+        .point {
+          margin-bottom: 20px;
+        }
+        strong {
+          font-weight: 700;
+        }
+        a {
+          color: #fc79a5;
+        }
+
+        .section {
+          margin-top: 30px;
+        }
+
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
         .sectionHeader {
           font-weight: 900;
           font-size: 1.2em;
@@ -573,6 +910,7 @@ function TechStack() {
     >
       <Padding>
         <h3>Technical Details</h3>
+<<<<<<< HEAD
         <p className={"detail"}>
           <span>0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f</span> &bull;{" "}
           <span>
@@ -587,11 +925,51 @@ function TechStack() {
             </a>
           </span>
         </p>
+=======
+        <div className={"detail"}>
+          {Contracts.map((contract, idx) => {
+            return (
+              <div
+                css={css`
+                  display: flex;
+                  flex-direction: row;
+                  column-gap: 10px;
+                `}
+                key={idx}
+              >
+                <div>{contract.label}</div>
+                <div>
+                  <span>{contract.address || "(not deployed)"}</span> &bull;{" "}
+                  <span>
+                    <a
+                      href={`https://etherscan.io/address/${contract.address}`}
+                    >
+                      Etherscan
+                    </a>
+                  </span>
+                  {contract.hasOpenSea ? (
+                    <Fragment>
+                      {" "}
+                      &bull;{" "}
+                      <span>
+                        <a href="https://marketplace.reservoir.tools/collection/ethereum/0xe0ba5a6fc8209e225a9937ce1dfb397f18ad402f">
+                          reservoir.market
+                        </a>
+                      </span>
+                    </Fragment>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 
         <div className={"section"}>
           <div className={"sectionHeader"}>Randomness</div>
           <p>
             Chainlink VRF provides the randomness to the contract. The
+<<<<<<< HEAD
             randomness generator can be triggered by anyone, at any time, as
             follows:
           </p>
@@ -668,10 +1046,19 @@ function TechStack() {
             ability to sell their tokens on the built-in market, using any
             interface available in the future, but retain the ability to list
             their tokens on other marketplaces.
+=======
+            randomness generator can be triggered by anyone, at any time. In
+            addition, there is a fallback randomness source based on
+            block-randomness. See{" "}
+            <Link legacyBehavior href={"/randomness"}>
+              <a>Randomness.</a>
+            </Link>
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
           </p>
         </div>
 
         <div className={"section"}>
+<<<<<<< HEAD
           <div className={"sectionHeader"}>On-Chain Content</div>
           <p>
             It is imperative that the media files represented by NFTs remain
@@ -680,12 +1067,21 @@ function TechStack() {
             through the web, we also store them on{" "}
             <a href={"https://www.arweave.org/"}>Arweave</a>. Finally, the Zora
             protocol allows an owner to update their
+=======
+          <div className={"sectionHeader"}>IPFS-hosted Content</div>
+          <p>
+            The artwork is stored in IPFS. In addition, there are placeholders
+            in the contract that allow on-chain storage &{" "}
+            <a href={"https://www.arweave.org/"}>Arweave</a> identifiers to be
+            associated with each piece.
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
           </p>
         </div>
 
         <div className={"section"}>
           <div className={"sectionHeader"}>Royalties</div>
           <p>
+<<<<<<< HEAD
             There is currently no accepted standard for NFT royalties. Since
             since is a long-term project, we wanted to future-proof it as much
             as possible by implementing multiple of the royalty standards
@@ -694,6 +1090,16 @@ function TechStack() {
           </p>
           <ul>
             <li>EIP-2981</li>
+=======
+            When Project Mahin was deployed, there was no accepted standard for
+            NFT royalties. As a long-term project, we still wanted to
+            future-proof it as much as possible by implementing multiple of the
+            royalty systems in use at the time. Specifically, the contract
+            exposes functions to implement these interfaces:
+          </p>
+          <ul>
+            <li>EIP-2981 (pre-final version)</li>
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
             <li>Rarible</li>
             <li>Known Origin</li>
             <li>InfinityNFT</li>
@@ -716,6 +1122,7 @@ function TechStack() {
   );
 }
 
+<<<<<<< HEAD
 function Gallery() {
   return (
     <div
@@ -819,6 +1226,8 @@ function Gallery() {
   );
 }
 
+=======
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
 function PurchaseButton() {
   const [busy, setBusy] = useState(false);
   const { library, active } = useWeb3React();
@@ -834,7 +1243,11 @@ function PurchaseButton() {
     try {
       tx = await withSigner.purchase({
         value: price,
+<<<<<<< HEAD
         gasLimit: 220000,
+=======
+        //gasLimit: 300000
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
       });
     } catch (e) {
       console.log(e);
@@ -886,7 +1299,11 @@ function PurchaseButton() {
           font-size: 18px;
         `}
       >
+<<<<<<< HEAD
         {busy ? "Waiting..." : active ? "Purchase" : "Connect to Purchase"}
+=======
+        {busy ? "Waiting..." : active ? "Purchase" : "Connect to Mint"}
+>>>>>>> 06e8f6a5977632ed61073819b54ed492a221024f
       </button>
     </Fragment>
   );

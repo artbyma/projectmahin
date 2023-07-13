@@ -1,23 +1,21 @@
-import { InjectedConnector } from '@web3-react/injected-connector'
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
-
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 
 const RPC_URL = "";
 const POLLING_INTERVAL = 12000;
-
 
 /**
  * Return all the connectors we are using.
  */
 // TODO: We could make this a generic getAll() function in web3wallet, since none of them require an api key.
 export function getConnectors(chainId: number) {
-  const injected = new InjectedConnector({ supportedChainIds: [chainId] })
+  const injected = new InjectedConnector({ supportedChainIds: [chainId] });
 
   const walletconnect = new WalletConnectConnector({
     rpc: { 1: RPC_URL },
-    bridge: 'https://bridge.walletconnect.org',
+    bridge: "https://bridge.walletconnect.org",
     qrcode: true,
-    pollingInterval: POLLING_INTERVAL
+    pollingInterval: POLLING_INTERVAL,
   });
 
   // const torus = new TorusConnector({ chainId: chainId })
@@ -52,5 +50,5 @@ export function getConnectors(chainId: number) {
     // ledger,
     // walletlink,
     // lattice
-  }
+  };
 }

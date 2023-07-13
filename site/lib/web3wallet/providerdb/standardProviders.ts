@@ -10,12 +10,11 @@ import DcentWalletLogo from "../logos/dcentwallet.png";
 import BitskiLogo from "../logos/bitski.svg";
 import FrameLogo from "../logos/frame.svg";
 import Web3DefaultLogo from "../logos/web3-default.svg";
-import LatticeLogo from '../logos/lattice.png';
-import LedgerLogo from '../logos/ledger.svg';
-import TrezorLogo from '../logos/trezor.svg';
-import WalletLinkLogo from '../logos/walletlink.svg';
-import {IProviderInfo} from "./types";
-
+import LatticeLogo from "../logos/lattice.png";
+import LedgerLogo from "../logos/ledger.svg";
+import TrezorLogo from "../logos/trezor.svg";
+import WalletLinkLogo from "../logos/walletlink.svg";
+import { IProviderInfo } from "./types";
 
 export const WALLETCONNECT: IProviderInfo = {
   id: "walletconnect",
@@ -51,8 +50,8 @@ export const ARKANE: IProviderInfo = {
   logo: ArkaneLogo,
   type: "web",
   package: {
-    required: ["clientId"]
-  }
+    required: ["clientId"],
+  },
 };
 
 export const AUTHEREUM: IProviderInfo = {
@@ -82,8 +81,8 @@ export const MEWCONNECT: IProviderInfo = {
   logo: MEWwallet,
   type: "qrcode",
   package: {
-    required: [["infuraId", "rpc"]]
-  }
+    required: [["infuraId", "rpc"]],
+  },
 };
 
 export const DCENT: IProviderInfo = {
@@ -92,8 +91,8 @@ export const DCENT: IProviderInfo = {
   logo: DcentWalletLogo,
   type: "hardware",
   package: {
-    required: ["rpcUrl"]
-  }
+    required: ["rpcUrl"],
+  },
 };
 
 export const TREZOR: IProviderInfo = {
@@ -123,8 +122,8 @@ export const BITSKI: IProviderInfo = {
   logo: BitskiLogo,
   type: "web",
   package: {
-    required: ["clientId", "callbackUrl"]
-  }
+    required: ["clientId", "callbackUrl"],
+  },
 };
 
 export const FRAME: IProviderInfo = {

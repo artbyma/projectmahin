@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prettier": "prettier -w lib/ pages/"
   },
   "dependencies": {
     "@emotion/css": "^11.1.3",
@@ -20,17 +21,17 @@
     "ethers": "^5.0.26",
     "graphql": "^16.6.0",
     "graphql-request": "^4.2.0",
-    "next": "10.0.5",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
+    "next": "^13.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "swr": "^1.2.2",
     "use-wallet": "^0.8.1"
   },
   "devDependencies": {
-    "typescript": "^4.1.3",
+    "typescript": "^5.1.3",
     "url-loader": "^4.1.1"
   },
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   }
 }

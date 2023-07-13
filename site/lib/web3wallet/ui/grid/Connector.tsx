@@ -1,6 +1,7 @@
 import * as React from "react";
-import styled from '@emotion/styled'
-import {ThemeColors} from "./types";
+import styled from "@emotion/styled";
+import { ThemeColors } from "./types";
+import { StaticImageData } from "next/image";
 
 const SIcon = styled.div`
   width: 45px;
@@ -80,42 +81,28 @@ const SConnectorWrapper = styled.div<IStyedThemeColorOptions>`
 
 interface IConnectorProps {
   name: string;
-  logo: string;
+  logo: string | StaticImageData;
   description: string;
   themeColors: ThemeColors;
   onClick: () => void;
 }
 
 export function Connector(props: IConnectorProps) {
-  const {
-    name,
-    logo,
-    description,
-    themeColors,
-    onClick,
-    ...otherProps
-  } = props;
+  const { name, logo, description, themeColors, onClick, ...otherProps } =
+    props;
   return (
-      <SConnectorWrapper
-          themeColors={themeColors}
-          onClick={onClick}
-          {...otherProps}
-      >
-        <SConnectorContainer
-            themeColors={themeColors}
-        >
-          <SIcon>
-            <img src={logo} alt={name} />
-          </SIcon>
-          <SName themeColors={themeColors}>
-            {name}
-          </SName>
-          <SDescription
-              themeColors={themeColors}
-          >
-            {description}
-          </SDescription>
-        </SConnectorContainer>
-      </SConnectorWrapper>
+    <SConnectorWrapper
+      themeColors={themeColors}
+      onClick={onClick}
+      {...otherProps}
+    >
+      <SConnectorContainer themeColors={themeColors}>
+        <SIcon>
+          <img src={typeof logo == "string" ? logo : logo.src} alt={name} />
+        </SIcon>
+        <SName themeColors={themeColors}>{name}</SName>
+        <SDescription themeColors={themeColors}>{description}</SDescription>
+      </SConnectorContainer>
+    </SConnectorWrapper>
   );
 }
